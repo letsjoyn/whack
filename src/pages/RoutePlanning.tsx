@@ -497,50 +497,50 @@ const RoutePlanning = () => {
                 </TabsList>
 
                 <TabsContent value="outbound" className="space-y-4 mt-4">                  {aiPlanLoading ? (
-                    <div className="flex flex-col items-center justify-center p-8 space-y-3">
-                      <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                      <p className="text-sm text-muted-foreground">
-                        Generating AI-powered route...
-                      </p>
-                    </div>
-                  ) : aiPlanError ? (
-                    <Card className="p-4 border-blue-200 bg-blue-50">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-blue-900 mb-1">
-                            {aiPlanError.includes('rate limit')
-                              ? '⏱️ AI Service Busy'
-                              : 'AI Plan Unavailable'}
-                          </p>
-                          <p className="text-xs text-blue-700 mb-2">
-                            {aiPlanError.includes('rate limit')
-                              ? 'The AI service is experiencing high demand. Your journey is still planned using our reliable routing system below.'
-                              : aiPlanError}
-                          </p>
-                          {aiPlanError.includes('rate limit') && (
-                            <div className="text-xs text-blue-600 space-y-1">
-                              <p>✓ All transport modes calculated</p>
-                              <p>✓ Timing based on your {departureTime} departure</p>
-                              <p>✓ Optimized for {intent === 'urgent' ? 'speed' : 'comfort'}</p>
-                            </div>
-                          )}
-                        </div>
+                  <div className="flex flex-col items-center justify-center p-8 space-y-3">
+                    <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">
+                      Generating AI-powered route...
+                    </p>
+                  </div>
+                ) : aiPlanError ? (
+                  <Card className="p-4 border-blue-200 bg-blue-50">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-900 mb-1">
+                          {aiPlanError.includes('rate limit')
+                            ? '⏱️ AI Service Busy'
+                            : 'AI Plan Unavailable'}
+                        </p>
+                        <p className="text-xs text-blue-700 mb-2">
+                          {aiPlanError.includes('rate limit')
+                            ? 'The AI service is experiencing high demand. Your journey is still planned using our reliable routing system below.'
+                            : aiPlanError}
+                        </p>
+                        {aiPlanError.includes('rate limit') && (
+                          <div className="text-xs text-blue-600 space-y-1">
+                            <p>✓ All transport modes calculated</p>
+                            <p>✓ Timing based on your {departureTime} departure</p>
+                            <p>✓ Optimized for {intent === 'urgent' ? 'speed' : 'comfort'}</p>
+                          </div>
+                        )}
                       </div>
-                    </Card>
-                  ) : aiJourneyPlan ? (
-                    <JourneyVisualization
-                      aiResponse={
-                        aiJourneyPlan
-                          .split('## RETURN JOURNEY')[0]
-                          .split('## STOPS & FOOD')[0]
-                          .split('## ACCOMMODATION')[0]
-                      }
-                      journeyType="outbound"
-                      userName="Traveler"
-                      onSummaryUpdate={setJourneySummary}
-                    />
-                  ) : null}
+                    </div>
+                  </Card>
+                ) : aiJourneyPlan ? (
+                  <JourneyVisualization
+                    aiResponse={
+                      aiJourneyPlan
+                        .split('## RETURN JOURNEY')[0]
+                        .split('## STOPS & FOOD')[0]
+                        .split('## ACCOMMODATION')[0]
+                    }
+                    journeyType="outbound"
+                    userName="Traveler"
+                    onSummaryUpdate={setJourneySummary}
+                  />
+                ) : null}
 
                   {/* Fallback: Outbound Route segments - Show if AI plan failed or is empty */}
                   {(!aiJourneyPlan || aiPlanError) && !aiPlanLoading && (
@@ -665,6 +665,7 @@ const RoutePlanning = () => {
                         }
                         journeyType="return"
                         userName="Traveler"
+                        onSummaryUpdate={setJourneySummary}
                       />
                     )}
 
@@ -739,6 +740,7 @@ const RoutePlanning = () => {
                       }
                       journeyType="outbound"
                       userName="Traveler"
+                      onSummaryUpdate={setJourneySummary}
                     />
                   )}
 
@@ -798,6 +800,7 @@ const RoutePlanning = () => {
                       }
                       journeyType="outbound"
                       userName="Traveler"
+                      onSummaryUpdate={setJourneySummary}
                     />
                   )}
 
@@ -928,8 +931,7 @@ const RoutePlanning = () => {
                     <span className="text-sm font-medium">Total Duration</span>
                   </div>
                   <span className="font-bold text-base">
-                    {Math.floor((60 + 25 + 150 + 35 + 5 + addedPlaces.length * 150) / 60)}h{' '}
-                    {(60 + 25 + 150 + 35 + 5 + addedPlaces.length * 150) % 60}min
+                    {journeySummary?.duration || '8min'}
                   </span>
                 </div>
 
@@ -939,7 +941,7 @@ const RoutePlanning = () => {
                     <span className="text-sm font-medium">Total Cost</span>
                   </div>
                   <span className="font-bold text-base text-primary">
-                    ₹{pricing.total.toLocaleString()}
+                    ₹{journeySummary?.cost?.toLocaleString() || pricing.total.toLocaleString()}
                   </span>
                 </div>
 
@@ -948,7 +950,7 @@ const RoutePlanning = () => {
                     <Navigation className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">Transport Modes</span>
                   </div>
-                  <span className="font-bold text-base">{4 + addedPlaces.length}</span>
+                  <span className="font-bold text-base">{journeySummary?.modes || 1}</span>
                 </div>
               </div>
             </Card>
@@ -1094,8 +1096,8 @@ const RouteSegment = ({
 }: RouteSegmentProps) => (
   <div
     className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${isClickable
-        ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md'
-        : 'hover:bg-muted/50'
+      ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md'
+      : 'hover:bg-muted/50'
       }`}
     onClick={onClick}
   >

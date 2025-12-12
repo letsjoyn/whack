@@ -521,13 +521,12 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                 {journeySteps.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-3 w-16 rounded-full transition-all duration-300 ${
-                      index < currentStepIndex
+                    className={`h-3 w-16 rounded-full transition-all duration-300 ${index < currentStepIndex
                         ? 'bg-primary-foreground shadow-lg'
                         : index === currentStepIndex
                           ? 'bg-primary-foreground animate-pulse shadow-lg scale-110'
                           : 'bg-primary-foreground/30'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -562,11 +561,10 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                   return (
                     <Card
                       key={option.id}
-                      className={`cursor-pointer transition-all hover:shadow-lg border-2 interactive-hover ${
-                        isSelected
+                      className={`cursor-pointer transition-all hover:shadow-lg border-2 interactive-hover ${isSelected
                           ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
                           : 'hover:border-primary/50 hover:scale-[1.01]'
-                      }`}
+                        }`}
                       onClick={() => handleOptionSelect(option)}
                     >
                       <CardContent className="p-5">
@@ -667,23 +665,21 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                     return (
                       <div
                         key={step.id}
-                        className={`border-2 rounded-xl p-3 transition-all ${
-                          isBooked
+                        className={`border-2 rounded-xl p-3 transition-all ${isBooked
                             ? 'bg-primary/5 border-primary/40 shadow-sm'
                             : isCurrent
                               ? 'bg-muted/50 border-muted-foreground/40 animate-pulse'
                               : 'bg-background border-border opacity-60'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start gap-4">
                           <div
-                            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm ${
-                              isBooked
+                            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm ${isBooked
                                 ? 'bg-primary text-primary-foreground'
                                 : isCurrent
                                   ? 'bg-muted-foreground text-background'
                                   : 'bg-muted text-muted-foreground'
-                            }`}
+                              }`}
                           >
                             {stepIndex + 1}
                           </div>
