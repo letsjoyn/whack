@@ -45,15 +45,8 @@ jobs:
       - name: Check code formatting
         run: |
           npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,scss,md}"
-        continue-on-error: true
           
       - name: Format Status
         if: success()
         run: |
           echo "✅ Code formatting is perfect! All files follow consistent style."
-          
-      - name: Format Warnings
-        if: failure()
-        run: |
-          echo "⚠️ Code formatting issues found, but build continues."
-          echo "Run 'npm run format' locally to auto-fix formatting."

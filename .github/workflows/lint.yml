@@ -31,15 +31,8 @@ jobs:
         
       - name: Run ESLint
         run: npm run lint
-        continue-on-error: true
         
       - name: Lint Status
         if: success()
         run: |
           echo "✅ ESLint passed! Code is clean and follows best practices."
-          
-      - name: Lint Warnings
-        if: failure()
-        run: |
-          echo "⚠️ ESLint found some issues, but build continues."
-          echo "Please review and fix when possible to improve code quality."
