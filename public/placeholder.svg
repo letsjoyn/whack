@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" fill="none">
+  <!-- BookOnce branded placeholder -->
+  <rect width="1200" height="1200" fill="#f8fafc" rx="12"/>
+  
+  <!-- Background pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e2e8f0" stroke-width="1" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#grid)"/>
+  
+  <!-- Central BookOnce logo area -->
+  <g transform="translate(600, 600)">
+    <!-- Background circle -->
+    <circle cx="0" cy="0" r="200" fill="#2563eb" opacity="0.1"/>
+    <circle cx="0" cy="0" r="150" fill="#2563eb" opacity="0.2"/>
+    
+    <!-- BookOnce monogram -->
+    <rect x="-60" y="-40" width="120" height="80" rx="20" fill="#2563eb"/>
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle">BO</text>
+    
+    <!-- BookOnce text -->
+    <text x="0" y="120" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#2563eb" text-anchor="middle">BookOnce</text>
+    <text x="0" y="150" font-family="Arial, sans-serif" font-size="16" fill="#64748b" text-anchor="middle">Travel Placeholder</text>
+    
+    <!-- Travel icons -->
+    <g transform="translate(-80, -120)" opacity="0.6">
+      <circle cx="0" cy="0" r="12" fill="none" stroke="#2563eb" stroke-width="3"/>
+      <path d="M-6 0l4 4 8-8" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    
+    <g transform="translate(80, -120)" opacity="0.6">
+      <path d="M-8 -8h16v16h-16z" fill="none" stroke="#2563eb" stroke-width="3" rx="2"/>
+      <path d="M-4 -4l8 8M4 -4l-8 8" stroke="#2563eb" stroke-width="2"/>
+    </g>
+  </g>
+</svg>
