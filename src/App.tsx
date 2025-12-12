@@ -11,26 +11,34 @@ import "@/features/booking/styles/accessibility.css";
 import "leaflet/dist/leaflet.css";
 import { BookOnceAIChatModal } from "@/components/BookOnceAIChatModal";
 
-
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Stays = lazy(() => import("./pages/Stays"));
 const TravelUtilities = lazy(() => import("./pages/TravelUtilities"));
 const JourneyPlanner = lazy(() => import("./pages/JourneyPlanner"));
-
 const RoutePlanning = lazy(() => import("./pages/RoutePlanning"));
 const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
 const BookingHistory = lazy(() => import("./pages/BookingHistory"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 // Loading fallback component
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <p className="text-muted-foreground text-sm">Loading...</p>
+    </div>
   </div>
 );
 
@@ -49,20 +57,20 @@ const App = () => {
             <Sonner />
             <BookOnceAIChatModal />
             
-
-            
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <main id="main-content">
                   <Routes>
+                    {/* Public Routes */}
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/stays" element={<Stays />} />
                     <Route path="/utilities" element={<TravelUtilities />} />
                     <Route path="/journey" element={<JourneyPlanner />} />
-
                     <Route path="/journey/plan" element={<RoutePlanning />} />
                     <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
+                    
+                    {/* Protected Routes - Require Authentication */}
                     <Route 
                       path="/profile" 
                       element={
@@ -79,6 +87,7 @@ const App = () => {
                         </ProtectedRoute>
                       } 
                     />
+                    
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

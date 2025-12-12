@@ -1,308 +1,163 @@
-/**
- * Authentication Context
- * Provides authentication state and methods throughout the application
- * Uses local authentication with EmailJS for OTP
- */
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { googleAuth } from '@/auth/googleAuth';
+import { emailAuth } from '@/auth/emailAuth';
+import { emailOTPAuth } from '@/auth/emailOTPAuth';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { UserProfile } from '@/types/booking';
+interface AuthUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  phoneNumber: string | null;
+  emailVerified: boolean;
+  authMethod?: 'google' | 'email' | 'email-otp' | 'anonymous';
+}
 
 interface AuthContextType {
-  user: UserProfile | null;
-  isAuthenticated: boolean;
+  user: AuthUser | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<{ success: boolean; message: string }>;
+  loginWithGoogle: () => Promise<{ success: boolean; message: string }>;
+  sendEmailOTP: (email: string, name?: string) => Promise<{ success: boolean; message: string }>;
+  verifyEmailOTP: (email: string, otp: string) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
+  resetPassword: (email: string) => Promise<{ success: boolean; message: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/**
- * JWT Token storage keys
- */
-const ACCESS_TOKEN_KEY = 'auth_access_token';
-const REFRESH_TOKEN_KEY = 'auth_refresh_token';
-const USER_DATA_KEY = 'auth_user_data';
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-/**
- * Token expiration time (30 minutes)
- */
-const TOKEN_EXPIRY_MS = 30 * 60 * 1000;
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-/**
- * Authentication Provider Component
- */
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastActivity, setLastActivity] = useState(Date.now());
 
-  /**
-   * Initialize auth state from localStorage
-   */
+  // Initialize EmailJS
   useEffect(() => {
-    try {
-      const userData = localStorage.getItem(USER_DATA_KEY);
-      if (userData) {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-      }
-    } catch (error) {
-      console.error('Failed to initialize auth:', error);
-      localStorage.removeItem(USER_DATA_KEY);
-    } finally {
-      setIsLoading(false);
-    }
+    emailOTPAuth.init();
   }, []);
 
-  /**
-   * Session timeout handler (30 minutes of inactivity)
-   */
+  // Listen to Firebase auth state changes
   useEffect(() => {
-    if (!user) return;
-
-    const checkSessionTimeout = () => {
-      const now = Date.now();
-      if (now - lastActivity > TOKEN_EXPIRY_MS) {
-        logout();
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          phoneNumber: firebaseUser.phoneNumber,
+          emailVerified: firebaseUser.emailVerified,
+        });
+      } else {
+        // Check localStorage for email OTP user
+        const savedUser = localStorage.getItem('bookonce_user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        } else {
+          setUser(null);
+        }
       }
-    };
+      setIsLoading(false);
+    });
 
-    const interval = setInterval(checkSessionTimeout, 60000); // Check every minute
+    return () => unsubscribe();
+  }, []);
 
-    // Update last activity on user interaction
-    const updateActivity = () => setLastActivity(Date.now());
-    window.addEventListener('mousedown', updateActivity);
-    window.addEventListener('keydown', updateActivity);
-    window.addEventListener('touchstart', updateActivity);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('mousedown', updateActivity);
-      window.removeEventListener('keydown', updateActivity);
-      window.removeEventListener('touchstart', updateActivity);
-    };
-  }, [user, lastActivity]);
-
-  /**
-   * Login user with local authentication
-   */
+  // Email/Password Login
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Mock JWT tokens
-      const accessToken = `local_token_${Date.now()}`;
-      const refreshToken = `refresh_token_${Date.now()}`;
-
-      // Mock user data
-      const userData: UserProfile = {
-        userId: `user_${Date.now()}`,
-        email,
-        firstName: email.split('@')[0],
-        lastName: 'User',
-        phone: '',
-        notificationPreferences: {
-          email: {
-            enabled: true,
-            types: [
-              'booking_confirmation',
-              'booking_modification',
-              'booking_cancellation',
-              'check_in_reminder',
-              'booking_status_change',
-              'hotel_cancellation',
-            ],
-          },
-          push: {
-            enabled: false,
-            types: [
-              'booking_status_change',
-              'check_in_reminder',
-              'hotel_cancellation',
-            ],
-          },
-        },
-      };
-
-      // Store tokens and user data
-      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-      localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-
-      setUser(userData);
-      setLastActivity(Date.now());
-    } catch (error: any) {
-      console.error('Login failed:', error);
-      throw new Error(error.message || 'Login failed. Please check your credentials.');
-    } finally {
-      setIsLoading(false);
-    }
+    const result = await emailAuth.signIn(email, password);
+    return { success: result.success, message: result.message };
   };
 
-  /**
-   * Register new user with local authentication
-   */
-  const register = async (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-  ) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Mock JWT tokens
-      const accessToken = `local_token_${Date.now()}`;
-      const refreshToken = `refresh_token_${Date.now()}`;
-
-      // Create user data
-      const userData: UserProfile = {
-        userId: `user_${Date.now()}`,
-        email,
-        firstName,
-        lastName,
-        phone: '',
-        notificationPreferences: {
-          email: {
-            enabled: true,
-            types: [
-              'booking_confirmation',
-              'booking_modification',
-              'booking_cancellation',
-              'check_in_reminder',
-              'booking_status_change',
-              'hotel_cancellation',
-            ],
-          },
-          push: {
-            enabled: false,
-            types: [
-              'booking_status_change',
-              'check_in_reminder',
-              'hotel_cancellation',
-            ],
-          },
-        },
-      };
-
-      // Store tokens and user data
-      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-      localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-
-      setUser(userData);
-      setLastActivity(Date.now());
-    } catch (error: any) {
-      console.error('Registration failed:', error);
-      throw new Error(error.message || 'Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+  // Email/Password Register
+  const register = async (email: string, password: string, firstName: string, lastName: string) => {
+    const result = await emailAuth.register(email, password, firstName, lastName);
+    return { success: result.success, message: result.message };
   };
 
-  /**
-   * Logout user
-   */
+  // Google Login
+  const loginWithGoogle = async () => {
+    const result = await googleAuth.signInWithPopup();
+    return { success: result.success, message: result.message };
+  };
+
+  // Email OTP - Send
+  const sendEmailOTP = async (email: string, name?: string) => {
+    const result = await emailOTPAuth.sendOTP(email, name);
+    return { success: result.success, message: result.message };
+  };
+
+  // Email OTP - Verify
+  const verifyEmailOTP = async (email: string, otp: string) => {
+    const result = emailOTPAuth.verifyOTP(email, otp);
+    
+    if (result.success) {
+      // Create user session for email OTP login
+      const emailUser: AuthUser = {
+        uid: `email_${email.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`,
+        email: email,
+        displayName: email.split('@')[0],
+        photoURL: null,
+        phoneNumber: null,
+        emailVerified: true,
+        authMethod: 'email-otp',
+      };
+      
+      // Save to localStorage
+      localStorage.setItem('bookonce_user', JSON.stringify(emailUser));
+      setUser(emailUser);
+    }
+    
+    return { success: result.success, message: result.message };
+  };
+
+  // Logout
   const logout = async () => {
-    try {
-      // Clear tokens and user data
-      localStorage.removeItem(ACCESS_TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
-      localStorage.removeItem(USER_DATA_KEY);
-      setUser(null);
-    } catch (error) {
-      console.error('Logout failed:', error);
-      throw new Error('Logout failed. Please try again.');
-    }
+    await auth.signOut();
+    localStorage.removeItem('bookonce_user');
+    emailOTPAuth.clearOTP();
+    setUser(null);
   };
 
-  /**
-   * Update user profile
-   */
-  const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) {
-      throw new Error('No user logged in');
-    }
-
-    setIsLoading(true);
-    try {
-      // In production, this would call an API endpoint
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const updatedUser = { ...user, ...updates };
-      localStorage.setItem(USER_DATA_KEY, JSON.stringify(updatedUser));
-      setUser(updatedUser);
-    } catch (error) {
-      console.error('Profile update failed:', error);
-      throw new Error('Failed to update profile. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+  // Reset Password
+  const resetPassword = async (email: string) => {
+    const result = await emailAuth.resetPassword(email);
+    return { success: result.success, message: result.message };
   };
 
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
     isLoading,
+    isAuthenticated: !!user,
     login,
     register,
+    loginWithGoogle,
+    sendEmailOTP,
+    verifyEmailOTP,
     logout,
-    updateProfile,
+    resetPassword,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-/**
- * Hook to use auth context
- */
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
-
-/**
- * Get access token for API calls
- */
-export function getAccessToken(): string | null {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
-}
-
-/**
- * Get refresh token
- */
-export function getRefreshToken(): string | null {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-}
-
-/**
- * Refresh access token
- */
-export async function refreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) {
-    return null;
-  }
-
-  try {
-    // In production, this would call an API endpoint
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const newAccessToken = `mock_access_token_${Date.now()}`;
-    localStorage.setItem(ACCESS_TOKEN_KEY, newAccessToken);
-    return newAccessToken;
-  } catch (error) {
-    console.error('Token refresh failed:', error);
-    return null;
-  }
-}
+export default AuthContext;
