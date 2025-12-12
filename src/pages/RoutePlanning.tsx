@@ -13,8 +13,11 @@ import {
 import { 
   ArrowLeft, MapPin, Calendar, Users, Clock,
   Navigation, Train, Plane, Bus, Footprints, Utensils,
-  Hotel, Sparkles, AlertCircle, RefreshCw, Map, ExternalLink
+  Hotel, Sparkles, AlertCircle, RefreshCw, Map, ExternalLink, AlertTriangle
 } from 'lucide-react';
+import { endangeredPlacesService, EndangeredPlace } from '@/services/EndangeredPlacesService';
+import EndangeredPlacesInline from '@/components/EndangeredPlacesInline';
+import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { JourneyMap, type Location, type RouteStep } from '@/features/journey/components/JourneyMap';
 import { freeGeocodingService } from '@/features/journey/services/FreeGeocodingService';
@@ -27,6 +30,7 @@ import { BookOnceAISidebar } from '@/components/BookOnceAISidebar';
 const RoutePlanning = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   
   // Get data from URL params
   const from = searchParams.get('from') || '';
@@ -58,7 +62,13 @@ const RoutePlanning = () => {
   // AI Sidebar state
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
 
-  // Calculate pricing based on number of travelers
+  // Endangered places state
+  const [endangeredPlaces, setEndangeredPlaces] = useState<EndangeredPlace[]>([]);
+  const [endangeredPlacesLoading, setEndangeredPlacesLoading] = useState(false);
+  const [endangeredPlacesLoaded, setEndangeredPlacesLoaded] = useState(false);
+  const [addedPlaces, setAddedPlaces] = useState<EndangeredPlace[]>([]);
+
+  // Calculate pricing based on number of travelers and added places
   const calculatePricing = () => {
     const basePrices = {
       metro: 60,
@@ -66,8 +76,19 @@ const RoutePlanning = () => {
       bus: 40,
     };
 
-    const totalPerPerson = basePrices.metro + basePrices.flight + basePrices.bus;
-    const total = totalPerPerson * numGuests;
+    // Calculate endangered places costs
+    const endangeredPlacesCost = addedPlaces.reduce((total, place) => {
+      // Estimate costs based on threat level and location
+      const baseCost = place.threatLevel === 'critical' ? 1500 : 
+                      place.threatLevel === 'high' ? 1000 : 800;
+      const transportCost = 300; // Local transport to the place
+      const guideCost = 500; // Local guide/witness fee
+      return total + baseCost + transportCost + guideCost;
+    }, 0);
+
+    const baseTotal = basePrices.metro + basePrices.flight + basePrices.bus;
+    const totalPerPerson = baseTotal + (endangeredPlacesCost / numGuests);
+    const total = (baseTotal * numGuests) + endangeredPlacesCost;
 
     // Group discount for 4+ travelers
     const discount = numGuests >= 4 ? 0.1 : 0;
@@ -79,10 +100,52 @@ const RoutePlanning = () => {
       discount: total * discount,
       total: finalTotal,
       hasDiscount: numGuests >= 4,
+      endangeredPlacesCost,
+      baseTransportCost: baseTotal * numGuests,
     };
   };
 
   const pricing = calculatePricing();
+
+  // Load endangered places after planning is complete
+  useEffect(() => {
+    const loadEndangeredPlaces = async () => {
+      if (!to || endangeredPlacesLoaded) return;
+
+      setEndangeredPlacesLoading(true);
+      try {
+        const nearbyEndangeredPlaces = await endangeredPlacesService.findNearbyEndangeredPlaces(to);
+        setEndangeredPlaces(nearbyEndangeredPlaces);
+      } catch (error) {
+        console.error('Error loading endangered places:', error);
+      } finally {
+        setEndangeredPlacesLoading(false);
+        setEndangeredPlacesLoaded(true);
+      }
+    };
+
+    // Load endangered places immediately when component mounts
+    loadEndangeredPlaces();
+  }, [to, endangeredPlacesLoaded]);
+
+  // Handle adding endangered place to trip
+  const handleAddToTrip = (place: EndangeredPlace) => {
+    if (!addedPlaces.find(p => p.id === place.id)) {
+      setAddedPlaces(prev => [...prev, place]);
+      toast({
+        title: "Added to Your Trip! 🌍",
+        description: `${place.name} has been added as a side visit to your journey.`,
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Already Added",
+        description: `${place.name} is already in your trip.`,
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
+  };
 
   // Load map data
   useEffect(() => {
@@ -515,6 +578,28 @@ const RoutePlanning = () => {
                     color="text-green-500"
                     travelers={numGuests}
                   />
+
+                  {/* Added Endangered Places as Side Visits */}
+                  {addedPlaces.map((place, index) => {
+                    const placeCost = place.threatLevel === 'critical' ? 2300 : 
+                                    place.threatLevel === 'high' ? 1800 : 1600;
+                    return (
+                      <RouteSegment
+                        key={place.id}
+                        icon={<AlertTriangle className="h-5 w-5" />}
+                        mode="Side Visit"
+                        from="Your Destination"
+                        to={place.name}
+                        duration="2-3 hours"
+                        distance="Local area"
+                        time="During stay"
+                        color="text-orange-600"
+                        details={`${place.threatLevel.toUpperCase()} - ${place.yearsRemaining} years remaining • Includes transport, guide & entry`}
+                        price={placeCost}
+                        travelers={numGuests}
+                      />
+                    );
+                  })}
                     </>
                   )}
                 </TabsContent>
@@ -689,6 +774,37 @@ const RoutePlanning = () => {
                 </TabsContent>
               </Tabs>
             </Card>
+
+            {/* Endangered Places Section */}
+            <EndangeredPlacesInline
+              places={endangeredPlaces}
+              destination={to}
+              isLoading={endangeredPlacesLoading}
+              onAddToTrip={handleAddToTrip}
+            />
+
+            {/* Added Places to Trip */}
+            {addedPlaces.length > 0 && (
+              <Card className="p-4 bg-green-50 border-green-200">
+                <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+                  ✅ Added to Your Trip
+                </h4>
+                <div className="space-y-2">
+                  {addedPlaces.map((place) => (
+                    <div key={place.id} className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-green-800">{place.name}</span>
+                      <button
+                        onClick={() => setAddedPlaces(prev => prev.filter(p => p.id !== place.id))}
+                        className="ml-auto text-green-600 hover:text-green-800 text-xs"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
 
           {/* Right: Map & Info */}
@@ -708,6 +824,16 @@ const RoutePlanning = () => {
                   <span className="text-muted-foreground">Price per person</span>
                   <span className="font-medium">₹{pricing.perPerson.toLocaleString()}</span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Transport</span>
+                  <span className="font-medium">₹{pricing.baseTransportCost.toLocaleString()}</span>
+                </div>
+                {pricing.endangeredPlacesCost > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Endangered Places ({addedPlaces.length})</span>
+                    <span className="font-medium text-orange-600">₹{pricing.endangeredPlacesCost.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">₹{pricing.subtotal.toLocaleString()}</span>
@@ -779,6 +905,10 @@ const RoutePlanning = () => {
               </div>
             </Card>
 
+
+
+
+
             <Button className="w-full" size="lg">
               Confirm & Book Journey
               <span className="ml-2 text-xs opacity-80">₹{pricing.total.toLocaleString()}</span>
@@ -794,6 +924,8 @@ const RoutePlanning = () => {
         onClose={() => setIsAISidebarOpen(false)}
         onToggle={() => setIsAISidebarOpen(!isAISidebarOpen)}
       />
+
+
 
       {/* Flight Comparison Modal */}
       <Dialog open={showFlightModal} onOpenChange={setShowFlightModal}>

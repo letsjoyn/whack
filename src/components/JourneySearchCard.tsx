@@ -57,6 +57,8 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
   const [tempReturnDate, setTempReturnDate] = useState<Date | null>(null);
   const [tempTripType, setTempTripType] = useState<'round-trip' | 'one-way'>('round-trip');
   
+
+  
   const sourceRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
   const guestRef = useRef<HTMLDivElement>(null);
@@ -771,6 +773,8 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
       >
         ✨ Complete door-to-door journey planning • AI-powered routing • Real-time updates
       </motion.p>
+
+
     </motion.div>
   );
 };
