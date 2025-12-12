@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import JourneySearchCard, { JourneySearchParams } from '@/components/JourneySearchCard';
 import MapView from '@/components/MapView';
 import SquaresBackground from '@/components/SquaresBackground';
+import TextType from '@/components/TextType';
 import EchoModal from '@/components/EchoModal';
 import LocalShadowWidget from '@/components/LocalShadowWidget';
 import SafetyMesh from '@/components/SafetyMesh';
@@ -97,11 +98,23 @@ const Index = () => {
             </motion.div>
 
             <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight">
-              Travel That
+              <TextType
+                texts={['Plan']}
+                typingSpeed={60}
+                deletingSpeed={30}
+                pause={1000}
+                loop={false}
+                className="text-white"
+              />
               <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Adapts to You
-              </span>
+              <TextType
+                texts={['Your Escape']}
+                typingSpeed={80}
+                deletingSpeed={30}
+                pause={1800}
+                loop={false}
+                className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+              />
             </h1>
 
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto mb-8">

@@ -836,6 +836,58 @@
   }
 }
 
+/* Blur text animation for hero (inspired by reactbits blur-text) */
+.blur-text {
+  position: relative;
+  display: inline-block;
+}
+.blur-text::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  pointer-events: none;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: blur(10px);
+  opacity: 0;
+  transform: translateY(-6px) scale(1.02);
+  animation: blur-text-fade 3.5s ease-in-out infinite;
+}
+
+@keyframes blur-text-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(1.02);
+  }
+  10% {
+    opacity: 0.85;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  90% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blur-text::after {
+    animation: none;
+    opacity: 0;
+    filter: none;
+  }
+}
+
 /* Calendar date range styling */
 .rdp-day_range_start:not(.rdp-day_range_end) {
   @apply rounded-l-md rounded-r-none;

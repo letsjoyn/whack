@@ -1,0 +1,34 @@
+.typewriter {
+  display: inline-block;
+  white-space: nowrap;
+}
+.typewriter-text {
+  display: inline-block;
+}
+.typewriter-cursor {
+  display: inline-block;
+  margin-left: 6px;
+  /* use currentColor so cursor matches surrounding text color */
+  color: currentColor;
+  animation: type-cursor 1s steps(1) infinite;
+  opacity: 0.95;
+}
+
+@keyframes type-cursor {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-cursor {
+    animation: none;
+  }
+}
