@@ -17,13 +17,9 @@ const Hero = ({ onSearch }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
+      {/* Background (image removed) */}
       <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=1920&auto=format&fit=crop"
-          alt="Travel destination"
-          className="w-full h-full object-cover"
-        />
+        {/* Static photo removed to avoid loading external images. Gradients remain for visual depth. */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background" />
         <div className="absolute inset-0 bg-gradient-hero" />
       </div>
@@ -122,24 +118,7 @@ const Hero = ({ onSearch }: HeroProps) => {
           </div>
         </motion.div>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-wrap justify-center gap-8 md:gap-16 mt-12"
-        >
-          {[
-            { value: "50K+", label: "Destinations" },
-            { value: "2M+", label: "Happy Travelers" },
-            { value: "4.9", label: "App Rating" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-foreground">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
+        {/* Stats removed per request */}
       </div>
 
       {/* Scroll Indicator */}

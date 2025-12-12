@@ -11,6 +11,7 @@ import VanishingDestinations from "@/components/VanishingDestinations";
 import { ContextLayerPanel } from "@/components/ContextLayer";
 
 import echoesData from "@/data/echoes.json";
+import Hyperspeed from "@/components/Hyperspeed";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
@@ -71,13 +72,10 @@ const Index = () => {
 
       {/* Hero Section with Journey Search */}
       <section className="relative min-h-screen flex items-center justify-center overflow-x-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1920&q=80')",
-          }}
-        />
+        {/* Hyperspeed background (replaces static background image) */}
+        <div className="absolute inset-0">
+          <Hyperspeed />
+        </div>
         
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background pointer-events-none" />
@@ -119,24 +117,7 @@ const Index = () => {
             initialDestinationName={initialDestinationName || undefined}
           />
 
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap justify-center gap-8 md:gap-16 mt-12"
-          >
-            {[
-              { value: "50K+", label: "Destinations" },
-              { value: "2M+", label: "Happy Travelers" },
-              { value: "4.9", label: "App Rating" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-sm text-white/70">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
+          {/* Stats removed per request */}
         </div>
       </section>
 
