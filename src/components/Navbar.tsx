@@ -87,7 +87,14 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                   <motion.button
                     key={item.label}
                     onClick={item.onClick}
-                    whileHover={{ scale: 1.05 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: 0.3,
+                      ease: [0.23, 1, 0.32, 1]
+                    }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className={className}
                   >
