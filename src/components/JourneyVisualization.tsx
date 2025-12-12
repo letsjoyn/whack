@@ -66,8 +66,8 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
     const steps: JourneyStep[] = [];
     const lines = aiResponse.split('\n').filter(line => line.trim());
 
-    let currentLocation = 'Home';
-    let stepCounter = 1;
+    const currentLocation = 'Home';
+    const stepCounter = 1;
 
     // Parse AI response to extract journey segments
     const segments = [];

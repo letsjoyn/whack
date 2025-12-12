@@ -205,7 +205,7 @@ export function sanitizeDate(dateString: string): string {
   }
 
   // Remove HTML tags
-  let sanitized = dateString.replace(/<[^>]*>/g, '').trim();
+  const sanitized = dateString.replace(/<[^>]*>/g, '').trim();
   
   // Try to parse as date
   const date = new Date(sanitized);
@@ -229,7 +229,7 @@ export function sanitizeURL(url: string): string {
   }
 
   // Remove HTML tags
-  let sanitized = url.replace(/<[^>]*>/g, '').trim();
+  const sanitized = url.replace(/<[^>]*>/g, '').trim();
   
   // Remove javascript: protocol
   if (sanitized.toLowerCase().startsWith('javascript:')) {

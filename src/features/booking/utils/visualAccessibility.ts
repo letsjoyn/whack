@@ -101,7 +101,7 @@ export function getAccessibleColor(
   const bgLuminance = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
   const shouldDarken = bgLuminance > 0.5;
 
-  let step = shouldDarken ? -10 : 10;
+  const step = shouldDarken ? -10 : 10;
   let attempts = 0;
   const maxAttempts = 25;
 
