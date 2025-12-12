@@ -11,7 +11,9 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn('p-3', className)}
+      // ensure the calendar has its own card background and border so it
+      // doesn't get visually lost when placed over dark overlays (dark mode)
+      className={cn('p-3 bg-card border border-border rounded-lg shadow-sm', className)}
       classNames={{
         months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
         month: 'space-y-4',
@@ -24,7 +26,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ),
         nav_button_previous: 'absolute left-1',
         nav_button_next: 'absolute right-1',
-        table: 'w-full border-collapse space-y-1',
+  // keep table transparent — the parent card provides the background
+  table: 'w-full border-collapse space-y-1 bg-transparent',
         head_row: 'flex',
         head_cell: 'text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]',
         row: 'flex w-full mt-2',
