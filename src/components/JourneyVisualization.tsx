@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Plane, 
-  Train, 
-  Bus, 
-  Car, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
+import {
+  Plane,
+  Train,
+  Bus,
+  Car,
+  MapPin,
+  Clock,
+  DollarSign,
   Navigation,
   Footprints,
   Coffee,
@@ -53,8 +53,8 @@ interface JourneyVisualizationProps {
   userName?: string;
 }
 
-const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({ 
-  aiResponse, 
+const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
+  aiResponse,
   journeyType,
   userName = 'Traveler'
 }) => {
@@ -65,18 +65,18 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
   const createJourneyTree = (): JourneyStep[] => {
     const steps: JourneyStep[] = [];
     const lines = aiResponse.split('\n').filter(line => line.trim());
-    
+
     let currentLocation = 'Home';
     let stepCounter = 1;
-    
+
     // Parse AI response to extract journey segments
     const segments = [];
     for (const line of lines) {
       const trimmedLine = line.trim();
-      if (trimmedLine.includes('Walk') || trimmedLine.includes('Metro') || 
-          trimmedLine.includes('Bus') || trimmedLine.includes('Train') || 
-          trimmedLine.includes('Flight') || trimmedLine.includes('Taxi') ||
-          trimmedLine.includes('Auto') || trimmedLine.includes('Cab')) {
+      if (trimmedLine.includes('Walk') || trimmedLine.includes('Metro') ||
+        trimmedLine.includes('Bus') || trimmedLine.includes('Train') ||
+        trimmedLine.includes('Flight') || trimmedLine.includes('Taxi') ||
+        trimmedLine.includes('Auto') || trimmedLine.includes('Cab')) {
         segments.push(trimmedLine);
       }
     }
@@ -85,7 +85,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
     if (segments.length > 0) {
       // Step 1: From Home - Always start with local transport options
       const homeOptions: TransportOption[] = [];
-      
+
       // Check if AI mentions walking
       if (segments.some(s => s.toLowerCase().includes('walk'))) {
         homeOptions.push({
@@ -131,8 +131,8 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
       );
 
       // Add direct options based on distance (inferred from AI response)
-      const hasLongDistance = segments.some(s => 
-        s.toLowerCase().includes('flight') || 
+      const hasLongDistance = segments.some(s =>
+        s.toLowerCase().includes('flight') ||
         s.toLowerCase().includes('train') ||
         s.toLowerCase().includes('airport')
       );
@@ -365,7 +365,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
 
   const getStepIcon = (type: TransportOption['type']) => {
     const iconProps = { className: "h-4 w-4" };
-    
+
     switch (type) {
       case 'walk':
         return <Footprints {...iconProps} />;
@@ -416,9 +416,24 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
   const currentStep = journeySteps[currentStepIndex];
 
   const handleOptionSelect = (option: TransportOption) => {
-    const newSelectedOptions = [...selectedOptions, option];
+    // Check if this step already has a selection
+    const existingSelectionIndex = selectedOptions.findIndex(
+      (selected) => journeySteps.findIndex(step => step.options.some(opt => opt.id === selected.id)) === currentStepIndex
+    );
+
+    let newSelectedOptions;
+    if (existingSelectionIndex !== -1) {
+      // Replace existing selection for this step
+      newSelectedOptions = [...selectedOptions];
+      newSelectedOptions[currentStepIndex] = option;
+    } else {
+      // Add new selection
+      newSelectedOptions = [...selectedOptions];
+      newSelectedOptions[currentStepIndex] = option;
+    }
+
     setSelectedOptions(newSelectedOptions);
-    
+
     // Move to next step if available
     if (currentStepIndex < journeySteps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
@@ -449,35 +464,43 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
         totalMinutes += parseInt(duration.match(/(\d+)/)?.[1] || '0');
       }
     });
-    
+
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     return hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`;
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full max-w-[1600px] mx-auto space-y-6 px-2">
       {/* Progress Header */}
-      <Card className="bg-gradient-accent text-primary-foreground">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-lg">
+      <Card className="bg-gradient-accent text-primary-foreground border-2 shadow-lg">
+        <CardContent className="p-6 md:p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="flex-1">
+              <h3 className="font-bold text-2xl md:text-3xl mb-2">
                 {journeyType === 'outbound' ? '🚀 Plan Your Journey' : '🏠 Plan Return Journey'}
               </h3>
-              <p className="text-primary-foreground/80 text-sm">
-                Choose your preferred transport at each step
+              <p className="text-primary-foreground/90 text-sm md:text-base">
+                Choose your preferred transport at each step to complete your door-to-door itinerary
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-primary-foreground/80">Step {currentStepIndex + 1} of {journeySteps.length}</p>
-              <div className="flex gap-1 mt-1">
+            <div className="flex flex-col items-center lg:items-end gap-3">
+              <div className="bg-primary-foreground/20 backdrop-blur-sm px-8 py-4 rounded-2xl border-2 border-primary-foreground/30 shadow-lg">
+                <p className="text-xs text-primary-foreground/80 uppercase tracking-widest mb-1 text-center font-semibold">Progress</p>
+                <p className="text-4xl md:text-5xl font-bold text-center tabular-nums">
+                  {currentStepIndex + 1}<span className="text-2xl text-primary-foreground/70 mx-2">/</span>{journeySteps.length}
+                </p>
+              </div>
+              <div className="flex gap-2">
                 {journeySteps.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-2 w-8 rounded ${
-                      index <= currentStepIndex ? 'bg-primary-foreground' : 'bg-primary-foreground/30'
-                    }`}
+                    className={`h-3 w-16 rounded-full transition-all duration-300 ${index < currentStepIndex
+                        ? 'bg-primary-foreground shadow-lg'
+                        : index === currentStepIndex
+                          ? 'bg-primary-foreground animate-pulse shadow-lg scale-110'
+                          : 'bg-primary-foreground/30'
+                      }`}
                   />
                 ))}
               </div>
@@ -486,72 +509,96 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
         {/* Left: Current Step Options */}
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-3">
           {currentStep && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-primary" />
-                  {currentStep.title}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Choose how you want to travel from {currentStep.location}
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {currentStep.options.map((option) => (
-                  <Card
-                    key={option.id}
-                    className="cursor-pointer transition-all hover:shadow-md hover:border-primary/50 border-2 interactive-hover"
-                    onClick={() => handleOptionSelect(option)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-full ${getStepColor(option.type)}`}>
-                            {getStepIcon(option.type)}
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-sm">{option.description}</h4>
-                            <p className="text-xs text-muted-foreground">{option.provider}</p>
-                            <p className="text-xs text-muted-foreground/70">
-                              {option.from} → {option.to}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="outline" className="text-xs">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {option.duration}
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs">
-                              {option.cost}
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground">{option.distance}</p>
-                        </div>
+            <Card className="shadow-md">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-3 text-xl">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <MapPin className="h-6 w-6 text-primary" />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      {currentStep.title}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-2 ml-14">
+                      Choose how you want to travel from {currentStep.location}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {currentStep.options.map((option) => {
+                  const isSelected = selectedOptions[currentStepIndex]?.id === option.id;
+                  return (
+                    <Card
+                      key={option.id}
+                      className={`cursor-pointer transition-all hover:shadow-lg border-2 interactive-hover ${isSelected
+                          ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
+                          : 'hover:border-primary/50 hover:scale-[1.01]'
+                        }`}
+                      onClick={() => handleOptionSelect(option)}
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-4 flex-1 min-w-0">
+                            <div className={`p-3 rounded-xl ${getStepColor(option.type)} flex-shrink-0`}>
+                              {getStepIcon(option.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold text-base">{option.description}</h4>
+                                {isSelected && (
+                                  <Badge variant="default" className="text-xs">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Selected
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground font-medium mb-1">{option.provider}</p>
+                              <p className="text-xs text-muted-foreground/70">
+                                {option.from} → {option.to}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="flex flex-col gap-2 items-end">
+                              <Badge variant="outline" className="text-xs font-medium">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {option.duration}
+                              </Badge>
+                              <Badge variant="secondary" className="text-sm font-bold">
+                                {option.cost}
+                              </Badge>
+                              {option.distance && (
+                                <p className="text-xs text-muted-foreground">{option.distance}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </CardContent>
             </Card>
           )}
 
           {/* Journey Complete */}
           {currentStepIndex >= journeySteps.length && (
-            <Card className="bg-success/10 border-success/20">
-              <CardContent className="p-6 text-center">
-                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-success" />
-                <h3 className="text-lg font-semibold text-success mb-2">Journey Planned!</h3>
-                <p className="text-sm text-success/80 mb-4">
+            <Card className="bg-success/10 border-success/20 shadow-lg">
+              <CardContent className="p-8 text-center">
+                <div className="bg-success/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-12 w-12 text-success" />
+                </div>
+                <h3 className="text-2xl font-bold text-success mb-2">Journey Planned!</h3>
+                <p className="text-sm text-success/80 mb-6">
                   Your complete door-to-door journey is ready to book
                 </p>
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={handleReset} variant="outline" size="sm">
+                <div className="flex gap-3 justify-center">
+                  <Button onClick={handleReset} variant="outline" size="lg">
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Plan Again
                   </Button>
@@ -562,78 +609,181 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
         </div>
 
         {/* Right: Selected Journey Summary */}
-        <div className="lg:col-span-1">
-          <Card className="sticky top-4">
-            <CardHeader>
-              <CardTitle className="text-lg">Your Journey</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Selected Options */}
-              <div className="space-y-2">
-                {selectedOptions.map((option, index) => (
-                  <div key={index} className="flex items-center gap-3 p-2 bg-muted rounded-lg">
-                    <div className={`p-1 rounded ${getStepColor(option.type)}`}>
-                      {getStepIcon(option.type)}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{option.description}</p>
-                      <p className="text-xs text-muted-foreground">{option.duration} • {option.cost}</p>
-                    </div>
+        <div className="xl:col-span-2">
+          <div className="sticky top-4 space-y-4">
+            <Card className="shadow-md">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Navigation className="h-5 w-5 text-primary" />
                   </div>
-                ))}
-                
-                {selectedOptions.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Select transport options to build your journey
-                  </p>
-                )}
-              </div>
+                  Your Journey
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Track your selected transport options
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Selected Options */}
+                <div className="space-y-3">
+                  {journeySteps.map((step, stepIndex) => {
+                    const selectedOption = selectedOptions[stepIndex];
+                    const isBooked = selectedOption !== undefined;
+                    const isCurrent = stepIndex === currentStepIndex;
+                    const isPast = stepIndex < currentStepIndex;
 
-              {/* Journey Summary */}
-              {selectedOptions.length > 0 && (
-                <div className="border-t pt-4">
-                  <h4 className="font-medium text-sm mb-2">Journey Summary</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Total Duration:</span>
-                      <span className="font-medium">{getTotalDuration()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Total Cost:</span>
-                      <span className="font-medium">₹{getTotalCost().toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Transport Modes:</span>
-                      <span className="font-medium">{selectedOptions.length}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Booking Actions */}
-              {selectedOptions.length > 0 && (
-                <div className="border-t pt-4 space-y-2">
-                  <h4 className="font-medium text-sm mb-2">Quick Actions</h4>
-                  {selectedOptions.map((option, index) => (
-                    option.bookingUrl && (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        className="w-full justify-start"
-                        asChild
+                    return (
+                      <div
+                        key={step.id}
+                        className={`border-2 rounded-xl p-4 transition-all ${isBooked
+                            ? 'bg-primary/5 border-primary/40 shadow-sm'
+                            : isCurrent
+                              ? 'bg-muted/50 border-muted-foreground/40 animate-pulse'
+                              : 'bg-background border-border opacity-60'
+                          }`}
                       >
-                        <a href={option.bookingUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3 w-3 mr-2" />
-                          Book {option.provider}
-                        </a>
-                      </Button>
-                    )
-                  ))}
+                        <div className="flex items-start gap-4">
+                          <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm ${isBooked
+                              ? 'bg-primary text-primary-foreground'
+                              : isCurrent
+                                ? 'bg-muted-foreground text-background'
+                                : 'bg-muted text-muted-foreground'
+                            }`}>
+                            {stepIndex + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                {step.title}
+                              </p>
+                              {isBooked && (
+                                <Badge variant="default" className="text-xs shadow-sm">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Booked
+                                </Badge>
+                              )}
+                              {isCurrent && !isBooked && (
+                                <Badge variant="outline" className="text-xs animate-pulse">
+                                  Current Step
+                                </Badge>
+                              )}
+                            </div>
+                            {isBooked ? (
+                              <div className="flex items-start gap-3 mt-2">
+                                <div className={`p-2 rounded-lg ${getStepColor(selectedOption.type)} flex-shrink-0`}>
+                                  {getStepIcon(selectedOption.type)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-bold mb-1">{selectedOption.description}</p>
+                                  <p className="text-xs text-muted-foreground mb-1 font-medium">
+                                    {selectedOption.provider}
+                                  </p>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <Badge variant="outline" className="text-xs">
+                                      <Clock className="h-3 w-3 mr-1" />
+                                      {selectedOption.duration}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs font-bold">
+                                      {selectedOption.cost}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground mt-1 italic">
+                                {isCurrent ? '⏳ Waiting for your selection...' : '⏸️ Pending selection'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {selectedOptions.length === 0 && journeySteps.length > 0 && (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Navigation className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Start building your journey by selecting transport options
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Journey Summary Card */}
+            {selectedOptions.length > 0 && (
+              <Card className="shadow-md border-2 border-primary/20">
+                <CardHeader className="pb-4 bg-primary/5">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Info className="h-5 w-5 text-primary" />
+                    Journey Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Total Duration</span>
+                      </div>
+                      <span className="font-bold text-lg">{getTotalDuration()}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Total Cost</span>
+                      </div>
+                      <span className="font-bold text-lg text-primary">₹{getTotalCost().toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Navigation className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Transport Modes</span>
+                      </div>
+                      <span className="font-bold text-lg">{selectedOptions.length}</span>
+                    </div>
+                  </div>
+
+                  {/* Quick Booking Actions */}
+                  {selectedOptions.some(opt => opt.bookingUrl) && (
+                    <div className="mt-6 pt-6 border-t">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Quick Booking Links
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedOptions.map((option, index) => (
+                          option.bookingUrl && (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-between hover:bg-primary hover:text-primary-foreground transition-colors"
+                              asChild
+                            >
+                              <a href={option.bookingUrl} target="_blank" rel="noopener noreferrer">
+                                <span className="flex items-center gap-2">
+                                  {getStepIcon(option.type)}
+                                  {option.provider}
+                                </span>
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            </Button>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </div>
