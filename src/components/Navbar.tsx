@@ -48,10 +48,10 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
       className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-8"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="navbar-glass rounded-2xl px-6 md:px-8 py-4 flex items-center justify-between shadow-themed-medium">
+        <div className="navbar-glass rounded-2xl px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between shadow-themed-medium">
           {/* Logo */}
           <Link to="/" className="no-underline">
-            <motion.div 
+            <motion.div
               className="flex items-center gap-3"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -66,15 +66,14 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-3">
             {navItems.map((item) => {
-              const className = `flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-                item.highlight
+              const className = `flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${item.highlight
                   ? item.isActive
                     ? "bg-gradient-accent text-primary-foreground shadow-glow ring-2 ring-primary/50"
                     : "bg-gradient-accent text-primary-foreground shadow-glow"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`;
+                }`;
 
               const content = (
                 <>
@@ -122,7 +121,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-3">
             {/* Map Button */}
             {onMapClick && (
               <motion.button
@@ -158,11 +157,10 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={onSafetyClick}
-              className={`p-2 rounded-xl transition-all ${
-                isOffline 
-                  ? "bg-destructive text-destructive-foreground" 
+              className={`p-2 rounded-xl transition-all ${isOffline
+                  ? "bg-destructive text-destructive-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
+                }`}
               title={isOffline ? "Safety Mode Active" : "Safety Information"}
             >
               <Shield className="w-5 h-5" />
@@ -183,7 +181,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
             </motion.button>
 
             {/* Login/Dashboard Button */}
-            <div className="hidden sm:block ml-2 pl-2 border-l border-border">
+            <div className="hidden sm:block ml-4 pl-4 border-l border-border">
               {!user ? (
                 <Link to="/auth" className="no-underline">
                   <motion.button
@@ -273,7 +271,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
         {/* Mobile Menu */}
         <motion.div
           initial={false}
-          animate={{ 
+          animate={{
             height: isMenuOpen ? "auto" : 0,
             opacity: isMenuOpen ? 1 : 0
           }}
@@ -285,13 +283,12 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
         >
           <div className="glass-strong rounded-2xl mt-2 p-4 space-y-2">
             {navItems.map((item) => {
-              const className = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                item.highlight
+              const className = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.highlight
                   ? item.isActive
                     ? "bg-gradient-accent text-primary-foreground ring-2 ring-primary/50"
                     : "bg-gradient-accent text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`;
+                }`;
 
               const content = (
                 <>

@@ -148,9 +148,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     await auth.signOut();
     localStorage.removeItem('bookonce_user');
-    sessionStorage.removeItem('auth_session_token');
-    sessionStorage.removeItem('auth_email');
-    sessionStorage.removeItem('auth_method');
+    localStorage.removeItem('auth_session_token');
+    localStorage.removeItem('auth_email');
+    localStorage.removeItem('auth_method');
     emailOTPAuth.clearOTP();
     setUser(null);
   };
