@@ -47,7 +47,7 @@ const guestInfoSchema = z.object({
     .string()
     .min(1, 'Phone number is required')
     .regex(
-      /^[\d\s\-\+\(\)]+$/,
+      /^[\d\s\-+()]+$/,
       'Please enter a valid phone number (digits, spaces, +, -, (, ) only)'
     )
     .min(10, 'Phone number must be at least 10 characters'),

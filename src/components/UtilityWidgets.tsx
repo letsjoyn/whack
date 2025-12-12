@@ -334,7 +334,7 @@ Provide a concise packing list with each item on a new line starting with "- ". 
           .filter((line: string) => line.trim().length > 3 && !line.includes(':'))
           .slice(0, 15)
           .map((line: string) => ({
-            item: line.replace(/^[\d\.\-\*\•]\s*/, '').trim(),
+            item: line.replace(/^[\d.\-*•]\s*/, '').trim(),
             checked: false,
           }));
         if (fallbackItems.length > 0) {

@@ -30,11 +30,6 @@ export function AccessibilityTester({ defaultVisible = false }: AccessibilityTes
   const { theme, resolvedTheme, systemPrefersHighContrast, systemPrefersReducedMotion } =
     useTheme();
 
-  // Only render in development
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
-
   /**
    * Run contrast checks when theme changes
    */
@@ -52,6 +47,11 @@ export function AccessibilityTester({ defaultVisible = false }: AccessibilityTes
 
     return () => clearTimeout(timeout);
   }, [resolvedTheme]);
+
+  // Only render in development
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
 
   /**
    * Run all accessibility tests
