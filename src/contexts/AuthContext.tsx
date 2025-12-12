@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const sessionToken = sessionStorage.getItem('auth_session_token');
         const authEmail = sessionStorage.getItem('auth_email');
         const authMethod = sessionStorage.getItem('auth_method');
-        
+
         if (sessionToken && authEmail && authMethod === 'otp') {
           // Restore OTP session
           setUser({
@@ -81,13 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             authMethod: 'email-otp',
           });
         } else {
-          // Check localStorage for email OTP user
-          const savedUser = localStorage.getItem('bookonce_user');
-          if (savedUser) {
-            setUser(JSON.parse(savedUser));
-          } else {
-            setUser(null);
-          }
+          setUser(null);
         }
       }
       setIsLoading(false);
@@ -123,11 +117,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Email OTP - Verify
   const verifyEmailOTP = async (email: string, otp: string) => {
     const result = emailOTPAuth.verifyOTP(email, otp);
-    
+
     if (result.success) {
       // Create user session for email OTP login
+      const sessionToken = `email_${email.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`;
       const emailUser: AuthUser = {
-        uid: `email_${email.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`,
+        uid: sessionToken,
         email: email,
         displayName: email.split('@')[0],
         photoURL: null,
@@ -135,22 +130,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         emailVerified: true,
         authMethod: 'email-otp',
       };
-      
-      // Save to localStorage
-      localStorage.setItem('bookonce_user', JSON.stringify(emailUser));
+
+      // Save to sessionStorage (expires when browser closes)
+      sessionStorage.setItem('auth_session_token', sessionToken);
+      sessionStorage.setItem('auth_email', email);
+      sessionStorage.setItem('auth_method', 'otp');
       setUser(emailUser);
     }
-    
+
     return { success: result.success, message: result.message };
   };
 
   // Logout
   const logout = async () => {
     await auth.signOut();
-    localStorage.removeItem('bookonce_user');
-    localStorage.removeItem('auth_session_token');
-    localStorage.removeItem('auth_email');
-    localStorage.removeItem('auth_method');
+    sessionStorage.removeItem('auth_session_token');
+    sessionStorage.removeItem('auth_email');
+    sessionStorage.removeItem('auth_method');
     emailOTPAuth.clearOTP();
     setUser(null);
   };

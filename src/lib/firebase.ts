@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
@@ -17,5 +17,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
+// Set session-based persistence (logout on browser close)
+if (typeof window !== 'undefined') {
+  setPersistence(auth, browserSessionPersistence).catch((error) => {
+    console.error('Failed to set session persistence:', error);
+  });
+}
 
 export { auth, googleProvider, analytics };
