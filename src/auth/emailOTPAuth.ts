@@ -73,17 +73,10 @@ export const emailOTPAuth = {
 
       // EmailJS template parameters - MUST match your template exactly
       const templateParams = {
-        // Standard EmailJS fields
-        to_name: userName || email.split('@')[0],
-        from_name: 'BookOnce',
-        message: `Your verification code is: ${otp}. This code will expire in 10 minutes.`,
-        reply_to: email,
-        
-        // Custom fields for OTP template
-        user_email: email,
-        otp_code: otp,
-        passcode: otp,
-        verification_code: otp,
+        email: email,                              // {{email}} in template
+        to_name: userName || email.split('@')[0], // {{to_name}} in template
+        otp_code: otp,                            // {{otp_code}} in template
+        expiry_time: '10 minutes',                // {{expiry_time}} in template
       };
 
       console.log('📧 Sending OTP to:', email);
@@ -104,7 +97,7 @@ export const emailOTPAuth = {
       };
     } catch (error: any) {
       console.error('❌ Email OTP error:', error);
-      
+
       // Better error message
       let message = 'Failed to send OTP. Please try again.';
       if (error.status === 422) {
@@ -112,7 +105,7 @@ export const emailOTPAuth = {
       } else if (error.text) {
         message = error.text;
       }
-      
+
       return {
         success: false,
         message,

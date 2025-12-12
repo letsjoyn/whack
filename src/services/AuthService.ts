@@ -40,16 +40,21 @@ export const emailOtpService = {
       if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
         try {
           const templateParams = {
-            to_email: email,
             otp_code: otp,
-            subject: 'Your BookOnce OTP Code',
+            to_name: email.split('@')[0],
+            expiry_time: '15 minutes',
           };
 
+          console.log('Sending OTP with params:', templateParams);
+          
           const response = await emailjs.send(
             EMAILJS_SERVICE_ID,
             EMAILJS_TEMPLATE_ID,
-            templateParams
+            templateParams,
+            EMAILJS_PUBLIC_KEY
           );
+
+          console.log('✅ EmailJS response:', response);
 
           if (response.status === 200) {
             console.log(`✅ OTP sent to ${email}`);
@@ -58,17 +63,24 @@ export const emailOtpService = {
               message: `OTP sent to ${email}. Check your inbox!`,
             };
           } else {
-            throw new Error('EmailJS returned non-200 status');
+            throw new Error(`EmailJS returned status: ${response.status}`);
           }
         } catch (emailjsError: any) {
-          console.error('EmailJS error:', emailjsError);
+          console.error('❌ EmailJS error:', emailjsError);
+          console.error('Error status:', emailjsError.status);
+          console.error('Error text:', emailjsError.text);
+          
           return {
             success: false,
-            message: `Failed to send OTP: ${emailjsError.message}`,
+            message: `Failed to send OTP: ${emailjsError.message || 'Unknown error'}`,
           };
         }
       } else {
         console.error('EmailJS not configured. Missing credentials.');
+        console.error('Public Key:', EMAILJS_PUBLIC_KEY ? 'Present' : 'Missing');
+        console.error('Service ID:', EMAILJS_SERVICE_ID ? 'Present' : 'Missing');
+        console.error('Template ID:', EMAILJS_TEMPLATE_ID ? 'Present' : 'Missing');
+        
         return {
           success: false,
           message: 'Email service not configured. Check your EmailJS credentials in .env',
