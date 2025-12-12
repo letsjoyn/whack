@@ -868,15 +868,6 @@ const RoutePlanning = () => {
                 )}
               </div>
             </Card>
-
-
-
-
-
-            <Button className="w-full" size="lg">
-              Confirm & Book Journey
-              <span className="ml-2 text-xs opacity-80">₹{pricing.total.toLocaleString()}</span>
-            </Button>
           </div>
         </div>
 

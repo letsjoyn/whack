@@ -612,7 +612,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
         <div className="xl:col-span-2">
           <div className="sticky top-4 space-y-4">
             <Card className="shadow-md">
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <div className="p-2 rounded-full bg-primary/10">
                     <Navigation className="h-5 w-5 text-primary" />
@@ -623,7 +623,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                   Track your selected transport options
                 </p>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 pb-4">
                 {/* Selected Options */}
                 <div className="space-y-3">
                   {journeySteps.map((step, stepIndex) => {
@@ -635,7 +635,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                     return (
                       <div
                         key={step.id}
-                        className={`border-2 rounded-xl p-4 transition-all ${isBooked
+                        className={`border-2 rounded-xl p-3 transition-all ${isBooked
                             ? 'bg-primary/5 border-primary/40 shadow-sm'
                             : isCurrent
                               ? 'bg-muted/50 border-muted-foreground/40 animate-pulse'
@@ -701,9 +701,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                   })}
 
                   {selectedOptions.length === 0 && journeySteps.length > 0 && (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Navigation className="h-8 w-8 text-muted-foreground" />
+                    <div className="text-center py-6">
+                      <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Navigation className="h-7 w-7 text-muted-foreground" />
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Start building your journey by selecting transport options
@@ -717,43 +717,43 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             {/* Journey Summary Card */}
             {selectedOptions.length > 0 && (
               <Card className="shadow-md border-2 border-primary/20">
-                <CardHeader className="pb-4 bg-primary/5">
+                <CardHeader className="pb-3 bg-primary/5">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Info className="h-5 w-5 text-primary" />
                     Journey Summary
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <CardContent className="pt-4 pb-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Total Duration</span>
                       </div>
-                      <span className="font-bold text-lg">{getTotalDuration()}</span>
+                      <span className="font-bold text-base">{getTotalDuration()}</span>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-2">
                         <CreditCard className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Total Cost</span>
                       </div>
-                      <span className="font-bold text-lg text-primary">₹{getTotalCost().toLocaleString()}</span>
+                      <span className="font-bold text-base text-primary">₹{getTotalCost().toLocaleString()}</span>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Navigation className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Transport Modes</span>
                       </div>
-                      <span className="font-bold text-lg">{selectedOptions.length}</span>
+                      <span className="font-bold text-base">{selectedOptions.length}</span>
                     </div>
                   </div>
 
                   {/* Quick Booking Actions */}
                   {selectedOptions.some(opt => opt.bookingUrl) && (
-                    <div className="mt-6 pt-6 border-t">
-                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                    <div className="mt-4 pt-4 border-t">
+                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                         <ExternalLink className="h-4 w-4" />
                         Quick Booking Links
                       </h4>
@@ -780,6 +780,25 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Confirm & Book Journey Button - Only show when all steps are selected */}
+            {selectedOptions.length === journeySteps.length && journeySteps.length > 0 && (
+              <Card className="shadow-lg border-2 border-primary">
+                <CardContent className="p-4">
+                  <Button 
+                    className="w-full h-12 text-base font-semibold" 
+                    size="lg"
+                  >
+                    <CheckCircle className="mr-2 h-5 w-5" />
+                    Confirm & Book Journey
+                    <span className="ml-2.5 text-sm opacity-90">₹{getTotalCost().toLocaleString()}</span>
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    All {journeySteps.length} steps selected • Ready to book
+                  </p>
                 </CardContent>
               </Card>
             )}
