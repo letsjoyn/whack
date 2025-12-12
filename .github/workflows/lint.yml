@@ -3,10 +3,12 @@ name: Lint Code
 on:
   pull_request:
     branches:
+      - master
       - main
       - develop
   push:
     branches:
+      - master
       - main
 
 jobs:
