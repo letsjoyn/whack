@@ -48,9 +48,7 @@ const TextType: React.FC<TextTypeProps> = ({
   return (
     <span className="text-type">
       <span className={`text-type-text ${className}`}>{display}</span>
-      <span className="text-type-cursor" aria-hidden>
-        ▮
-      </span>
+        <span className="text-type-cursor" aria-hidden />
     </span>
   );
 };

@@ -7,9 +7,12 @@
 }
 .typewriter-cursor {
   display: inline-block;
-  margin-left: 6px;
-  /* use currentColor so cursor matches surrounding text color */
-  color: currentColor;
+  margin-left: 0.5rem;
+  width: 2px;
+  height: 1em;
+  background: currentColor;
+  border-radius: 1px;
+  vertical-align: middle;
   animation: type-cursor 1s steps(1) infinite;
   opacity: 0.95;
 }

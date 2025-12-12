@@ -68,11 +68,7 @@ const Typewriter: React.FC<TypewriterProps> = ({
   return (
     <span className="typewriter" aria-live="polite">
       <span className={`typewriter-text ${className}`}>{display}</span>
-      {showCursor !== false ? (
-        <span className="typewriter-cursor" aria-hidden>
-          │
-        </span>
-      ) : null}
+      {showCursor !== false ? <span className="typewriter-cursor" aria-hidden /> : null}
     </span>
   );
 };

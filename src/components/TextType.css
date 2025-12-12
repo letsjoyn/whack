@@ -7,8 +7,12 @@
 }
 .text-type-cursor {
   display: inline-block;
-  margin-left: 6px;
-  color: currentColor;
+  margin-left: 0.5rem;
+  width: 2px; /* thin vertical bar */
+  height: 1em;
+  background: currentColor;
+  border-radius: 1px;
+  vertical-align: middle;
   animation: blink 1s steps(1) infinite;
   opacity: 0.95;
 }
