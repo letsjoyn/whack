@@ -95,7 +95,7 @@ export const emailOtpService = {
     }
   },
 
-  async verifyOTP(email: string, otp: string): Promise<{ success: boolean; message: string }> {
+  async verifyOTP(email: string, otp: string): Promise<{ success: boolean; message: string; sessionToken?: string }> {
     try {
       const stored = this.otpStore.get(email);
 
@@ -113,7 +113,15 @@ export const emailOtpService = {
       }
 
       this.otpStore.delete(email);
-      return { success: true, message: 'Email verified successfully!' };
+      
+      // Generate session token
+      const sessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      return { 
+        success: true, 
+        message: 'Email verified successfully!',
+        sessionToken 
+      };
     } catch (error) {
       return { success: false, message: 'Verification failed' };
     }

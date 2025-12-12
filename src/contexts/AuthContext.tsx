@@ -64,12 +64,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           emailVerified: firebaseUser.emailVerified,
         });
       } else {
-        // Check localStorage for email OTP user
-        const savedUser = localStorage.getItem('bookonce_user');
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
+        // Check sessionStorage for session-based OTP login (expires when browser closes)
+        const sessionToken = sessionStorage.getItem('auth_session_token');
+        const authEmail = sessionStorage.getItem('auth_email');
+        const authMethod = sessionStorage.getItem('auth_method');
+        
+        if (sessionToken && authEmail && authMethod === 'otp') {
+          // Restore OTP session
+          setUser({
+            uid: sessionToken,
+            email: authEmail,
+            displayName: authEmail.split('@')[0],
+            photoURL: null,
+            phoneNumber: null,
+            emailVerified: true,
+            authMethod: 'email-otp',
+          });
         } else {
-          setUser(null);
+          // Check localStorage for email OTP user
+          const savedUser = localStorage.getItem('bookonce_user');
+          if (savedUser) {
+            setUser(JSON.parse(savedUser));
+          } else {
+            setUser(null);
+          }
         }
       }
       setIsLoading(false);
@@ -130,6 +148,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     await auth.signOut();
     localStorage.removeItem('bookonce_user');
+    sessionStorage.removeItem('auth_session_token');
+    sessionStorage.removeItem('auth_email');
+    sessionStorage.removeItem('auth_method');
     emailOTPAuth.clearOTP();
     setUser(null);
   };

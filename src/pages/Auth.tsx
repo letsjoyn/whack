@@ -151,6 +151,12 @@ const Auth = () => {
     try {
       const result = await verifyEmailOTP(otpEmail, emailOtp);
       if (result.success) {
+        // Create session-based login (expires when browser closes)
+        const sessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        sessionStorage.setItem('auth_session_token', sessionToken);
+        sessionStorage.setItem('auth_email', otpEmail);
+        sessionStorage.setItem('auth_method', 'otp');
+        
         toast.success(result.message);
         navigate("/");
       } else {
