@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Home, Building2, Plane, Sparkles, User, Shield, Menu, X, Zap, Calendar, MapIcon, Compass } from "lucide-react";
-import { useState } from "react";
+import { Home, Building2, Plane, Sparkles, User, Shield, Menu, X, Zap, Calendar, MapIcon, Compass, LogOut, Settings, ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChatStore } from "@/stores/chatStore";
@@ -15,16 +15,30 @@ interface NavbarProps {
 
 const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
   const { isOpen: isChatOpen, setOpen: setChatOpen } = useChatStore();
+
+  // Close dashboard dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dashboardRef.current && !dashboardRef.current.contains(event.target as Node)) {
+        setIsDashboardOpen(false);
+      }
+    };
+
+    if (isDashboardOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isDashboardOpen]);
 
   const navItems = [
     { icon: Home, label: "Home", href: "/", isRoute: true },
     { icon: Building2, label: "Explore", href: "/stays", isRoute: true },
     { icon: Compass, label: "Utilities", href: "/utilities", isRoute: true },
     { icon: Sparkles, label: "BookOnce AI", href: "#ai", highlight: true, isRoute: false, onClick: () => setChatOpen(true), isActive: isChatOpen },
-    { icon: Calendar, label: "My Bookings", href: "/profile/bookings", isRoute: true, requiresAuth: true },
-    { icon: User, label: "Profile", href: "/profile", isRoute: true, requiresAuth: true },
   ];
 
   return (
@@ -125,9 +139,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navItems
-              .filter((item) => !item.requiresAuth || user)
-              .map((item) => {
+            {navItems.map((item) => {
                 const className = `flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
                   item.highlight
                     ? item.isActive
@@ -182,7 +194,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             {/* Map Button */}
             {onMapClick && (
               <motion.button
@@ -196,6 +208,19 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                 <span className="text-sm font-medium">Map</span>
               </motion.button>
             )}
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary focus-enhanced touch-target"
+              aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
+            >
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </motion.button>
+          </div>
 
             {/* Context Layer Button */}
             {onContextClick && (
@@ -235,18 +260,92 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
               </span>
             </motion.button>
 
-            {/* Mobile Menu Button */}
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary focus-enhanced touch-target"
-              aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-navigation"
-            >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </motion.button>
-          </div>
+            {/* Login/Dashboard Button - Far Right */}
+            <div className="ml-2 pl-2 border-l border-border">
+              {!user ? (
+                <Link to="/auth" className="no-underline">
+                  <motion.button
+                    whileHover={{ scale: 1.08, boxShadow: "0 0 30px rgba(99, 102, 241, 0.4)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground hover:shadow-glow transition-all font-semibold text-sm shadow-lg border border-primary/30"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Login</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </motion.button>
+                </Link>
+              ) : (
+                <div className="relative" ref={dashboardRef}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsDashboardOpen(!isDashboardOpen)}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground hover:shadow-glow transition-all font-semibold text-sm shadow-lg border border-primary/30"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </motion.button>
+
+                  {/* Dashboard Dropdown */}
+                  {isDashboardOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-xl shadow-lg overflow-hidden z-40"
+                    >
+                      <div className="p-4 border-b border-border">
+                        <p className="text-sm font-medium text-foreground">{user.firstName} {user.lastName}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+
+                      <div className="p-2 space-y-1">
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsDashboardOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors no-underline"
+                        >
+                          <User className="w-4 h-4" />
+                          My Profile
+                        </Link>
+
+                        <Link
+                          to="/profile/bookings"
+                          onClick={() => setIsDashboardOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors no-underline"
+                        >
+                          <Calendar className="w-4 h-4" />
+                          My Bookings
+                        </Link>
+
+                        <button
+                          onClick={() => {
+                            setIsDashboardOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors"
+                        >
+                          <Settings className="w-4 h-4" />
+                          Settings
+                        </button>
+
+                        <div className="border-t border-border my-2"></div>
+
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsDashboardOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              )}
+            </div>
         </div>
 
         {/* Mobile Menu */}
@@ -281,9 +380,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
               <Plane className="w-6 h-6 text-blue-600 drop-shadow-2xl" style={{ filter: 'drop-shadow(0 0 10px rgba(37, 99, 235, 0.8))' }} />
             </motion.div>
             
-            {navItems
-              .filter((item) => !item.requiresAuth || user)
-              .map((item) => {
+            {navItems.map((item) => {
                 const className = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   item.highlight
                     ? item.isActive

@@ -13,6 +13,7 @@ import { BookOnceAIChatModal } from "@/components/BookOnceAIChatModal";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
 const Stays = lazy(() => import("./pages/Stays"));
 const TravelUtilities = lazy(() => import("./pages/TravelUtilities"));
 const JourneyPlanner = lazy(() => import("./pages/JourneyPlanner"));
@@ -53,6 +54,7 @@ const App = () => {
               <main id="main-content">
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="/stays" element={<Stays />} />
                   <Route path="/utilities" element={<TravelUtilities />} />
                   <Route path="/journey" element={<JourneyPlanner />} />
