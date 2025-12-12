@@ -91,6 +91,13 @@ const RoutePlanning = () => {
   const [endangeredPlacesLoaded, setEndangeredPlacesLoaded] = useState(false);
   const [addedPlaces, setAddedPlaces] = useState<EndangeredPlace[]>([]);
 
+  // Journey summary from AI visualization
+  const [journeySummary, setJourneySummary] = useState<{
+    duration: string;
+    cost: number;
+    modes: number;
+  } | null>(null);
+
   // Calculate pricing based on number of travelers and added places
   const calculatePricing = () => {
     const basePrices = {
@@ -434,48 +441,39 @@ const RoutePlanning = () => {
         </div>
 
         {/* Trip Summary */}
-        <Card className="p-6 mb-6">
-          <div className="grid md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">From</p>
-                <p className="font-medium text-sm">{from}</p>
+        <Card className="p-3 mb-4">
+          <div className="grid md:grid-cols-4 gap-3">
+            <div className="flex items-center justify-center gap-2">
+              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground text-center">From</p>
+                <p className="font-medium text-sm truncate text-center">{from}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Navigation className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">To</p>
-                <p className="font-medium text-sm">{to}</p>
+            <div className="flex items-center justify-center gap-2">
+              <Navigation className="h-4 w-4 text-primary flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground text-center">To</p>
+                <p className="font-medium text-sm truncate text-center">{to}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">
+            <div className="flex items-center justify-center gap-2">
+              <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground text-center">
                   {returnDate ? 'Trip Dates' : 'Departure'}
                 </p>
-                <p className="font-medium text-sm">
+                <p className="font-medium text-sm text-center">
                   {departure && format(new Date(departure), 'MMM dd')}
                   {returnDate && ` - ${format(new Date(returnDate), 'MMM dd')}`}
                 </p>
-                {returnDate && (
-                  <p className="text-xs text-muted-foreground">
-                    {Math.ceil(
-                      (new Date(returnDate).getTime() - new Date(departure).getTime()) /
-                        (1000 * 60 * 60 * 24)
-                    )}{' '}
-                    nights
-                  </p>
-                )}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">Travelers</p>
-                <p className="font-medium text-sm">{guests} guests</p>
+            <div className="flex items-center justify-center gap-2">
+              <Users className="h-4 w-4 text-primary flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground text-center">Travelers</p>
+                <p className="font-medium text-sm text-center">{guests} guests</p>
               </div>
             </div>
           </div>
@@ -486,17 +484,8 @@ const RoutePlanning = () => {
           {/* Left: Route Timeline */}
           <div className="lg:col-span-2 space-y-4">
             <Card className="p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6">
                 <h2 className="text-lg font-bold">Your Door-to-Door Route</h2>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="time"
-                    value={departureTime}
-                    onChange={e => setDepartureTime(e.target.value)}
-                    className="text-sm border rounded px-2 py-1"
-                  />
-                </div>
               </div>
 
               <Tabs defaultValue="outbound" className="w-full">
@@ -507,60 +496,51 @@ const RoutePlanning = () => {
                   <TabsTrigger value="stay">Accommodation</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="outbound" className="space-y-4 mt-4">
-                  <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm font-medium">
-                      {departure && format(new Date(departure), 'EEEE, MMMM dd, yyyy')}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {from} → {to} • Departure: {departureTime}
+                <TabsContent value="outbound" className="space-y-4 mt-4">                  {aiPlanLoading ? (
+                  <div className="flex flex-col items-center justify-center p-8 space-y-3">
+                    <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">
+                      Generating AI-powered route...
                     </p>
                   </div>
-
-                  {aiPlanLoading ? (
-                    <div className="flex flex-col items-center justify-center p-8 space-y-3">
-                      <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                      <p className="text-sm text-muted-foreground">
-                        Generating AI-powered route...
-                      </p>
-                    </div>
-                  ) : aiPlanError ? (
-                    <Card className="p-4 border-blue-200 bg-blue-50">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-blue-900 mb-1">
-                            {aiPlanError.includes('rate limit')
-                              ? '⏱️ AI Service Busy'
-                              : 'AI Plan Unavailable'}
-                          </p>
-                          <p className="text-xs text-blue-700 mb-2">
-                            {aiPlanError.includes('rate limit')
-                              ? 'The AI service is experiencing high demand. Your journey is still planned using our reliable routing system below.'
-                              : aiPlanError}
-                          </p>
-                          {aiPlanError.includes('rate limit') && (
-                            <div className="text-xs text-blue-600 space-y-1">
-                              <p>✓ All transport modes calculated</p>
-                              <p>✓ Timing based on your {departureTime} departure</p>
-                              <p>✓ Optimized for {intent === 'urgent' ? 'speed' : 'comfort'}</p>
-                            </div>
-                          )}
-                        </div>
+                ) : aiPlanError ? (
+                  <Card className="p-4 border-blue-200 bg-blue-50">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-900 mb-1">
+                          {aiPlanError.includes('rate limit')
+                            ? '⏱️ AI Service Busy'
+                            : 'AI Plan Unavailable'}
+                        </p>
+                        <p className="text-xs text-blue-700 mb-2">
+                          {aiPlanError.includes('rate limit')
+                            ? 'The AI service is experiencing high demand. Your journey is still planned using our reliable routing system below.'
+                            : aiPlanError}
+                        </p>
+                        {aiPlanError.includes('rate limit') && (
+                          <div className="text-xs text-blue-600 space-y-1">
+                            <p>✓ All transport modes calculated</p>
+                            <p>✓ Timing based on your {departureTime} departure</p>
+                            <p>✓ Optimized for {intent === 'urgent' ? 'speed' : 'comfort'}</p>
+                          </div>
+                        )}
                       </div>
-                    </Card>
-                  ) : aiJourneyPlan ? (
-                    <JourneyVisualization
-                      aiResponse={
-                        aiJourneyPlan
-                          .split('## RETURN JOURNEY')[0]
-                          .split('## STOPS & FOOD')[0]
-                          .split('## ACCOMMODATION')[0]
-                      }
-                      journeyType="outbound"
-                      userName="Traveler"
-                    />
-                  ) : null}
+                    </div>
+                  </Card>
+                ) : aiJourneyPlan ? (
+                  <JourneyVisualization
+                    aiResponse={
+                      aiJourneyPlan
+                        .split('## RETURN JOURNEY')[0]
+                        .split('## STOPS & FOOD')[0]
+                        .split('## ACCOMMODATION')[0]
+                    }
+                    journeyType="outbound"
+                    userName="Traveler"
+                    onSummaryUpdate={setJourneySummary}
+                  />
+                ) : null}
 
                   {/* Fallback: Outbound Route segments - Show if AI plan failed or is empty */}
                   {(!aiJourneyPlan || aiPlanError) && !aiPlanLoading && (
@@ -685,6 +665,7 @@ const RoutePlanning = () => {
                         }
                         journeyType="return"
                         userName="Traveler"
+                        onSummaryUpdate={setJourneySummary}
                       />
                     )}
 
@@ -759,6 +740,7 @@ const RoutePlanning = () => {
                       }
                       journeyType="outbound"
                       userName="Traveler"
+                      onSummaryUpdate={setJourneySummary}
                     />
                   )}
 
@@ -818,6 +800,7 @@ const RoutePlanning = () => {
                       }
                       journeyType="outbound"
                       userName="Traveler"
+                      onSummaryUpdate={setJourneySummary}
                     />
                   )}
 
@@ -842,7 +825,7 @@ const RoutePlanning = () => {
                           •{' '}
                           {Math.ceil(
                             (new Date(returnDate).getTime() - new Date(departure).getTime()) /
-                              (1000 * 60 * 60 * 24)
+                            (1000 * 60 * 60 * 24)
                           )}{' '}
                           nights
                         </p>
@@ -933,6 +916,43 @@ const RoutePlanning = () => {
                   <p className="text-sm text-muted-foreground">Unable to load map</p>
                 </div>
               )}
+            </Card>
+
+            {/* Journey Summary Card */}
+            <Card className="p-6 border-2 border-primary/20 bg-primary/5">
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary">
+                <Navigation className="h-5 w-5" />
+                Journey Summary
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Total Duration</span>
+                  </div>
+                  <span className="font-bold text-base">
+                    {journeySummary?.duration || '8min'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Total Cost</span>
+                  </div>
+                  <span className="font-bold text-base text-primary">
+                    ₹{journeySummary?.cost?.toLocaleString() || pricing.total.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <Navigation className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Transport Modes</span>
+                  </div>
+                  <span className="font-bold text-base">{journeySummary?.modes || 1}</span>
+                </div>
+              </div>
             </Card>
 
             <Card className="p-6">
@@ -1075,11 +1095,10 @@ const RouteSegment = ({
   isClickable,
 }: RouteSegmentProps) => (
   <div
-    className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${
-      isClickable
-        ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md'
-        : 'hover:bg-muted/50'
-    }`}
+    className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${isClickable
+      ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md'
+      : 'hover:bg-muted/50'
+      }`}
     onClick={onClick}
   >
     <div className="flex flex-col items-center">

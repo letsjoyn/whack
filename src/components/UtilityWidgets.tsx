@@ -454,11 +454,10 @@ Provide a concise packing list with each item on a new line starting with "- ". 
               key={index}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`text-xs p-2 rounded-lg ${
-                msg.role === 'user'
+              className={`text-xs p-2 rounded-lg ${msg.role === 'user'
                   ? 'bg-primary/10 text-foreground ml-4'
                   : 'bg-secondary/30 text-muted-foreground mr-4'
-              }`}
+                }`}
             >
               {msg.content}
             </motion.div>
@@ -499,9 +498,8 @@ Provide a concise packing list with each item on a new line starting with "- ". 
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => toggleItem(index)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors text-left ${
-                item.checked ? 'bg-success/10' : 'bg-secondary/30 hover:bg-secondary/50'
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors text-left ${item.checked ? 'bg-success/10' : 'bg-secondary/30 hover:bg-secondary/50'
+                }`}
             >
               {item.checked ? (
                 <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
@@ -509,9 +507,8 @@ Provide a concise packing list with each item on a new line starting with "- ". 
                 <Circle className="w-4 h-4 text-muted-foreground shrink-0" />
               )}
               <span
-                className={`text-sm ${
-                  item.checked ? 'line-through text-muted-foreground' : 'text-foreground'
-                }`}
+                className={`text-sm ${item.checked ? 'line-through text-muted-foreground' : 'text-foreground'
+                  }`}
               >
                 {item.item}
               </span>
