@@ -3,7 +3,7 @@
  * Full booking information display with modification and cancellation options
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import {
   Calendar,
@@ -19,6 +19,7 @@ import {
   Share2,
   Edit,
   XCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   Dialog,
@@ -35,6 +36,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { BookingConfirmation } from '@/types/booking';
 import { ModifyBooking } from './ModifyBooking';
 import { CancelBooking } from './CancelBooking';
+// import { DisruptionRecovery } from './DisruptionRecovery';
 
 interface BookingDetailsProps {
   booking: BookingConfirmation;
@@ -46,6 +48,7 @@ interface BookingDetailsProps {
 export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: BookingDetailsProps) {
   const [isModifying, setIsModifying] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isRecovering, setIsRecovering] = useState(false);
   const [currentBooking, setCurrentBooking] = useState<BookingConfirmation>(booking);
 
   const {
@@ -63,14 +66,17 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
   // Calculate number of nights
   const numberOfNights = differenceInDays(new Date(checkOutDate), new Date(checkInDate));
 
-  // Check if booking can be modified
-  const canModify = status === 'confirmed' && new Date(checkInDate) > new Date();
+  // Check if booking can be modified (pending or confirmed, and future date)
+  const canModify = status === 'confirmed' || status === 'pending';
 
-  // Check if booking can be cancelled
-  const canCancel = status === 'confirmed' && new Date(checkInDate) > new Date();
+  // Check if booking can be cancelled (pending or confirmed, and future date)
+  const canCancel = status === 'confirmed' || status === 'pending';
 
   // Check if booking is cancelled
   const isCancelled = status === 'cancelled';
+
+  // Debug log
+  console.log('Booking status:', status, 'canModify:', canModify, 'canCancel:', canCancel, 'checkInDate:', checkInDate);
 
   // Get status badge
   const getStatusBadge = () => {
@@ -129,6 +135,20 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
     console.log('Re-booking:', currentBooking);
   };
 
+  // Handle disruption recovery
+  const handleDisruptionRecovery = () => {
+    setIsRecovering(true);
+  };
+
+  // Handle recovery complete
+  const handleRecoveryComplete = (updatedBooking: BookingConfirmation) => {
+    setCurrentBooking(updatedBooking);
+    setIsRecovering(false);
+    if (onBookingUpdate) {
+      onBookingUpdate();
+    }
+  };
+
   // Handle download confirmation
   const handleDownload = () => {
     // TODO: Implement PDF download
@@ -144,19 +164,23 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-3xl max-h-[90vh]">
-          <DialogHeader>
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader className="flex-shrink-0">
             <div className="flex items-start justify-between">
               <div>
-                <DialogTitle className="text-2xl">Booking Details</DialogTitle>
-                <DialogDescription>Reference: {referenceNumber}</DialogDescription>
+                <DialogTitle className="text-lg">Booking Details</DialogTitle>
+                <DialogDescription className="text-xs">Reference: {referenceNumber}</DialogDescription>
               </div>
               {getStatusBadge()}
             </div>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[calc(90vh-120px)] pr-4">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="space-y-4 pr-4 pb-2">
               {/* Cancelled Alert */}
               {isCancelled && (
                 <Alert variant="destructive">
@@ -169,18 +193,18 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
 
               {/* Hotel Information */}
               <div>
-                <h3 className="font-semibold text-lg mb-3">Hotel Information</h3>
-                <div className="flex gap-4">
+                <h3 className="font-semibold text-base mb-2">Hotel Information</h3>
+                <div className="flex gap-3">
                   <img
                     src={hotel.image}
                     alt={hotel.title}
-                    className="w-32 h-32 object-cover rounded-md"
+                    className="w-24 h-24 object-cover rounded-md flex-shrink-0"
                   />
-                  <div className="flex-1 space-y-2">
-                    <h4 className="font-semibold text-xl">{hotel.title}</h4>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{hotel.location}</span>
+                  <div className="flex-1 space-y-1.5 min-w-0">
+                    <h4 className="font-semibold text-base truncate">{hotel.title}</h4>
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <span className="truncate">{hotel.location}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -368,36 +392,49 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
                 </div>
               </div>
             </div>
-          </ScrollArea>
+          </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={handleDownload}>
-              <Download className="h-4 w-4 mr-2" />
-              Download PDF
-            </Button>
-            <Button variant="outline" onClick={handleShare}>
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
-            </Button>
-            {canModify && (
-              <Button variant="outline" onClick={handleModify}>
-                <Edit className="h-4 w-4 mr-2" />
-                Modify Booking
+          <div className="flex-shrink-0 pt-3 border-t mt-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="h-3 w-3 mr-1" />
+                <span className="text-xs">Download</span>
               </Button>
-            )}
-            {canCancel && (
-              <Button variant="destructive" onClick={handleCancel}>
-                <XCircle className="h-4 w-4 mr-2" />
-                Cancel Booking
+              <Button variant="outline" size="sm" onClick={handleShare}>
+                <Share2 className="h-3 w-3 mr-1" />
+                <span className="text-xs">Share</span>
               </Button>
-            )}
-            {isCancelled && (
-              <Button onClick={handleRebook}>
-                <CreditCard className="h-4 w-4 mr-2" />
-                Re-book Hotel
-              </Button>
-            )}
+              {canModify && (
+                <Button variant="outline" size="sm" onClick={handleModify}>
+                  <Edit className="h-3 w-3 mr-1" />
+                  <span className="text-xs">Modify</span>
+                </Button>
+              )}
+              {canModify && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDisruptionRecovery}
+                  className="border-orange-500 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950"
+                >
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  <span className="text-xs">Report Issue</span>
+                </Button>
+              )}
+              {canCancel && (
+                <Button variant="destructive" size="sm" onClick={handleCancel} className="col-span-2">
+                  <XCircle className="h-3 w-3 mr-1" />
+                  <span className="text-xs">Cancel Booking</span>
+                </Button>
+              )}
+              {isCancelled && (
+                <Button onClick={handleRebook} size="sm" className="col-span-2">
+                  <CreditCard className="h-3 w-3 mr-1" />
+                  <span className="text-xs">Re-book Hotel</span>
+                </Button>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -417,6 +454,14 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
         onClose={() => setIsCancelling(false)}
         onCancellationComplete={handleCancellationComplete}
       />
+
+      {/* Disruption Recovery Modal */}
+      {/* <DisruptionRecovery
+        booking={currentBooking}
+        isOpen={isRecovering}
+        onClose={() => setIsRecovering(false)}
+        onRecoveryComplete={handleRecoveryComplete}
+      /> */}
     </>
   );
 }
