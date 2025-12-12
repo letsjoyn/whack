@@ -1,12 +1,10 @@
 /**
  * Authentication Context
  * Provides authentication state and methods throughout the application
- * Integrated with Firebase Authentication
+ * Uses local authentication with EmailJS for OTP
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { auth } from '@/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import type { UserProfile } from '@/types/booking';
 
 interface AuthContextType {
@@ -42,66 +40,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [lastActivity, setLastActivity] = useState(Date.now());
 
   /**
-   * Initialize auth state from Firebase
+   * Initialize auth state from localStorage
    */
   useEffect(() => {
-    if (!auth) {
-      console.warn('Firebase auth not initialized');
-      setIsLoading(false);
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        if (firebaseUser) {
-          // User is logged in
-          const userData: UserProfile = {
-            userId: firebaseUser.uid,
-            email: firebaseUser.email || '',
-            firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
-            lastName: firebaseUser.displayName?.split(' ')[1] || '',
-            phone: firebaseUser.phoneNumber || '',
-            notificationPreferences: {
-              email: {
-                enabled: true,
-                types: [
-                  'booking_confirmation',
-                  'booking_modification',
-                  'booking_cancellation',
-                  'check_in_reminder',
-                  'booking_status_change',
-                  'hotel_cancellation',
-                ],
-              },
-              push: {
-                enabled: false,
-                types: [
-                  'booking_status_change',
-                  'check_in_reminder',
-                  'hotel_cancellation',
-                ],
-              },
-            },
-          };
-          
-          localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-          setUser(userData);
-        } else {
-          // User is logged out
-          localStorage.removeItem(ACCESS_TOKEN_KEY);
-          localStorage.removeItem(REFRESH_TOKEN_KEY);
-          localStorage.removeItem(USER_DATA_KEY);
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+    try {
+      const userData = localStorage.getItem(USER_DATA_KEY);
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
       }
-    });
-
-    return unsubscribe;
+    } catch (error) {
+      console.error('Failed to initialize auth:', error);
+      localStorage.removeItem(USER_DATA_KEY);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   /**
@@ -134,19 +87,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, lastActivity]);
 
   /**
-   * Login user with Firebase
+   * Login user with local authentication
    */
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Get ID token for API calls
-      const accessToken = await firebaseUser.getIdToken();
+      // Mock JWT tokens
+      const accessToken = `local_token_${Date.now()}`;
+      const refreshToken = `refresh_token_${Date.now()}`;
+
+      // Mock user data
+      const userData: UserProfile = {
+        userId: `user_${Date.now()}`,
+        email,
+        firstName: email.split('@')[0],
+        lastName: 'User',
+        phone: '',
+        notificationPreferences: {
+          email: {
+            enabled: true,
+            types: [
+              'booking_confirmation',
+              'booking_modification',
+              'booking_cancellation',
+              'check_in_reminder',
+              'booking_status_change',
+              'hotel_cancellation',
+            ],
+          },
+          push: {
+            enabled: false,
+            types: [
+              'booking_status_change',
+              'check_in_reminder',
+              'hotel_cancellation',
+            ],
+          },
+        },
+      };
+
+      // Store tokens and user data
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
 
-      // User data will be set by onAuthStateChanged
+      setUser(userData);
       setLastActivity(Date.now());
     } catch (error: any) {
       console.error('Login failed:', error);
@@ -157,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   /**
-   * Register new user with Firebase
+   * Register new user with local authentication
    */
   const register = async (
     email: string,
@@ -167,14 +155,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     setIsLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Get ID token for API calls
-      const accessToken = await firebaseUser.getIdToken();
+      // Mock JWT tokens
+      const accessToken = `local_token_${Date.now()}`;
+      const refreshToken = `refresh_token_${Date.now()}`;
+
+      // Create user data
+      const userData: UserProfile = {
+        userId: `user_${Date.now()}`,
+        email,
+        firstName,
+        lastName,
+        phone: '',
+        notificationPreferences: {
+          email: {
+            enabled: true,
+            types: [
+              'booking_confirmation',
+              'booking_modification',
+              'booking_cancellation',
+              'check_in_reminder',
+              'booking_status_change',
+              'hotel_cancellation',
+            ],
+          },
+          push: {
+            enabled: false,
+            types: [
+              'booking_status_change',
+              'check_in_reminder',
+              'hotel_cancellation',
+            ],
+          },
+        },
+      };
+
+      // Store tokens and user data
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
 
-      // User data will be set by onAuthStateChanged
+      setUser(userData);
       setLastActivity(Date.now());
     } catch (error: any) {
       console.error('Registration failed:', error);
@@ -185,11 +208,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   /**
-   * Logout user from Firebase
+   * Logout user
    */
   const logout = async () => {
     try {
-      await signOut(auth);
       // Clear tokens and user data
       localStorage.removeItem(ACCESS_TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);

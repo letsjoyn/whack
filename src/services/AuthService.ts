@@ -1,10 +1,26 @@
 /**
  * Authentication Service
  * Handles email, phone, and Google authentication
- * Uses FREE services: Resend for email, Ethereal for testing
+ * Uses EmailJS for sending emails
  */
 
-// Email OTP Service - Using Resend (Free tier: 100 emails/day)
+import emailjs from '@emailjs/browser';
+
+// Initialize EmailJS
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+
+if (EMAILJS_PUBLIC_KEY) {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+  console.log('✅ EmailJS initialized with public key:', EMAILJS_PUBLIC_KEY.substring(0, 5) + '...');
+  console.log('Service ID:', EMAILJS_SERVICE_ID);
+  console.log('Template ID:', EMAILJS_TEMPLATE_ID);
+} else {
+  console.error('❌ EmailJS public key not found in environment variables');
+}
+
+// Email OTP Service - Using EmailJS
 export const emailOtpService = {
   // Store OTPs in memory (in production, use backend)
   otpStore: new Map<string, { code: string; expiresAt: number }>(),
@@ -20,91 +36,44 @@ export const emailOtpService = {
 
       this.otpStore.set(email, { code: otp, expiresAt });
 
-      // Try Gmail first (if configured)
-      const gmailEmail = import.meta.env.VITE_GMAIL_EMAIL;
-      const gmailPassword = import.meta.env.VITE_GMAIL_PASSWORD;
-
-      if (gmailEmail && gmailPassword) {
+      // Send via EmailJS
+      if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
         try {
-          // Send via backend API (you'll need to set this up)
-          // For now, we'll use a simple fetch to a backend endpoint
-          const response = await fetch('/api/send-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              to: email,
-              subject: 'Your BookOnce OTP Code',
-              otp: otp,
-              gmailEmail,
-              gmailPassword,
-            }),
-          });
+          const templateParams = {
+            to_email: email,
+            otp_code: otp,
+            subject: 'Your BookOnce OTP Code',
+          };
 
-          if (response.ok) {
-            console.log(`✅ Email OTP sent to ${email} via Gmail`);
+          const response = await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            templateParams
+          );
+
+          if (response.status === 200) {
+            console.log(`✅ OTP sent to ${email}`);
             return {
               success: true,
               message: `OTP sent to ${email}. Check your inbox!`,
             };
+          } else {
+            throw new Error('EmailJS returned non-200 status');
           }
-        } catch (gmailError) {
-          console.warn('Gmail send error, trying Resend:', gmailError);
+        } catch (emailjsError: any) {
+          console.error('EmailJS error:', emailjsError);
+          return {
+            success: false,
+            message: `Failed to send OTP: ${emailjsError.message}`,
+          };
         }
+      } else {
+        console.error('EmailJS not configured. Missing credentials.');
+        return {
+          success: false,
+          message: 'Email service not configured. Check your EmailJS credentials in .env',
+        };
       }
-
-      // Try Resend API (if configured)
-      const resendApiKey = import.meta.env.VITE_RESEND_API_KEY;
-      
-      if (resendApiKey && resendApiKey !== 're_your_api_key_here') {
-        try {
-          const response = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${resendApiKey}`,
-            },
-            body: JSON.stringify({
-              from: 'BookOnce <onboarding@resend.dev>',
-              to: email,
-              subject: 'Your BookOnce OTP Code',
-              html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #6366f1;">BookOnce Email Verification</h2>
-                  <p>Your OTP code is:</p>
-                  <h1 style="color: #6366f1; letter-spacing: 5px; font-size: 32px;">${otp}</h1>
-                  <p style="color: #666;">This code expires in 15 minutes.</p>
-                  <p style="color: #999; font-size: 12px;">If you didn't request this code, please ignore this email.</p>
-                </div>
-              `,
-            }),
-          });
-
-          if (response.ok) {
-            console.log(`✅ Email OTP sent to ${email} via Resend`);
-            return {
-              success: true,
-              message: `OTP sent to ${email}. Check your inbox!`,
-            };
-          }
-        } catch (resendError) {
-          console.warn('Resend API error, falling back to console:', resendError);
-        }
-      }
-
-      // Fallback: Show in console for testing
-      console.log(`📧 Email OTP for ${email}: ${otp}`);
-      console.log(`⏱️ Expires in 15 minutes`);
-      
-      if (typeof window !== 'undefined') {
-        (window as any).__DEMO_EMAIL_OTP__ = otp;
-      }
-
-      return {
-        success: true,
-        message: `OTP sent to ${email}. Check console for demo OTP.`,
-      };
     } catch (error) {
       console.error('Error sending OTP:', error);
       return {
