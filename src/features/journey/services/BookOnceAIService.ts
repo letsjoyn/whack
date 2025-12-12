@@ -162,15 +162,16 @@ class BookOnceAIService {
    * Generate complete journey plan with timing calculations
    */
   async generateCompleteJourneyPlan(context: JourneyContext): Promise<string> {
-    const systemPrompt = `You are BookOnce AI, an expert AI travel planner. Generate a complete door-to-door journey plan with precise timing calculations.
+    const systemPrompt = `You are BookOnce AI, an expert AI travel planner. Generate a complete door-to-door journey plan with precise timing calculations and cost breakdowns.
 
 IMPORTANT: Calculate exact times for each segment based on the departure time: ${context.departureTime}
 
 Your response must include:
-1. OUTBOUND JOURNEY - Step-by-step route with exact times
+1. OUTBOUND JOURNEY - Step-by-step route with exact times and costs
 2. RETURN JOURNEY - Complete return route (if round-trip)
 3. STOPS & FOOD - Meal recommendations with timing
 4. ACCOMMODATION - Hotel suggestions with check-in/out times
+${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? `5. ENDANGERED PLACES - Include the special visits to endangered places with timing and pricing` : ''}
 
 Format each segment clearly with:
 - Mode of transport
@@ -178,10 +179,11 @@ Format each segment clearly with:
 - Departure and arrival times
 - Duration
 - Distance
-- Cost estimate
+- Cost estimate (include endangered places costs when applicable)
 - Special notes
 
-Be specific about timing - calculate when each segment starts and ends based on the ${context.departureTime} departure time.`;
+Be specific about timing - calculate when each segment starts and ends based on the ${context.departureTime} departure time.
+When endangered places are included, integrate them into the journey flow and mention their costs.`;
 
     const userPrompt = `Create a complete journey plan:
 
@@ -193,6 +195,11 @@ ${context.returnDate ? `RETURN DATE: ${context.returnDate}` : ''}
 TRAVELERS: ${context.travelers}
 STYLE: ${context.intent === 'urgent' ? 'Fast and efficient - minimize travel time' : 'Leisurely - comfortable and scenic'}
 EXPERIENCE: ${context.visitor === 'first-time' ? 'First-time visitor - include must-see highlights' : 'Returning visitor - suggest new experiences'}
+${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? `
+ENDANGERED PLACES TO VISIT:
+${context.endangeredPlaces.map((place: any) => `  - ${place.name} (${place.location}) - ${place.threatLevel.toUpperCase()} threat, ${place.yearsRemaining} years remaining
+    Estimated cost: ₹${place.estimatedCost.toLocaleString()} (includes transport, guide & entry)`).join('\n')}
+TOTAL ENDANGERED PLACES COST: ₹${context.totalEndangeredPlacesCost?.toLocaleString() || 0}` : ''}
 
 Generate a detailed plan with:
 
@@ -219,7 +226,16 @@ ${context.returnDate ? `- Hotel recommendations
 - Number of rooms needed for ${context.travelers} travelers
 - Cost estimates` : '[Not needed - day trip]'}
 
-Be specific with times, costs, and practical details!`;
+${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? `## ENDANGERED PLACES VISITS
+Include these special visits in your plan:
+${context.endangeredPlaces.map((place: any) => `- ${place.name}: A ${place.threatLevel} threat site with only ${place.yearsRemaining} years remaining
+  Cost: ₹${place.estimatedCost.toLocaleString()} per group (includes local transport, expert guide, and entry fee)
+  Timing: Schedule during the stay, suggest best time of day`).join('\n')}
+
+Total cost for endangered places: ₹${context.totalEndangeredPlacesCost?.toLocaleString() || 0}
+These visits support conservation efforts and local communities.` : ''}
+
+Be specific with times, costs, and practical details!${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? '\nIMPORTANT: Include the endangered places costs in your pricing breakdown!' : ''}`;
 
     try {
       const response = await this.callAI([

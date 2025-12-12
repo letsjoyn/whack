@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { 
+import {
   ArrowLeft, MapPin, Calendar, Users, Clock,
   Navigation, Train, Plane, Bus, Footprints, Utensils,
   Hotel, Sparkles, AlertCircle, RefreshCw, Map, ExternalLink, AlertTriangle
@@ -31,7 +31,7 @@ const RoutePlanning = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  
+
   // Get data from URL params
   const from = searchParams.get('from') || '';
   const to = searchParams.get('to') || '';
@@ -45,7 +45,7 @@ const RoutePlanning = () => {
   const [isPlanning, setIsPlanning] = useState(true);
   const [departureTime, setDepartureTime] = useState(departureTimeParam);
   const [showFlightModal, setShowFlightModal] = useState(false);
-  const [selectedFlightRoute, setSelectedFlightRoute] = useState<{from: string; to: string; time: string; date: string} | null>(null);
+  const [selectedFlightRoute, setSelectedFlightRoute] = useState<{ from: string; to: string; time: string; date: string } | null>(null);
   const numGuests = parseInt(guests) || 2;
 
   // Map state
@@ -79,8 +79,8 @@ const RoutePlanning = () => {
     // Calculate endangered places costs
     const endangeredPlacesCost = addedPlaces.reduce((total, place) => {
       // Estimate costs based on threat level and location
-      const baseCost = place.threatLevel === 'critical' ? 1500 : 
-                      place.threatLevel === 'high' ? 1000 : 800;
+      const baseCost = place.threatLevel === 'critical' ? 1500 :
+        place.threatLevel === 'high' ? 1000 : 800;
       const transportCost = 300; // Local transport to the place
       const guideCost = 500; // Local guide/witness fee
       return total + baseCost + transportCost + guideCost;
@@ -132,9 +132,10 @@ const RoutePlanning = () => {
   const handleAddToTrip = (place: EndangeredPlace) => {
     if (!addedPlaces.find(p => p.id === place.id)) {
       setAddedPlaces(prev => [...prev, place]);
+      setAiPlanLoading(true);
       toast({
         title: "Added to Your Trip! 🌍",
-        description: `${place.name} has been added as a side visit to your journey.`,
+        description: `${place.name} has been added. AI is updating your journey plan with pricing...`,
         duration: 3000,
       });
     } else {
@@ -239,7 +240,7 @@ const RoutePlanning = () => {
 
     const fromCity = from.split(',')[0].trim();
     const toCity = to.split(',')[0].trim();
-    
+
     const originCode = airportCodes[fromCity] || 'BOM';
     const destCode = airportCodes[toCity] || 'GOI';
 
@@ -313,6 +314,15 @@ const RoutePlanning = () => {
           intent,
           visitor,
           departureTime,
+          endangeredPlaces: addedPlaces.map(place => ({
+            name: place.name,
+            location: place.location,
+            threatLevel: place.threatLevel,
+            yearsRemaining: place.yearsRemaining,
+            estimatedCost: place.threatLevel === 'critical' ? 2300 :
+              place.threatLevel === 'high' ? 1800 : 1600,
+          })),
+          totalEndangeredPlacesCost: pricing.endangeredPlacesCost,
         };
 
         console.log('Generating AI journey plan with context:', context);
@@ -333,7 +343,7 @@ const RoutePlanning = () => {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [from, to, departure, returnDate, numGuests, intent, visitor, departureTime]);
+  }, [from, to, departure, returnDate, numGuests, intent, visitor, departureTime, addedPlaces, pricing.endangeredPlacesCost]);
 
   if (!from || !to) {
     return (
@@ -384,7 +394,7 @@ const RoutePlanning = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          
+
           <div className="flex items-center gap-2">
             <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
               {intent === 'urgent' ? '⚡ Urgent' : '🎒 Leisure'}
@@ -484,7 +494,7 @@ const RoutePlanning = () => {
                             {aiPlanError.includes('rate limit') ? '⏱️ AI Service Busy' : 'AI Plan Unavailable'}
                           </p>
                           <p className="text-xs text-blue-700 mb-2">
-                            {aiPlanError.includes('rate limit') 
+                            {aiPlanError.includes('rate limit')
                               ? 'The AI service is experiencing high demand. Your journey is still planned using our reliable routing system below.'
                               : aiPlanError}
                           </p>
@@ -499,7 +509,7 @@ const RoutePlanning = () => {
                       </div>
                     </Card>
                   ) : aiJourneyPlan ? (
-                    <JourneyVisualization 
+                    <JourneyVisualization
                       aiResponse={aiJourneyPlan.split('## RETURN JOURNEY')[0].split('## STOPS & FOOD')[0].split('## ACCOMMODATION')[0]}
                       journeyType="outbound"
                       userName="Traveler"
@@ -510,96 +520,96 @@ const RoutePlanning = () => {
                   {(!aiJourneyPlan || aiPlanError) && !aiPlanLoading && (
                     <>
                       <RouteSegment
-                    icon={<Footprints className="h-5 w-5" />}
-                    mode="Walk"
-                    from="Your Home"
-                    to="Metro Station"
-                    duration="8 min"
-                    distance="650 m"
-                    time={segmentTimes.walk1}
-                    color="text-green-500"
-                    travelers={numGuests}
-                  />
-                  
-                  <RouteSegment
-                    icon={<Train className="h-5 w-5" />}
-                    mode="Metro"
-                    from="Central Station"
-                    to="Airport Station"
-                    duration="25 min"
-                    distance="18 km"
-                    time={segmentTimes.metro}
-                    color="text-blue-500"
-                    details="Line 3 - Direction Airport"
-                    price={60}
-                    travelers={numGuests}
-                    seatsRequired={true}
-                  />
-
-                  <RouteSegment
-                    icon={<Plane className="h-5 w-5" />}
-                    mode="Flight"
-                    from={from}
-                    to={to}
-                    duration="2h 30min"
-                    distance="1,200 km"
-                    time={segmentTimes.flight}
-                    color="text-purple-500"
-                    details={`AI 101 - Economy • ${numGuests} ${numGuests === 1 ? 'passenger' : 'passengers'}`}
-                    price={intent === 'urgent' ? 8500 : 5500}
-                    travelers={numGuests}
-                    seatsRequired={true}
-                    isClickable={true}
-                    onClick={() => handleFlightClick(from, to, segmentTimes.flight, departure)}
-                  />
-
-                  <RouteSegment
-                    icon={<Bus className="h-5 w-5" />}
-                    mode="Bus"
-                    from="Airport"
-                    to="City Center"
-                    duration="35 min"
-                    distance="22 km"
-                    time={segmentTimes.bus}
-                    color="text-orange-500"
-                    price={40}
-                    travelers={numGuests}
-                    seatsRequired={true}
-                  />
-
-                  <RouteSegment
-                    icon={<Footprints className="h-5 w-5" />}
-                    mode="Walk"
-                    from="Bus Stop"
-                    to="Your Destination"
-                    duration="5 min"
-                    distance="400 m"
-                    time={segmentTimes.walk2}
-                    color="text-green-500"
-                    travelers={numGuests}
-                  />
-
-                  {/* Added Endangered Places as Side Visits */}
-                  {addedPlaces.map((place, index) => {
-                    const placeCost = place.threatLevel === 'critical' ? 2300 : 
-                                    place.threatLevel === 'high' ? 1800 : 1600;
-                    return (
-                      <RouteSegment
-                        key={place.id}
-                        icon={<AlertTriangle className="h-5 w-5" />}
-                        mode="Side Visit"
-                        from="Your Destination"
-                        to={place.name}
-                        duration="2-3 hours"
-                        distance="Local area"
-                        time="During stay"
-                        color="text-orange-600"
-                        details={`${place.threatLevel.toUpperCase()} - ${place.yearsRemaining} years remaining • Includes transport, guide & entry`}
-                        price={placeCost}
+                        icon={<Footprints className="h-5 w-5" />}
+                        mode="Walk"
+                        from="Your Home"
+                        to="Metro Station"
+                        duration="8 min"
+                        distance="650 m"
+                        time={segmentTimes.walk1}
+                        color="text-green-500"
                         travelers={numGuests}
                       />
-                    );
-                  })}
+
+                      <RouteSegment
+                        icon={<Train className="h-5 w-5" />}
+                        mode="Metro"
+                        from="Central Station"
+                        to="Airport Station"
+                        duration="25 min"
+                        distance="18 km"
+                        time={segmentTimes.metro}
+                        color="text-blue-500"
+                        details="Line 3 - Direction Airport"
+                        price={60}
+                        travelers={numGuests}
+                        seatsRequired={true}
+                      />
+
+                      <RouteSegment
+                        icon={<Plane className="h-5 w-5" />}
+                        mode="Flight"
+                        from={from}
+                        to={to}
+                        duration="2h 30min"
+                        distance="1,200 km"
+                        time={segmentTimes.flight}
+                        color="text-purple-500"
+                        details={`AI 101 - Economy • ${numGuests} ${numGuests === 1 ? 'passenger' : 'passengers'}`}
+                        price={intent === 'urgent' ? 8500 : 5500}
+                        travelers={numGuests}
+                        seatsRequired={true}
+                        isClickable={true}
+                        onClick={() => handleFlightClick(from, to, segmentTimes.flight, departure)}
+                      />
+
+                      <RouteSegment
+                        icon={<Bus className="h-5 w-5" />}
+                        mode="Bus"
+                        from="Airport"
+                        to="City Center"
+                        duration="35 min"
+                        distance="22 km"
+                        time={segmentTimes.bus}
+                        color="text-orange-500"
+                        price={40}
+                        travelers={numGuests}
+                        seatsRequired={true}
+                      />
+
+                      <RouteSegment
+                        icon={<Footprints className="h-5 w-5" />}
+                        mode="Walk"
+                        from="Bus Stop"
+                        to="Your Destination"
+                        duration="5 min"
+                        distance="400 m"
+                        time={segmentTimes.walk2}
+                        color="text-green-500"
+                        travelers={numGuests}
+                      />
+
+                      {/* Added Endangered Places as Side Visits */}
+                      {addedPlaces.map((place, index) => {
+                        const placeCost = place.threatLevel === 'critical' ? 2300 :
+                          place.threatLevel === 'high' ? 1800 : 1600;
+                        return (
+                          <RouteSegment
+                            key={place.id}
+                            icon={<AlertTriangle className="h-5 w-5" />}
+                            mode="Side Visit"
+                            from="Your Destination"
+                            to={place.name}
+                            duration="2-3 hours"
+                            distance="Local area"
+                            time="During stay"
+                            color="text-orange-600"
+                            details={`${place.threatLevel.toUpperCase()} - ${place.yearsRemaining} years remaining • Includes transport, guide & entry`}
+                            price={placeCost}
+                            travelers={numGuests}
+                          />
+                        );
+                      })}
                     </>
                   )}
                 </TabsContent>
@@ -616,7 +626,7 @@ const RoutePlanning = () => {
                     </div>
 
                     {aiJourneyPlan && aiJourneyPlan.includes('## RETURN JOURNEY') && (
-                      <JourneyVisualization 
+                      <JourneyVisualization
                         aiResponse={aiJourneyPlan.split('## RETURN JOURNEY')[1]?.split('## STOPS & FOOD')[0]?.split('## ACCOMMODATION')[0] || 'Calculating return journey...'}
                         journeyType="return"
                         userName="Traveler"
@@ -685,7 +695,7 @@ const RoutePlanning = () => {
 
                 <TabsContent value="stops" className="space-y-4 mt-4">
                   {aiJourneyPlan && aiJourneyPlan.includes('## STOPS & FOOD') && (
-                    <JourneyVisualization 
+                    <JourneyVisualization
                       aiResponse={aiJourneyPlan.split('## STOPS & FOOD')[1]?.split('## ACCOMMODATION')[0]?.split('## RETURN JOURNEY')[0] || 'Calculating meal stops...'}
                       journeyType="outbound"
                       userName="Traveler"
@@ -703,27 +713,27 @@ const RoutePlanning = () => {
                       </p>
                     </div>
                   )}
-                  
+
                   <StopCard
                     icon={<Utensils className="h-5 w-5 text-orange-500" />}
                     title="Breakfast Stop"
                     location="Airport Terminal 2"
                     time="09:45 - 10:15"
-                    description={intent === 'urgent' 
-                      ? `Quick grab-and-go options for ${numGuests} ${numGuests === 1 ? 'person' : 'people'}` 
+                    description={intent === 'urgent'
+                      ? `Quick grab-and-go options for ${numGuests} ${numGuests === 1 ? 'person' : 'people'}`
                       : `Local cuisine recommendations • Table for ${numGuests}`}
                   />
-                  
+
                   <StopCard
                     icon={<Utensils className="h-5 w-5 text-orange-500" />}
                     title="Lunch"
                     location="Near destination"
                     time="14:30"
-                    description={visitor === 'first-time' 
-                      ? `Popular local restaurant • Seating for ${numGuests}` 
+                    description={visitor === 'first-time'
+                      ? `Popular local restaurant • Seating for ${numGuests}`
                       : `Your favorite from last visit • Party of ${numGuests}`}
                   />
-                  
+
                   {numGuests >= 6 && (
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-xs text-muted-foreground">
@@ -735,7 +745,7 @@ const RoutePlanning = () => {
 
                 <TabsContent value="stay" className="space-y-4 mt-4">
                   {aiJourneyPlan && aiJourneyPlan.includes('## ACCOMMODATION') && (
-                    <JourneyVisualization 
+                    <JourneyVisualization
                       aiResponse={aiJourneyPlan.split('## ACCOMMODATION')[1] || 'Calculating accommodation options...'}
                       journeyType="outbound"
                       userName="Traveler"
@@ -755,7 +765,7 @@ const RoutePlanning = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <StopCard
                     icon={<Hotel className="h-5 w-5 text-blue-500" />}
                     title="Recommended Hotel"
@@ -763,7 +773,7 @@ const RoutePlanning = () => {
                     time="Check-in: 15:00"
                     description={intent === 'urgent' ? 'Quick check-in, near transport' : 'Comfortable stay with local experiences'}
                   />
-                  
+
                   {numGuests > 2 && (
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-xs text-muted-foreground">
@@ -809,53 +819,7 @@ const RoutePlanning = () => {
 
           {/* Right: Map & Info */}
           <div className="space-y-4">
-            {/* Pricing Summary */}
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Trip Summary
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Travelers</span>
-                  <span className="font-medium">{numGuests} {numGuests === 1 ? 'person' : 'people'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Price per person</span>
-                  <span className="font-medium">₹{pricing.perPerson.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Transport</span>
-                  <span className="font-medium">₹{pricing.baseTransportCost.toLocaleString()}</span>
-                </div>
-                {pricing.endangeredPlacesCost > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Endangered Places ({addedPlaces.length})</span>
-                    <span className="font-medium text-orange-600">₹{pricing.endangeredPlacesCost.toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">₹{pricing.subtotal.toLocaleString()}</span>
-                </div>
-                {pricing.hasDiscount && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Group discount (10%)</span>
-                    <span>-₹{pricing.discount.toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="pt-3 border-t">
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Total</span>
-                    <span className="font-bold text-lg">₹{pricing.total.toLocaleString()}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {returnDate ? 'Round-trip for all travelers' : 'One-way for all travelers'}
-                  </p>
-                </div>
-              </div>
-            </Card>
-
+            {/* Map moved to top */}
             <Card className="p-6">
               <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Map className="h-4 w-4" />
@@ -976,7 +940,7 @@ const RoutePlanning = () => {
 
           <div className="mt-6 p-4 bg-muted/50 rounded-lg">
             <p className="text-xs text-muted-foreground">
-              💡 <strong>Pro Tip:</strong> Open multiple tabs to compare prices across platforms. Prices can vary significantly between sites. 
+              💡 <strong>Pro Tip:</strong> Open multiple tabs to compare prices across platforms. Prices can vary significantly between sites.
               Each link opens with your search details pre-filled for instant results!
             </p>
           </div>
@@ -1005,10 +969,9 @@ interface RouteSegmentProps {
 }
 
 const RouteSegment = ({ icon, mode, from, to, duration, distance, time, color, details, price, travelers, seatsRequired, onClick, isClickable }: RouteSegmentProps) => (
-  <div 
-    className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${
-      isClickable ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md' : 'hover:bg-muted/50'
-    }`}
+  <div
+    className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${isClickable ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md' : 'hover:bg-muted/50'
+      }`}
     onClick={onClick}
   >
     <div className="flex flex-col items-center">
