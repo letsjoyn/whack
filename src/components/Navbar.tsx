@@ -69,10 +69,10 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
           <div className="hidden md:flex items-center gap-3">
             {navItems.map((item) => {
               const className = `flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${item.highlight
-                  ? item.isActive
-                    ? "bg-gradient-accent text-primary-foreground shadow-glow ring-2 ring-primary/50"
-                    : "bg-gradient-accent text-primary-foreground shadow-glow"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                ? item.isActive
+                  ? "bg-gradient-accent text-primary-foreground shadow-glow ring-2 ring-primary/50"
+                  : "bg-gradient-accent text-primary-foreground shadow-glow"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`;
 
               const content = (
@@ -89,8 +89,8 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                     onClick={item.onClick}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ 
-                      duration: 0.5, 
+                    transition={{
+                      duration: 0.5,
                       delay: 0.3,
                       ease: [0.23, 1, 0.32, 1]
                     }}
@@ -165,8 +165,8 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
               whileTap={{ scale: 0.9 }}
               onClick={onSafetyClick}
               className={`p-2 rounded-xl transition-all ${isOffline
-                  ? "bg-destructive text-destructive-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                ? "bg-destructive text-destructive-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`}
               title={isOffline ? "Safety Mode Active" : "Safety Information"}
             >
@@ -221,8 +221,8 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                       className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-xl shadow-lg overflow-hidden z-40"
                     >
                       <div className="p-4 border-b border-border">
-                        <p className="text-sm font-medium text-foreground">{user?.displayName || 'User'}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{user?.displayName || `${user?.firstName} ${user?.lastName}` || 'User'}</p>
+                        <p className="text-xs text-muted-foreground truncate" title={user?.email}>{user?.email}</p>
                       </div>
 
                       <div className="p-2 space-y-1">
@@ -244,15 +244,14 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                           My Bookings
                         </Link>
 
-                        <button
-                          onClick={() => {
-                            setIsDashboardOpen(false);
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors"
+                        <Link
+                          to="/profile/settings"
+                          onClick={() => setIsDashboardOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors no-underline"
                         >
                           <Settings className="w-4 h-4" />
                           Settings
-                        </button>
+                        </Link>
 
                         <div className="border-t border-border my-2"></div>
 
@@ -291,10 +290,10 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
           <div className="glass-strong rounded-2xl mt-2 p-4 space-y-2">
             {navItems.map((item) => {
               const className = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.highlight
-                  ? item.isActive
-                    ? "bg-gradient-accent text-primary-foreground ring-2 ring-primary/50"
-                    : "bg-gradient-accent text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                ? item.isActive
+                  ? "bg-gradient-accent text-primary-foreground ring-2 ring-primary/50"
+                  : "bg-gradient-accent text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`;
 
               const content = (

@@ -21,6 +21,7 @@ const RoutePlanning = lazy(() => import("./pages/RoutePlanning"));
 const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
 const BookingHistory = lazy(() => import("./pages/BookingHistory"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
+const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -52,11 +53,11 @@ const App = () => {
             <a href="#main-content" className="skip-link">
               Skip to main content
             </a>
-            
+
             <Toaster />
             <Sonner />
             <BookOnceAIChatModal />
-            
+
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <main id="main-content">
@@ -69,25 +70,33 @@ const App = () => {
                     <Route path="/journey" element={<JourneyPlanner />} />
                     <Route path="/journey/plan" element={<RoutePlanning />} />
                     <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
-                    
+
                     {/* Protected Routes - Require Authentication */}
-                    <Route 
-                      path="/profile" 
+                    <Route
+                      path="/profile"
                       element={
                         <ProtectedRoute>
                           <UserProfile />
                         </ProtectedRoute>
-                      } 
+                      }
                     />
-                    <Route 
-                      path="/profile/bookings" 
+                    <Route
+                      path="/profile/bookings"
                       element={
                         <ProtectedRoute>
                           <BookingHistory />
                         </ProtectedRoute>
-                      } 
+                      }
                     />
-                    
+                    <Route
+                      path="/profile/settings"
+                      element={
+                        <ProtectedRoute>
+                          <Settings />
+                        </ProtectedRoute>
+                      }
+                    />
+
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
