@@ -938,6 +938,58 @@ npm run build
 
 ---
 
+## 📍 Key Pages & Navigation
+
+### Login Page
+- **Location**: `src/pages/Auth.tsx`
+- **Component**: `src/components/AuthModal.tsx`
+- **Features**:
+  - Email/password authentication
+  - Social login integration
+  - Account creation
+  - Password recovery
+- **Access**: Navigate to `/auth` or click "Sign In" in the navbar
+
+### Dashboard
+- **Location**: `src/pages/Index.tsx` (Home/Dashboard)
+- **Features**:
+  - Hero section with journey planner
+  - Interactive maps with Leaflet
+  - Hotel search and browsing
+  - AI chat assistant (Vagabon AI)
+  - Travel utilities and tools
+  - Safety heatmap visualization
+  - Vanishing destinations showcase
+- **Access**: Main landing page after login
+
+### User Profile
+- **Location**: `src/pages/UserProfile.tsx`
+- **Features**:
+  - Profile management
+  - Saved preferences
+  - Account settings
+- **Access**: Click profile icon in navbar
+
+### Booking History
+- **Location**: `src/pages/BookingHistory.tsx`
+- **Features**:
+  - View past bookings
+  - Modify existing bookings
+  - Cancel bookings
+  - Download confirmations
+- **Access**: User menu → "My Bookings"
+
+### Travel Utilities
+- **Location**: `src/pages/TravelUtilities.tsx`
+- **Features**:
+  - Currency converter
+  - Time zone converter
+  - Expense tracker
+  - Travel checklist
+- **Access**: Main navigation menu
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions from the community! Whether it's:
