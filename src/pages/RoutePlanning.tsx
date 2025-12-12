@@ -29,6 +29,7 @@ import {
   Map,
   ExternalLink,
   AlertTriangle,
+  Zap,
 } from 'lucide-react';
 import { endangeredPlacesService, EndangeredPlace } from '@/services/EndangeredPlacesService';
 import EndangeredPlacesInline from '@/components/EndangeredPlacesInline';
@@ -44,6 +45,7 @@ import { freeRoutingService } from '@/features/journey/services/FreeRoutingServi
 import { bookOnceAIService } from '@/features/journey/services/BookOnceAIService';
 import JourneyVisualization from '@/components/JourneyVisualization';
 import { BookOnceAISidebar } from '@/components/BookOnceAISidebar';
+import { ContextLayerPanel } from '@/components/ContextLayer';
 
 const RoutePlanning = () => {
   const navigate = useNavigate();
@@ -84,6 +86,9 @@ const RoutePlanning = () => {
 
   // AI Sidebar state
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+
+  // Context Layer state
+  const [isContextOpen, setIsContextOpen] = useState(false);
 
   // Endangered places state
   const [endangeredPlaces, setEndangeredPlaces] = useState<EndangeredPlace[]>([]);
@@ -181,22 +186,34 @@ const RoutePlanning = () => {
   // Load map data
   useEffect(() => {
     const loadMapData = async () => {
-      if (!from || !to) return;
+      if (!from || !to) {
+        console.log('Map data load skipped: missing from or to');
+        setMapLoading(false);
+        return;
+      }
 
       setMapLoading(true);
       try {
+        console.log('Loading map data for:', { from, to });
+
         // Geocode origin
         const originResults = await freeGeocodingService.search(from);
+        console.log('Origin geocoding results:', originResults);
+
         if (originResults.length > 0) {
           setOriginLocation({
             lat: originResults[0].coordinates.lat,
             lng: originResults[0].coordinates.lng,
             name: from,
           });
+        } else {
+          console.error('No geocoding results for origin:', from);
         }
 
         // Geocode destination
         const destResults = await freeGeocodingService.search(to);
+        console.log('Destination geocoding results:', destResults);
+
         if (destResults.length > 0) {
           setDestinationLocation({
             lat: destResults[0].coordinates.lat,
@@ -206,6 +223,7 @@ const RoutePlanning = () => {
 
           // Calculate route if both locations are available
           if (originResults.length > 0) {
+            console.log('Calculating route...');
             const route = await freeRoutingService.getRoute({
               origin: {
                 lat: originResults[0].coordinates.lat,
@@ -217,18 +235,26 @@ const RoutePlanning = () => {
               },
               mode: 'driving-car',
             });
+            console.log('Route calculated:', route);
             setRouteSteps(route.steps);
           }
+        } else {
+          console.error('No geocoding results for destination:', to);
         }
       } catch (error) {
         console.error('Error loading map data:', error);
+        toast({
+          title: 'Map Load Error',
+          description: 'Unable to load map data. Please try again.',
+          variant: 'destructive',
+        });
       } finally {
         setMapLoading(false);
       }
     };
 
     loadMapData();
-  }, [from, to]);
+  }, [from, to, toast]);
 
   // Calculate segment times based on departure time
   const calculateSegmentTimes = (startTime: string) => {
@@ -425,6 +451,21 @@ const RoutePlanning = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* Small Context Layer Button - Top Right (hidden when panel is open) */}
+      {!isContextOpen && (
+        <button
+          onClick={() => setIsContextOpen(true)}
+          className="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 shadow-md hover:shadow-lg transition-all hover:scale-110 hover:bg-primary/20"
+          title="Real-Time Updates"
+        >
+          <Zap className="w-4 h-4 text-primary" />
+          <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+          </span>
+        </button>
+      )}
+
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -955,8 +996,16 @@ const RoutePlanning = () => {
               </div>
             </Card>
 
+            {/* Confirm and Pay Button */}
+            <Button
+              onClick={() => navigate('/booking-confirmation')}
+              className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all"
+            >
+              Confirm and Pay ₹{journeySummary?.cost?.toLocaleString() || pricing.total.toLocaleString()}
+            </Button>
+
             <Card className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <h3 className="font-semibold flex items-center gap-2 mb-4">
                 <AlertCircle className="h-4 w-4" />
                 Real-Time Updates
               </h3>
@@ -987,6 +1036,9 @@ const RoutePlanning = () => {
         onClose={() => setIsAISidebarOpen(false)}
         onToggle={() => setIsAISidebarOpen(!isAISidebarOpen)}
       />
+
+      {/* Context Layer Panel */}
+      <ContextLayerPanel isOpen={isContextOpen} onClose={() => setIsContextOpen(false)} />
 
       {/* Flight Comparison Modal */}
       <Dialog open={showFlightModal} onOpenChange={setShowFlightModal}>

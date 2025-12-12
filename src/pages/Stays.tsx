@@ -89,13 +89,13 @@ const Stays = () => {
     return vanishingData.filter(place => {
       const matchesLocation = location
         ? place.location.toLowerCase().includes(location.toLowerCase()) ||
-          place.name.toLowerCase().includes(location.toLowerCase())
+        place.name.toLowerCase().includes(location.toLowerCase())
         : true;
 
       const matchesSearch = searchQuery
         ? place.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          place.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          place.culture.toLowerCase().includes(searchQuery.toLowerCase())
+        place.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        place.culture.toLowerCase().includes(searchQuery.toLowerCase())
         : true;
 
       return matchesLocation && matchesSearch;
@@ -109,13 +109,13 @@ const Stays = () => {
       .filter(hotel => {
         const matchesLocation = location
           ? hotel.location.toLowerCase().includes(location.toLowerCase()) ||
-            hotel.title.toLowerCase().includes(location.toLowerCase())
+          hotel.title.toLowerCase().includes(location.toLowerCase())
           : true;
 
         const matchesSearch = searchQuery
           ? hotel.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            hotel.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            hotel.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+          hotel.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          hotel.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
           : true;
 
         return matchesLocation && matchesSearch;
@@ -135,7 +135,6 @@ const Stays = () => {
       <Navbar
         onSafetyClick={() => setIsSafetyOpen(true)}
         isOffline={isOffline}
-        onContextClick={() => setIsContextOpen(!isContextOpen)}
         onMapClick={() => setIsMapOpen(true)}
       />
 
