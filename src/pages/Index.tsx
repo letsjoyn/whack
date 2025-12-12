@@ -66,7 +66,6 @@ const Index = () => {
       <Navbar
         onSafetyClick={() => setIsSafetyOpen(true)}
         isOffline={isOffline}
-        onContextClick={() => setIsContextOpen(!isContextOpen)}
         onMapClick={() => setIsMapOpen(true)}
       />
 
