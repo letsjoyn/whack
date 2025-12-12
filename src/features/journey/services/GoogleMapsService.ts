@@ -5,7 +5,7 @@
  * Required APIs: Maps JavaScript API, Places API, Directions API, Distance Matrix API, Geocoding API
  */
 
-/// <reference path="../../../types/google-maps.d.ts" />
+import type {} from '../../../types/google-maps.d.ts';
 
 import { cacheStore } from '../utils/cache';
 

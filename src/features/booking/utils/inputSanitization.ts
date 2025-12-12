@@ -104,7 +104,7 @@ export function sanitizePhone(phone: string): string {
   let sanitized = phone.replace(/<[^>]*>/g, '');
 
   // Keep only digits, spaces, +, -, (, )
-  sanitized = sanitized.replace(/[^\d\s\+\-\(\)]/g, '');
+  sanitized = sanitized.replace(/[^\d\s+\-()]/g, '');
 
   // Trim whitespace
   sanitized = sanitized.trim();
@@ -257,7 +257,7 @@ export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
   const sanitized: any = {};
 
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.hasOwn(obj, key)) {
       const value = obj[key];
 
       if (typeof value === 'string') {
@@ -335,8 +335,8 @@ export function escapeSQLString(input: string): string {
     .replace(/"/g, '\\"')
     .replace(/\n/g, '\\n')
     .replace(/\r/g, '\\r')
-    .replace(/\x00/g, '\\0')
-    .replace(/\x1a/g, '\\Z');
+    .replace(new RegExp(String.fromCharCode(0), 'g'), '\\0')
+    .replace(new RegExp(String.fromCharCode(26), 'g'), '\\Z');
 }
 
 /**
@@ -393,7 +393,7 @@ export function detectSQLInjection(input: string): boolean {
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE)\b)/i,
     /(UNION\s+SELECT)/i,
     /('|")\s*(OR|AND)\s*('|")/i,
-    /(--|\#|\/\*)/,
+    /(--|#|\/\*)/,
     /(\bOR\b\s+\d+\s*=\s*\d+)/i,
   ];
 
