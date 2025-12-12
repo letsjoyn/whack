@@ -173,13 +173,12 @@ export function AccessibilityTester({ defaultVisible = false }: AccessibilityTes
                       className="flex items-center gap-2 p-2 rounded-lg bg-muted/50"
                     >
                       <StatusIcon
-                        className={`h-4 w-4 shrink-0 ${
-                          status === 'success'
+                        className={`h-4 w-4 shrink-0 ${status === 'success'
                             ? 'text-green-600'
                             : status === 'warning'
                               ? 'text-yellow-600'
                               : 'text-red-600'
-                        }`}
+                          }`}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-medium truncate">{check.property}</div>

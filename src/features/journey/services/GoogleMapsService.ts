@@ -5,7 +5,7 @@
  * Required APIs: Maps JavaScript API, Places API, Directions API, Distance Matrix API, Geocoding API
  */
 
-import type {} from '../../../types/google-maps.d.ts';
+import type { } from '../../../types/google-maps.d.ts';
 
 import { cacheStore } from '../utils/cache';
 
@@ -407,33 +407,33 @@ class GoogleMapsService {
             distance: step.distance?.value || 0,
             transitDetails: step.transit
               ? {
-                  line: {
-                    name: step.transit.line.name || '',
-                    shortName: step.transit.line.short_name || '',
-                    vehicle: {
-                      type: step.transit.line.vehicle.type || '',
-                      name: step.transit.line.vehicle.name || '',
-                      icon: step.transit.line.vehicle.icon || '',
-                    },
+                line: {
+                  name: step.transit.line.name || '',
+                  shortName: step.transit.line.short_name || '',
+                  vehicle: {
+                    type: step.transit.line.vehicle.type || '',
+                    name: step.transit.line.vehicle.name || '',
+                    icon: step.transit.line.vehicle.icon || '',
                   },
-                  departureStop: {
-                    name: step.transit.departure_stop.name,
-                    location: {
-                      lat: step.transit.departure_stop.location.lat(),
-                      lng: step.transit.departure_stop.location.lng(),
-                    },
+                },
+                departureStop: {
+                  name: step.transit.departure_stop.name,
+                  location: {
+                    lat: step.transit.departure_stop.location.lat(),
+                    lng: step.transit.departure_stop.location.lng(),
                   },
-                  arrivalStop: {
-                    name: step.transit.arrival_stop.name,
-                    location: {
-                      lat: step.transit.arrival_stop.location.lat(),
-                      lng: step.transit.arrival_stop.location.lng(),
-                    },
+                },
+                arrivalStop: {
+                  name: step.transit.arrival_stop.name,
+                  location: {
+                    lat: step.transit.arrival_stop.location.lat(),
+                    lng: step.transit.arrival_stop.location.lng(),
                   },
-                  departureTime: new Date(step.transit.departure_time.value),
-                  arrivalTime: new Date(step.transit.arrival_time.value),
-                  numStops: step.transit.num_stops || 0,
-                }
+                },
+                departureTime: new Date(step.transit.departure_time.value),
+                arrivalTime: new Date(step.transit.arrival_time.value),
+                numStops: step.transit.num_stops || 0,
+              }
               : undefined,
           })),
           duration: leg.duration?.value ? leg.duration.value / 60 : 0,

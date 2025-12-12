@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,12 +51,14 @@ interface JourneyVisualizationProps {
   aiResponse: string;
   journeyType: 'outbound' | 'return';
   userName?: string;
+  onSummaryUpdate?: (summary: { duration: string; cost: number; modes: number }) => void;
 }
 
 const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
   aiResponse,
   journeyType,
   userName = 'Traveler',
+  onSummaryUpdate,
 }) => {
   const [selectedOptions, setSelectedOptions] = useState<TransportOption[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -479,6 +481,17 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
     return hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`;
   };
 
+  // Update parent component with summary data
+  useEffect(() => {
+    if (onSummaryUpdate) {
+      onSummaryUpdate({
+        duration: getTotalDuration(),
+        cost: getTotalCost(),
+        modes: selectedOptions.length,
+      });
+    }
+  }, [selectedOptions, onSummaryUpdate]);
+
   return (
     <div className="w-full max-w-[1600px] mx-auto space-y-6 px-2">
       {/* Progress Header */}
@@ -743,82 +756,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               </CardContent>
             </Card>
 
-            {/* Journey Summary Card */}
-            {selectedOptions.length > 0 && (
-              <Card className="shadow-md border-2 border-primary/20">
-                <CardHeader className="pb-3 bg-primary/5">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Info className="h-5 w-5 text-primary" />
-                    Journey Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4 pb-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Total Duration</span>
-                      </div>
-                      <span className="font-bold text-base">{getTotalDuration()}</span>
-                    </div>
 
-                    <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Total Cost</span>
-                      </div>
-                      <span className="font-bold text-base text-primary">
-                        ₹{getTotalCost().toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <Navigation className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Transport Modes</span>
-                      </div>
-                      <span className="font-bold text-base">{selectedOptions.length}</span>
-                    </div>
-                  </div>
-
-                  {/* Quick Booking Actions */}
-                  {selectedOptions.some(opt => opt.bookingUrl) && (
-                    <div className="mt-4 pt-4 border-t">
-                      <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                        <ExternalLink className="h-4 w-4" />
-                        Quick Booking Links
-                      </h4>
-                      <div className="space-y-2">
-                        {selectedOptions.map(
-                          (option, index) =>
-                            option.bookingUrl && (
-                              <Button
-                                key={index}
-                                variant="outline"
-                                size="sm"
-                                className="w-full justify-between hover:bg-primary hover:text-primary-foreground transition-colors"
-                                asChild
-                              >
-                                <a
-                                  href={option.bookingUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <span className="flex items-center gap-2">
-                                    {getStepIcon(option.type)}
-                                    {option.provider}
-                                  </span>
-                                  <ExternalLink className="h-3 w-3" />
-                                </a>
-                              </Button>
-                            )
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
             {/* Confirm & Book Journey Button - Only show when all steps are selected */}
             {selectedOptions.length === journeySteps.length && journeySteps.length > 0 && (
