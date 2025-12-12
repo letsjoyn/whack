@@ -3,23 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   MapPin, 
-  Calendar, 
-  Users, 
-  Clock, 
   Sparkles, 
   Loader2,
   Route,
   MessageSquare
 } from 'lucide-react';
-import { bookOnceAIService } from '@/features/journey/services/BookOnceAIService';
-import JourneyVisualization from './JourneyVisualization';
-import type { JourneyContext } from '@/features/journey/types/aiAdvisor';
-import vagabondAIService from '@/features/journey/services/VagabondAIService';
 
 const AIJourneyPlanner: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,18 +45,57 @@ const AIJourneyPlanner: React.FC = () => {
     setError('');
 
     try {
-      const context: JourneyContext = {
-        origin: formData.origin,
-        destination: formData.destination,
-        departureDate: formData.departureDate,
-        departureTime: formData.departureTime,
-        returnDate: formData.returnDate || undefined,
-        travelers: parseInt(formData.travelers),
-        intent: formData.intent
-      };
+      // Mock journey plan generation
+      const mockPlan = `
+## OUTBOUND JOURNEY
 
-      const plan = await vagabondAIService.generateCompleteJourneyPlan(context);
-      setJourneyPlan(plan);
+**From:** ${formData.origin}
+**To:** ${formData.destination}
+**Date:** ${formData.departureDate}
+**Time:** ${formData.departureTime}
+**Travelers:** ${formData.travelers}
+**Style:** ${formData.intent === 'urgent' ? 'Fast & Efficient' : 'Leisurely & Scenic'}
+
+### Step 1: Prepare & Depart
+- Arrive at departure point 30 minutes early
+- Check weather and pack accordingly
+- Confirm all bookings
+
+### Step 2: Travel
+- Begin journey at ${formData.departureTime}
+- Follow recommended route
+- Take breaks as needed
+
+### Step 3: Arrive
+- Reach destination safely
+- Check into accommodation
+- Explore local area
+
+${formData.returnDate ? `
+## RETURN JOURNEY
+
+**From:** ${formData.destination}
+**To:** ${formData.origin}
+**Date:** ${formData.returnDate}
+
+### Step 1: Prepare
+- Pack belongings
+- Settle any local bills
+- Confirm return booking
+
+### Step 2: Travel Back
+- Depart on schedule
+- Follow return route
+- Enjoy the journey
+
+### Step 3: Arrive Home
+- Reach home safely
+- Unpack and rest
+- Share your experience
+` : ''}
+      `;
+
+      setJourneyPlan(mockPlan);
       setActiveTab('visualization');
     } catch (err: any) {
       setError(err.message || 'Failed to generate journey plan');
@@ -257,19 +287,39 @@ const AIJourneyPlanner: React.FC = () => {
           {journeyPlan ? (
             <div className="space-y-6">
               {/* Outbound Journey */}
-              <JourneyVisualization 
-                aiResponse={extractOutboundJourney(journeyPlan)}
-                journeyType="outbound"
-                userName={formData.userName || 'Traveler'}
-              />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Route className="h-5 w-5" />
+                    Outbound Journey
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted p-4 rounded-lg">
+                    <pre className="whitespace-pre-wrap text-sm text-foreground">
+                      {extractOutboundJourney(journeyPlan)}
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Return Journey */}
               {formData.returnDate && extractReturnJourney(journeyPlan) && (
-                <JourneyVisualization 
-                  aiResponse={extractReturnJourney(journeyPlan)}
-                  journeyType="return"
-                  userName={formData.userName || 'Traveler'}
-                />
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Route className="h-5 w-5" />
+                      Return Journey
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <pre className="whitespace-pre-wrap text-sm text-foreground">
+                        {extractReturnJourney(journeyPlan)}
+                      </pre>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
           ) : (

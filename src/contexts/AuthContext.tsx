@@ -1,6 +1,7 @@
 /**
  * Authentication Context
  * Provides authentication state and methods throughout the application
+ * Uses local authentication with EmailJS for OTP
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -12,7 +13,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
 }
 
@@ -42,27 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * Initialize auth state from localStorage
    */
   useEffect(() => {
-    const initAuth = () => {
-      try {
-        const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-        const userData = localStorage.getItem(USER_DATA_KEY);
-
-        if (accessToken && userData) {
-          const parsedUser = JSON.parse(userData);
-          setUser(parsedUser);
-        }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        // Clear invalid data
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
-        localStorage.removeItem(USER_DATA_KEY);
-      } finally {
-        setIsLoading(false);
+    try {
+      const userData = localStorage.getItem(USER_DATA_KEY);
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
       }
-    };
-
-    initAuth();
+    } catch (error) {
+      console.error('Failed to initialize auth:', error);
+      localStorage.removeItem(USER_DATA_KEY);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   /**
@@ -95,18 +87,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, lastActivity]);
 
   /**
-   * Login user
+   * Login user with local authentication
    */
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // In production, this would call an API endpoint
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Mock JWT tokens
-      const accessToken = `mock_access_token_${Date.now()}`;
-      const refreshToken = `mock_refresh_token_${Date.now()}`;
+      const accessToken = `local_token_${Date.now()}`;
+      const refreshToken = `refresh_token_${Date.now()}`;
 
       // Mock user data
       const userData: UserProfile = {
@@ -114,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         firstName: email.split('@')[0],
         lastName: 'User',
-        phone: '+1 (555) 123-4567',
+        phone: '',
         notificationPreferences: {
           email: {
             enabled: true,
@@ -145,16 +136,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(userData);
       setLastActivity(Date.now());
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
-      throw new Error('Login failed. Please check your credentials.');
+      throw new Error(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
 
   /**
-   * Register new user
+   * Register new user with local authentication
    */
   const register = async (
     email: string,
@@ -164,12 +155,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     setIsLoading(true);
     try {
-      // In production, this would call an API endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Mock JWT tokens
-      const accessToken = `mock_access_token_${Date.now()}`;
-      const refreshToken = `mock_refresh_token_${Date.now()}`;
+      const accessToken = `local_token_${Date.now()}`;
+      const refreshToken = `refresh_token_${Date.now()}`;
 
       // Create user data
       const userData: UserProfile = {
@@ -177,6 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         firstName,
         lastName,
+        phone: '',
         notificationPreferences: {
           email: {
             enabled: true,
@@ -207,9 +199,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(userData);
       setLastActivity(Date.now());
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration failed:', error);
-      throw new Error('Registration failed. Please try again.');
+      throw new Error(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -218,13 +210,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /**
    * Logout user
    */
-  const logout = () => {
-    // Clear tokens and user data
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_DATA_KEY);
-
-    setUser(null);
+  const logout = async () => {
+    try {
+      // Clear tokens and user data
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_DATA_KEY);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw new Error('Logout failed. Please try again.');
+    }
   };
 
   /**
