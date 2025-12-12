@@ -29,11 +29,7 @@ export const emailJSService = {
         subject: 'Your BookOnce OTP Code',
       };
 
-      const response = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams
-      );
+      const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
 
       if (response.status === 200) {
         console.log(`✅ OTP sent to ${email}`);

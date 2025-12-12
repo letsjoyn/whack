@@ -18,7 +18,7 @@ export const googleAuth = {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      
+
       return {
         success: true,
         user: {
@@ -31,7 +31,7 @@ export const googleAuth = {
       };
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      
+
       let message = 'Google sign-in failed';
       if (error.code === 'auth/popup-closed-by-user') {
         message = 'Sign-in popup was closed';
@@ -42,7 +42,7 @@ export const googleAuth = {
       } else if (error.code === 'auth/network-request-failed') {
         message = 'Network error. Please check your connection.';
       }
-      
+
       return {
         success: false,
         message,

@@ -1,6 +1,6 @@
 /**
  * Journey Map Component
- * 
+ *
  * Interactive map using Leaflet and OpenStreetMap (completely free!)
  * Shows origin, destination, and route between them
  */
@@ -59,10 +59,7 @@ export function JourneyMap({
 
     // Initialize map
     if (!mapRef.current) {
-      mapRef.current = L.map(mapContainerRef.current).setView(
-        [origin.lat, origin.lng],
-        10
-      );
+      mapRef.current = L.map(mapContainerRef.current).setView([origin.lat, origin.lng], 10);
 
       // Add OpenStreetMap tiles (free!)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -75,7 +72,7 @@ export function JourneyMap({
     const map = mapRef.current;
 
     // Clear existing markers and routes
-    map.eachLayer((layer) => {
+    map.eachLayer(layer => {
       if (layer instanceof L.Marker || layer instanceof L.Polyline) {
         map.removeLayer(layer);
       }
@@ -162,10 +159,7 @@ export function JourneyMap({
 
     // Draw route if available
     if (route && route.length > 0) {
-      const routeCoordinates: [number, number][] = route.map((step) => [
-        step.lat,
-        step.lng,
-      ]);
+      const routeCoordinates: [number, number][] = route.map(step => [step.lat, step.lng]);
 
       // Draw route line
       const routeLine = L.polyline(routeCoordinates, {

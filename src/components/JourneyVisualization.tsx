@@ -23,7 +23,7 @@ import {
   CreditCard,
   X,
   ChevronRight,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
 
 interface TransportOption {
@@ -56,7 +56,7 @@ interface JourneyVisualizationProps {
 const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
   aiResponse,
   journeyType,
-  userName = 'Traveler'
+  userName = 'Traveler',
 }) => {
   const [selectedOptions, setSelectedOptions] = useState<TransportOption[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -73,10 +73,16 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
     const segments = [];
     for (const line of lines) {
       const trimmedLine = line.trim();
-      if (trimmedLine.includes('Walk') || trimmedLine.includes('Metro') ||
-        trimmedLine.includes('Bus') || trimmedLine.includes('Train') ||
-        trimmedLine.includes('Flight') || trimmedLine.includes('Taxi') ||
-        trimmedLine.includes('Auto') || trimmedLine.includes('Cab')) {
+      if (
+        trimmedLine.includes('Walk') ||
+        trimmedLine.includes('Metro') ||
+        trimmedLine.includes('Bus') ||
+        trimmedLine.includes('Train') ||
+        trimmedLine.includes('Flight') ||
+        trimmedLine.includes('Taxi') ||
+        trimmedLine.includes('Auto') ||
+        trimmedLine.includes('Cab')
+      ) {
         segments.push(trimmedLine);
       }
     }
@@ -98,7 +104,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
           cost: 'Free',
           provider: 'Walking',
           description: 'Walk to nearest transit point',
-          bookingUrl: undefined
+          bookingUrl: undefined,
         });
       }
 
@@ -114,7 +120,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
           cost: '₹30-60',
           provider: 'Rapido',
           description: 'Bike ride to transit',
-          bookingUrl: 'https://rapido.bike'
+          bookingUrl: 'https://rapido.bike',
         },
         {
           id: 'auto-transit',
@@ -126,15 +132,16 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
           cost: '₹50-100',
           provider: 'Auto Rickshaw',
           description: 'Auto to transit point',
-          bookingUrl: undefined
+          bookingUrl: undefined,
         }
       );
 
       // Add direct options based on distance (inferred from AI response)
-      const hasLongDistance = segments.some(s =>
-        s.toLowerCase().includes('flight') ||
-        s.toLowerCase().includes('train') ||
-        s.toLowerCase().includes('airport')
+      const hasLongDistance = segments.some(
+        s =>
+          s.toLowerCase().includes('flight') ||
+          s.toLowerCase().includes('train') ||
+          s.toLowerCase().includes('airport')
       );
 
       if (hasLongDistance) {
@@ -148,7 +155,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
           cost: '₹400-800',
           provider: 'Uber/Ola',
           description: 'Direct cab to airport/station',
-          bookingUrl: 'https://uber.com'
+          bookingUrl: 'https://uber.com',
         });
       } else {
         homeOptions.push({
@@ -161,7 +168,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
           cost: '₹600-1500',
           provider: 'Uber/Ola',
           description: 'Direct cab to destination',
-          bookingUrl: 'https://uber.com'
+          bookingUrl: 'https://uber.com',
         });
       }
 
@@ -169,7 +176,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
         id: 'step-1',
         title: 'From Your Home',
         location: 'Starting Point',
-        options: homeOptions
+        options: homeOptions,
       });
 
       // Step 2: From Transit Point (if not direct)
@@ -187,7 +194,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             cost: '₹40-80',
             provider: 'Metro Rail',
             description: 'Metro to airport/main station',
-            bookingUrl: 'https://paytm.com/metro-card-recharge'
+            bookingUrl: 'https://paytm.com/metro-card-recharge',
           });
         }
 
@@ -202,7 +209,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             cost: '₹30-60',
             provider: 'City Bus',
             description: 'Bus to airport/station',
-            bookingUrl: 'https://redbus.in'
+            bookingUrl: 'https://redbus.in',
           });
         }
 
@@ -216,14 +223,14 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
           cost: '₹300-600',
           provider: 'Uber/Ola',
           description: 'Cab to airport/station',
-          bookingUrl: 'https://uber.com'
+          bookingUrl: 'https://uber.com',
         });
 
         steps.push({
           id: 'step-2',
           title: 'From Transit Point',
           location: 'Metro/Bus Station',
-          options: transitOptions
+          options: transitOptions,
         });
 
         // Step 3: Long Distance Transport
@@ -240,7 +247,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             cost: '₹3000-8000',
             provider: 'Airlines',
             description: 'Flight to destination',
-            bookingUrl: 'https://makemytrip.com'
+            bookingUrl: 'https://makemytrip.com',
           });
         }
 
@@ -255,7 +262,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             cost: '₹500-2000',
             provider: 'Indian Railways',
             description: 'Train to destination',
-            bookingUrl: 'https://irctc.co.in'
+            bookingUrl: 'https://irctc.co.in',
           });
         }
 
@@ -264,7 +271,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             id: 'step-3',
             title: 'Long Distance Travel',
             location: 'Airport/Railway Station',
-            options: longDistanceOptions
+            options: longDistanceOptions,
           });
         }
 
@@ -284,7 +291,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               cost: 'Free',
               provider: 'Walking',
               description: 'Walk to final destination',
-              bookingUrl: undefined
+              bookingUrl: undefined,
             },
             {
               id: 'taxi-final',
@@ -296,7 +303,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               cost: '₹200-500',
               provider: 'Local Taxi/Uber',
               description: 'Cab to final destination',
-              bookingUrl: 'https://uber.com'
+              bookingUrl: 'https://uber.com',
             },
             {
               id: 'bus-final',
@@ -308,9 +315,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               cost: '₹30-80',
               provider: 'Local Bus',
               description: 'Local bus to city',
-              bookingUrl: undefined
-            }
-          ]
+              bookingUrl: undefined,
+            },
+          ],
         });
       } else {
         // Short distance journey - no flights/trains needed
@@ -329,7 +336,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               cost: '₹40-80',
               provider: 'Metro Rail',
               description: 'Metro to destination area',
-              bookingUrl: 'https://paytm.com/metro-card-recharge'
+              bookingUrl: 'https://paytm.com/metro-card-recharge',
             },
             {
               id: 'bus-dest',
@@ -341,7 +348,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               cost: '₹25-60',
               provider: 'City Bus',
               description: 'Bus to destination',
-              bookingUrl: 'https://redbus.in'
+              bookingUrl: 'https://redbus.in',
             },
             {
               id: 'cab-dest',
@@ -353,9 +360,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
               cost: '₹300-800',
               provider: 'Uber/Ola',
               description: 'Direct cab to destination',
-              bookingUrl: 'https://uber.com'
-            }
-          ]
+              bookingUrl: 'https://uber.com',
+            },
+          ],
         });
       }
     }
@@ -364,7 +371,7 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
   };
 
   const getStepIcon = (type: TransportOption['type']) => {
-    const iconProps = { className: "h-4 w-4" };
+    const iconProps = { className: 'h-4 w-4' };
 
     switch (type) {
       case 'walk':
@@ -418,7 +425,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
   const handleOptionSelect = (option: TransportOption) => {
     // Check if this step already has a selection
     const existingSelectionIndex = selectedOptions.findIndex(
-      (selected) => journeySteps.findIndex(step => step.options.some(opt => opt.id === selected.id)) === currentStepIndex
+      selected =>
+        journeySteps.findIndex(step => step.options.some(opt => opt.id === selected.id)) ===
+        currentStepIndex
     );
 
     let newSelectedOptions;
@@ -486,21 +495,26 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             </div>
             <div className="flex flex-col items-center lg:items-end gap-3">
               <div className="bg-primary-foreground/20 backdrop-blur-sm px-8 py-4 rounded-2xl border-2 border-primary-foreground/30 shadow-lg">
-                <p className="text-xs text-primary-foreground/80 uppercase tracking-widest mb-1 text-center font-semibold">Progress</p>
+                <p className="text-xs text-primary-foreground/80 uppercase tracking-widest mb-1 text-center font-semibold">
+                  Progress
+                </p>
                 <p className="text-4xl md:text-5xl font-bold text-center tabular-nums">
-                  {currentStepIndex + 1}<span className="text-2xl text-primary-foreground/70 mx-2">/</span>{journeySteps.length}
+                  {currentStepIndex + 1}
+                  <span className="text-2xl text-primary-foreground/70 mx-2">/</span>
+                  {journeySteps.length}
                 </p>
               </div>
               <div className="flex gap-2">
                 {journeySteps.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-3 w-16 rounded-full transition-all duration-300 ${index < currentStepIndex
-                      ? 'bg-primary-foreground shadow-lg'
-                      : index === currentStepIndex
-                        ? 'bg-primary-foreground animate-pulse shadow-lg scale-110'
-                        : 'bg-primary-foreground/30'
-                      }`}
+                    className={`h-3 w-16 rounded-full transition-all duration-300 ${
+                      index < currentStepIndex
+                        ? 'bg-primary-foreground shadow-lg'
+                        : index === currentStepIndex
+                          ? 'bg-primary-foreground animate-pulse shadow-lg scale-110'
+                          : 'bg-primary-foreground/30'
+                    }`}
                   />
                 ))}
               </div>
@@ -530,21 +544,24 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {currentStep.options.map((option) => {
+                {currentStep.options.map(option => {
                   const isSelected = selectedOptions[currentStepIndex]?.id === option.id;
                   return (
                     <Card
                       key={option.id}
-                      className={`cursor-pointer transition-all hover:shadow-lg border-2 interactive-hover ${isSelected
-                        ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
-                        : 'hover:border-primary/50 hover:scale-[1.01]'
-                        }`}
+                      className={`cursor-pointer transition-all hover:shadow-lg border-2 interactive-hover ${
+                        isSelected
+                          ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]'
+                          : 'hover:border-primary/50 hover:scale-[1.01]'
+                      }`}
                       onClick={() => handleOptionSelect(option)}
                     >
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex items-start gap-4 flex-1 min-w-0">
-                            <div className={`p-3 rounded-xl ${getStepColor(option.type)} flex-shrink-0`}>
+                            <div
+                              className={`p-3 rounded-xl ${getStepColor(option.type)} flex-shrink-0`}
+                            >
                               {getStepIcon(option.type)}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -557,7 +574,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-sm text-muted-foreground font-medium mb-1">{option.provider}</p>
+                              <p className="text-sm text-muted-foreground font-medium mb-1">
+                                {option.provider}
+                              </p>
                               <p className="text-xs text-muted-foreground/70">
                                 {option.from} → {option.to}
                               </p>
@@ -635,20 +654,24 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                     return (
                       <div
                         key={step.id}
-                        className={`border-2 rounded-xl p-3 transition-all ${isBooked
-                          ? 'bg-primary/5 border-primary/40 shadow-sm'
-                          : isCurrent
-                            ? 'bg-muted/50 border-muted-foreground/40 animate-pulse'
-                            : 'bg-background border-border opacity-60'
-                          }`}
+                        className={`border-2 rounded-xl p-3 transition-all ${
+                          isBooked
+                            ? 'bg-primary/5 border-primary/40 shadow-sm'
+                            : isCurrent
+                              ? 'bg-muted/50 border-muted-foreground/40 animate-pulse'
+                              : 'bg-background border-border opacity-60'
+                        }`}
                       >
                         <div className="flex items-start gap-4">
-                          <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm ${isBooked
-                            ? 'bg-primary text-primary-foreground'
-                            : isCurrent
-                              ? 'bg-muted-foreground text-background'
-                              : 'bg-muted text-muted-foreground'
-                            }`}>
+                          <div
+                            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-sm ${
+                              isBooked
+                                ? 'bg-primary text-primary-foreground'
+                                : isCurrent
+                                  ? 'bg-muted-foreground text-background'
+                                  : 'bg-muted text-muted-foreground'
+                            }`}
+                          >
                             {stepIndex + 1}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -670,11 +693,15 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                             </div>
                             {isBooked ? (
                               <div className="flex items-start gap-3 mt-2">
-                                <div className={`p-2 rounded-lg ${getStepColor(selectedOption.type)} flex-shrink-0`}>
+                                <div
+                                  className={`p-2 rounded-lg ${getStepColor(selectedOption.type)} flex-shrink-0`}
+                                >
                                   {getStepIcon(selectedOption.type)}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-bold mb-1">{selectedOption.description}</p>
+                                  <p className="text-sm font-bold mb-1">
+                                    {selectedOption.description}
+                                  </p>
                                   <p className="text-xs text-muted-foreground mb-1 font-medium">
                                     {selectedOption.provider}
                                   </p>
@@ -691,7 +718,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                               </div>
                             ) : (
                               <p className="text-xs text-muted-foreground mt-1 italic">
-                                {isCurrent ? '⏳ Waiting for your selection...' : '⏸️ Pending selection'}
+                                {isCurrent
+                                  ? '⏳ Waiting for your selection...'
+                                  : '⏸️ Pending selection'}
                               </p>
                             )}
                           </div>
@@ -738,7 +767,9 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                         <CreditCard className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Total Cost</span>
                       </div>
-                      <span className="font-bold text-base text-primary">₹{getTotalCost().toLocaleString()}</span>
+                      <span className="font-bold text-base text-primary">
+                        ₹{getTotalCost().toLocaleString()}
+                      </span>
                     </div>
 
                     <div className="flex items-center justify-between p-2.5 bg-muted/50 rounded-lg">
@@ -758,25 +789,30 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
                         Quick Booking Links
                       </h4>
                       <div className="space-y-2">
-                        {selectedOptions.map((option, index) => (
-                          option.bookingUrl && (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              className="w-full justify-between hover:bg-primary hover:text-primary-foreground transition-colors"
-                              asChild
-                            >
-                              <a href={option.bookingUrl} target="_blank" rel="noopener noreferrer">
-                                <span className="flex items-center gap-2">
-                                  {getStepIcon(option.type)}
-                                  {option.provider}
-                                </span>
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                            </Button>
-                          )
-                        ))}
+                        {selectedOptions.map(
+                          (option, index) =>
+                            option.bookingUrl && (
+                              <Button
+                                key={index}
+                                variant="outline"
+                                size="sm"
+                                className="w-full justify-between hover:bg-primary hover:text-primary-foreground transition-colors"
+                                asChild
+                              >
+                                <a
+                                  href={option.bookingUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <span className="flex items-center gap-2">
+                                    {getStepIcon(option.type)}
+                                    {option.provider}
+                                  </span>
+                                  <ExternalLink className="h-3 w-3" />
+                                </a>
+                              </Button>
+                            )
+                        )}
                       </div>
                     </div>
                   )}
@@ -788,13 +824,12 @@ const JourneyVisualization: React.FC<JourneyVisualizationProps> = ({
             {selectedOptions.length === journeySteps.length && journeySteps.length > 0 && (
               <Card className="shadow-lg border-2 border-primary">
                 <CardContent className="p-4">
-                  <Button
-                    className="w-full h-12 text-base font-semibold"
-                    size="lg"
-                  >
+                  <Button className="w-full h-12 text-base font-semibold" size="lg">
                     <CheckCircle className="mr-2 h-5 w-5" />
                     Confirm & Book Journey
-                    <span className="ml-2.5 text-sm opacity-90">₹{getTotalCost().toLocaleString()}</span>
+                    <span className="ml-2.5 text-sm opacity-90">
+                      ₹{getTotalCost().toLocaleString()}
+                    </span>
                   </Button>
                   <p className="text-xs text-center text-muted-foreground mt-2">
                     All {journeySteps.length} steps selected • Ready to book

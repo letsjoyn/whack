@@ -13,7 +13,10 @@ const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
 
 if (EMAILJS_PUBLIC_KEY) {
   emailjs.init(EMAILJS_PUBLIC_KEY);
-  console.log('✅ EmailJS initialized with public key:', EMAILJS_PUBLIC_KEY.substring(0, 5) + '...');
+  console.log(
+    '✅ EmailJS initialized with public key:',
+    EMAILJS_PUBLIC_KEY.substring(0, 5) + '...'
+  );
   console.log('Service ID:', EMAILJS_SERVICE_ID);
   console.log('Template ID:', EMAILJS_TEMPLATE_ID);
 } else {
@@ -46,7 +49,7 @@ export const emailOtpService = {
           };
 
           console.log('Sending OTP with params:', templateParams);
-          
+
           const response = await emailjs.send(
             EMAILJS_SERVICE_ID,
             EMAILJS_TEMPLATE_ID,
@@ -69,7 +72,7 @@ export const emailOtpService = {
           console.error('❌ EmailJS error:', emailjsError);
           console.error('Error status:', emailjsError.status);
           console.error('Error text:', emailjsError.text);
-          
+
           return {
             success: false,
             message: `Failed to send OTP: ${emailjsError.message || 'Unknown error'}`,
@@ -80,7 +83,7 @@ export const emailOtpService = {
         console.error('Public Key:', EMAILJS_PUBLIC_KEY ? 'Present' : 'Missing');
         console.error('Service ID:', EMAILJS_SERVICE_ID ? 'Present' : 'Missing');
         console.error('Template ID:', EMAILJS_TEMPLATE_ID ? 'Present' : 'Missing');
-        
+
         return {
           success: false,
           message: 'Email service not configured. Check your EmailJS credentials in .env',
@@ -95,7 +98,10 @@ export const emailOtpService = {
     }
   },
 
-  async verifyOTP(email: string, otp: string): Promise<{ success: boolean; message: string; sessionToken?: string }> {
+  async verifyOTP(
+    email: string,
+    otp: string
+  ): Promise<{ success: boolean; message: string; sessionToken?: string }> {
     try {
       const stored = this.otpStore.get(email);
 
@@ -113,14 +119,14 @@ export const emailOtpService = {
       }
 
       this.otpStore.delete(email);
-      
+
       // Generate session token
       const sessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      return { 
-        success: true, 
+
+      return {
+        success: true,
         message: 'Email verified successfully!',
-        sessionToken 
+        sessionToken,
       };
     } catch (error) {
       return { success: false, message: 'Verification failed' };
@@ -164,7 +170,10 @@ export const phoneOtpService = {
     }
   },
 
-  async verifyOTP(phoneNumber: string, otp: string): Promise<{ success: boolean; message: string }> {
+  async verifyOTP(
+    phoneNumber: string,
+    otp: string
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const stored = this.otpStore.get(phoneNumber);
 
@@ -215,7 +224,7 @@ export const googleAuthService = {
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
           .join('')
       );
 
@@ -246,14 +255,11 @@ export const googleAuthService = {
   // Render Google Sign-In button
   renderButton(containerId: string): void {
     if (typeof window !== 'undefined' && (window as any).google) {
-      (window as any).google.accounts.id.renderButton(
-        document.getElementById(containerId),
-        {
-          theme: 'outline',
-          size: 'large',
-          text: 'signin_with',
-        }
-      );
+      (window as any).google.accounts.id.renderButton(document.getElementById(containerId), {
+        theme: 'outline',
+        size: 'large',
+        text: 'signin_with',
+      });
     }
   },
 };
@@ -261,7 +267,10 @@ export const googleAuthService = {
 // Email/Password Service
 export const emailPasswordService = {
   // Store users in memory (in production, use database)
-  users: new Map<string, { password: string; firstName: string; lastName: string; verified: boolean }>(),
+  users: new Map<
+    string,
+    { password: string; firstName: string; lastName: string; verified: boolean }
+  >(),
 
   async register(
     email: string,
@@ -292,7 +301,10 @@ export const emailPasswordService = {
     }
   },
 
-  async login(email: string, password: string): Promise<{ success: boolean; user?: any; message: string }> {
+  async login(
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; user?: any; message: string }> {
     try {
       const user = this.users.get(email);
 

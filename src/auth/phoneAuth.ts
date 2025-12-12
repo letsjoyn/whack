@@ -1,8 +1,4 @@
-import { 
-  RecaptchaVerifier, 
-  signInWithPhoneNumber,
-  ConfirmationResult 
-} from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 let confirmationResult: ConfirmationResult | null = null;
@@ -23,7 +19,7 @@ export const phoneAuth = {
     if (recaptchaVerifier) {
       recaptchaVerifier.clear();
     }
-    
+
     recaptchaVerifier = new RecaptchaVerifier(auth, buttonId, {
       size: 'invisible',
       callback: () => {
@@ -33,7 +29,7 @@ export const phoneAuth = {
         console.log('reCAPTCHA expired');
       },
     });
-    
+
     return recaptchaVerifier;
   },
 
@@ -53,20 +49,20 @@ export const phoneAuth = {
       }
 
       confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifier!);
-      
+
       return {
         success: true,
         message: 'OTP sent successfully!',
       };
     } catch (error: any) {
       console.error('Phone OTP error:', error);
-      
+
       // Reset reCAPTCHA on error
       if (recaptchaVerifier) {
         recaptchaVerifier.clear();
         recaptchaVerifier = null;
       }
-      
+
       let message = 'Failed to send OTP';
       if (error.code === 'auth/invalid-phone-number') {
         message = 'Invalid phone number format. Include country code (e.g., +91)';
@@ -77,7 +73,7 @@ export const phoneAuth = {
       } else if (error.code === 'auth/captcha-check-failed') {
         message = 'reCAPTCHA verification failed. Please refresh and try again.';
       }
-      
+
       return {
         success: false,
         message,
@@ -97,14 +93,14 @@ export const phoneAuth = {
 
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
-      
+
       // Clear after successful verification
       confirmationResult = null;
       if (recaptchaVerifier) {
         recaptchaVerifier.clear();
         recaptchaVerifier = null;
       }
-      
+
       return {
         success: true,
         user: {
@@ -115,14 +111,14 @@ export const phoneAuth = {
       };
     } catch (error: any) {
       console.error('OTP verification error:', error);
-      
+
       let message = 'Invalid OTP';
       if (error.code === 'auth/invalid-verification-code') {
         message = 'Invalid verification code';
       } else if (error.code === 'auth/code-expired') {
         message = 'OTP has expired. Please request a new one.';
       }
-      
+
       return {
         success: false,
         message,

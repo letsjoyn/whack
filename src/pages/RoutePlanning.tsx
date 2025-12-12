@@ -11,21 +11,39 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  ArrowLeft, MapPin, Calendar, Users, Clock,
-  Navigation, Train, Plane, Bus, Footprints, Utensils,
-  Hotel, Sparkles, AlertCircle, RefreshCw, Map, ExternalLink, AlertTriangle
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  Users,
+  Clock,
+  Navigation,
+  Train,
+  Plane,
+  Bus,
+  Footprints,
+  Utensils,
+  Hotel,
+  Sparkles,
+  AlertCircle,
+  RefreshCw,
+  Map,
+  ExternalLink,
+  AlertTriangle,
 } from 'lucide-react';
 import { endangeredPlacesService, EndangeredPlace } from '@/services/EndangeredPlacesService';
 import EndangeredPlacesInline from '@/components/EndangeredPlacesInline';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { JourneyMap, type Location, type RouteStep } from '@/features/journey/components/JourneyMap';
+import {
+  JourneyMap,
+  type Location,
+  type RouteStep,
+} from '@/features/journey/components/JourneyMap';
 import { freeGeocodingService } from '@/features/journey/services/FreeGeocodingService';
 import { freeRoutingService } from '@/features/journey/services/FreeRoutingService';
 import { bookOnceAIService } from '@/features/journey/services/BookOnceAIService';
 import JourneyVisualization from '@/components/JourneyVisualization';
 import { BookOnceAISidebar } from '@/components/BookOnceAISidebar';
-
 
 const RoutePlanning = () => {
   const navigate = useNavigate();
@@ -38,14 +56,19 @@ const RoutePlanning = () => {
   const departure = searchParams.get('departure') || '';
   const returnDate = searchParams.get('return') || '';
   const guests = searchParams.get('guests') || '2';
-  const intent = searchParams.get('intent') as 'urgent' | 'leisure' || 'urgent';
-  const visitor = searchParams.get('visitor') as 'first-time' | 'returning' || 'first-time';
+  const intent = (searchParams.get('intent') as 'urgent' | 'leisure') || 'urgent';
+  const visitor = (searchParams.get('visitor') as 'first-time' | 'returning') || 'first-time';
   const departureTimeParam = searchParams.get('departureTime') || '09:00';
 
   const [isPlanning, setIsPlanning] = useState(true);
   const [departureTime, setDepartureTime] = useState(departureTimeParam);
   const [showFlightModal, setShowFlightModal] = useState(false);
-  const [selectedFlightRoute, setSelectedFlightRoute] = useState<{ from: string; to: string; time: string; date: string } | null>(null);
+  const [selectedFlightRoute, setSelectedFlightRoute] = useState<{
+    from: string;
+    to: string;
+    time: string;
+    date: string;
+  } | null>(null);
   const numGuests = parseInt(guests) || 2;
 
   // Map state
@@ -79,16 +102,16 @@ const RoutePlanning = () => {
     // Calculate endangered places costs
     const endangeredPlacesCost = addedPlaces.reduce((total, place) => {
       // Estimate costs based on threat level and location
-      const baseCost = place.threatLevel === 'critical' ? 1500 :
-        place.threatLevel === 'high' ? 1000 : 800;
+      const baseCost =
+        place.threatLevel === 'critical' ? 1500 : place.threatLevel === 'high' ? 1000 : 800;
       const transportCost = 300; // Local transport to the place
       const guideCost = 500; // Local guide/witness fee
       return total + baseCost + transportCost + guideCost;
     }, 0);
 
     const baseTotal = basePrices.metro + basePrices.flight + basePrices.bus;
-    const totalPerPerson = baseTotal + (endangeredPlacesCost / numGuests);
-    const total = (baseTotal * numGuests) + endangeredPlacesCost;
+    const totalPerPerson = baseTotal + endangeredPlacesCost / numGuests;
+    const total = baseTotal * numGuests + endangeredPlacesCost;
 
     // Group discount for 4+ travelers
     const discount = numGuests >= 4 ? 0.1 : 0;
@@ -134,15 +157,15 @@ const RoutePlanning = () => {
       setAddedPlaces(prev => [...prev, place]);
       setAiPlanLoading(true);
       toast({
-        title: "Added to Your Trip! 🌍",
+        title: 'Added to Your Trip! 🌍',
         description: `${place.name} has been added. AI is updating your journey plan with pricing...`,
         duration: 3000,
       });
     } else {
       toast({
-        title: "Already Added",
+        title: 'Already Added',
         description: `${place.name} is already in your trip.`,
-        variant: "destructive",
+        variant: 'destructive',
         duration: 2000,
       });
     }
@@ -226,16 +249,16 @@ const RoutePlanning = () => {
   // Generate flight comparison links (no API needed!)
   const generateFlightLinks = (from: string, to: string, date: string) => {
     const airportCodes: Record<string, string> = {
-      'Mumbai': 'BOM',
-      'Goa': 'GOI',
-      'Delhi': 'DEL',
-      'Bangalore': 'BLR',
-      'Chennai': 'MAA',
-      'Kolkata': 'CCU',
-      'Hyderabad': 'HYD',
-      'Jaipur': 'JAI',
-      'Pune': 'PNQ',
-      'Ahmedabad': 'AMD',
+      Mumbai: 'BOM',
+      Goa: 'GOI',
+      Delhi: 'DEL',
+      Bangalore: 'BLR',
+      Chennai: 'MAA',
+      Kolkata: 'CCU',
+      Hyderabad: 'HYD',
+      Jaipur: 'JAI',
+      Pune: 'PNQ',
+      Ahmedabad: 'AMD',
     };
 
     const fromCity = from.split(',')[0].trim();
@@ -271,7 +294,7 @@ const RoutePlanning = () => {
         name: 'MakeMyTrip',
         logo: '🇮🇳',
         url: `https://www.makemytrip.com/flight/search?itinerary=${originCode}-${destCode}-${date.replace(/-/g, '/')}&paxType=A-${numGuests}_C-0_I-0&intl=false&cabinClass=${intent === 'urgent' ? 'B' : 'E'}`,
-        description: 'India\'s leading travel site',
+        description: "India's leading travel site",
         color: 'bg-red-50 text-red-700 border-red-200',
       },
       {
@@ -319,8 +342,8 @@ const RoutePlanning = () => {
             location: place.location,
             threatLevel: place.threatLevel,
             yearsRemaining: place.yearsRemaining,
-            estimatedCost: place.threatLevel === 'critical' ? 2300 :
-              place.threatLevel === 'high' ? 1800 : 1600,
+            estimatedCost:
+              place.threatLevel === 'critical' ? 2300 : place.threatLevel === 'high' ? 1800 : 1600,
           })),
           totalEndangeredPlacesCost: pricing.endangeredPlacesCost,
         };
@@ -343,7 +366,18 @@ const RoutePlanning = () => {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [from, to, departure, returnDate, numGuests, intent, visitor, departureTime, addedPlaces, pricing.endangeredPlacesCost]);
+  }, [
+    from,
+    to,
+    departure,
+    returnDate,
+    numGuests,
+    intent,
+    visitor,
+    departureTime,
+    addedPlaces,
+    pricing.endangeredPlacesCost,
+  ]);
 
   if (!from || !to) {
     return (
@@ -370,7 +404,8 @@ const RoutePlanning = () => {
           </div>
           <h2 className="text-xl font-bold mb-2">Planning Your Journey</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            AI is analyzing {intent === 'urgent' ? 'fastest routes' : 'best experiences'} from {from} to {to}...
+            AI is analyzing {intent === 'urgent' ? 'fastest routes' : 'best experiences'} from{' '}
+            {from} to {to}...
           </p>
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <RefreshCw className="h-3 w-3 animate-spin" />
@@ -386,11 +421,7 @@ const RoutePlanning = () => {
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
@@ -422,14 +453,20 @@ const RoutePlanning = () => {
             <div className="flex items-center gap-3">
               <Calendar className="h-5 w-5 text-primary" />
               <div>
-                <p className="text-xs text-muted-foreground">{returnDate ? 'Trip Dates' : 'Departure'}</p>
+                <p className="text-xs text-muted-foreground">
+                  {returnDate ? 'Trip Dates' : 'Departure'}
+                </p>
                 <p className="font-medium text-sm">
                   {departure && format(new Date(departure), 'MMM dd')}
                   {returnDate && ` - ${format(new Date(returnDate), 'MMM dd')}`}
                 </p>
                 {returnDate && (
                   <p className="text-xs text-muted-foreground">
-                    {Math.ceil((new Date(returnDate).getTime() - new Date(departure).getTime()) / (1000 * 60 * 60 * 24))} nights
+                    {Math.ceil(
+                      (new Date(returnDate).getTime() - new Date(departure).getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    )}{' '}
+                    nights
                   </p>
                 )}
               </div>
@@ -456,7 +493,7 @@ const RoutePlanning = () => {
                   <input
                     type="time"
                     value={departureTime}
-                    onChange={(e) => setDepartureTime(e.target.value)}
+                    onChange={e => setDepartureTime(e.target.value)}
                     className="text-sm border rounded px-2 py-1"
                   />
                 </div>
@@ -483,7 +520,9 @@ const RoutePlanning = () => {
                   {aiPlanLoading ? (
                     <div className="flex flex-col items-center justify-center p-8 space-y-3">
                       <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                      <p className="text-sm text-muted-foreground">Generating AI-powered route...</p>
+                      <p className="text-sm text-muted-foreground">
+                        Generating AI-powered route...
+                      </p>
                     </div>
                   ) : aiPlanError ? (
                     <Card className="p-4 border-blue-200 bg-blue-50">
@@ -491,7 +530,9 @@ const RoutePlanning = () => {
                         <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-blue-900 mb-1">
-                            {aiPlanError.includes('rate limit') ? '⏱️ AI Service Busy' : 'AI Plan Unavailable'}
+                            {aiPlanError.includes('rate limit')
+                              ? '⏱️ AI Service Busy'
+                              : 'AI Plan Unavailable'}
                           </p>
                           <p className="text-xs text-blue-700 mb-2">
                             {aiPlanError.includes('rate limit')
@@ -510,7 +551,12 @@ const RoutePlanning = () => {
                     </Card>
                   ) : aiJourneyPlan ? (
                     <JourneyVisualization
-                      aiResponse={aiJourneyPlan.split('## RETURN JOURNEY')[0].split('## STOPS & FOOD')[0].split('## ACCOMMODATION')[0]}
+                      aiResponse={
+                        aiJourneyPlan
+                          .split('## RETURN JOURNEY')[0]
+                          .split('## STOPS & FOOD')[0]
+                          .split('## ACCOMMODATION')[0]
+                      }
                       journeyType="outbound"
                       userName="Traveler"
                     />
@@ -591,8 +637,12 @@ const RoutePlanning = () => {
 
                       {/* Added Endangered Places as Side Visits */}
                       {addedPlaces.map((place, index) => {
-                        const placeCost = place.threatLevel === 'critical' ? 2300 :
-                          place.threatLevel === 'high' ? 1800 : 1600;
+                        const placeCost =
+                          place.threatLevel === 'critical'
+                            ? 2300
+                            : place.threatLevel === 'high'
+                              ? 1800
+                              : 1600;
                         return (
                           <RouteSegment
                             key={place.id}
@@ -627,7 +677,12 @@ const RoutePlanning = () => {
 
                     {aiJourneyPlan && aiJourneyPlan.includes('## RETURN JOURNEY') && (
                       <JourneyVisualization
-                        aiResponse={aiJourneyPlan.split('## RETURN JOURNEY')[1]?.split('## STOPS & FOOD')[0]?.split('## ACCOMMODATION')[0] || 'Calculating return journey...'}
+                        aiResponse={
+                          aiJourneyPlan
+                            .split('## RETURN JOURNEY')[1]
+                            ?.split('## STOPS & FOOD')[0]
+                            ?.split('## ACCOMMODATION')[0] || 'Calculating return journey...'
+                        }
                         journeyType="return"
                         userName="Traveler"
                       />
@@ -696,7 +751,12 @@ const RoutePlanning = () => {
                 <TabsContent value="stops" className="space-y-4 mt-4">
                   {aiJourneyPlan && aiJourneyPlan.includes('## STOPS & FOOD') && (
                     <JourneyVisualization
-                      aiResponse={aiJourneyPlan.split('## STOPS & FOOD')[1]?.split('## ACCOMMODATION')[0]?.split('## RETURN JOURNEY')[0] || 'Calculating meal stops...'}
+                      aiResponse={
+                        aiJourneyPlan
+                          .split('## STOPS & FOOD')[1]
+                          ?.split('## ACCOMMODATION')[0]
+                          ?.split('## RETURN JOURNEY')[0] || 'Calculating meal stops...'
+                      }
                       journeyType="outbound"
                       userName="Traveler"
                     />
@@ -709,7 +769,8 @@ const RoutePlanning = () => {
                         <span className="text-sm font-medium text-orange-900">Group Dining</span>
                       </div>
                       <p className="text-xs text-orange-700">
-                        For groups of {numGuests}, we recommend restaurants with group seating. Reservations suggested.
+                        For groups of {numGuests}, we recommend restaurants with group seating.
+                        Reservations suggested.
                       </p>
                     </div>
                   )}
@@ -719,9 +780,11 @@ const RoutePlanning = () => {
                     title="Breakfast Stop"
                     location="Airport Terminal 2"
                     time="09:45 - 10:15"
-                    description={intent === 'urgent'
-                      ? `Quick grab-and-go options for ${numGuests} ${numGuests === 1 ? 'person' : 'people'}`
-                      : `Local cuisine recommendations • Table for ${numGuests}`}
+                    description={
+                      intent === 'urgent'
+                        ? `Quick grab-and-go options for ${numGuests} ${numGuests === 1 ? 'person' : 'people'}`
+                        : `Local cuisine recommendations • Table for ${numGuests}`
+                    }
                   />
 
                   <StopCard
@@ -729,15 +792,18 @@ const RoutePlanning = () => {
                     title="Lunch"
                     location="Near destination"
                     time="14:30"
-                    description={visitor === 'first-time'
-                      ? `Popular local restaurant • Seating for ${numGuests}`
-                      : `Your favorite from last visit • Party of ${numGuests}`}
+                    description={
+                      visitor === 'first-time'
+                        ? `Popular local restaurant • Seating for ${numGuests}`
+                        : `Your favorite from last visit • Party of ${numGuests}`
+                    }
                   />
 
                   {numGuests >= 6 && (
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-xs text-muted-foreground">
-                        💡 Tip: Large groups may qualify for set menus or group discounts at select restaurants.
+                        💡 Tip: Large groups may qualify for set menus or group discounts at select
+                        restaurants.
                       </p>
                     </div>
                   )}
@@ -746,7 +812,10 @@ const RoutePlanning = () => {
                 <TabsContent value="stay" className="space-y-4 mt-4">
                   {aiJourneyPlan && aiJourneyPlan.includes('## ACCOMMODATION') && (
                     <JourneyVisualization
-                      aiResponse={aiJourneyPlan.split('## ACCOMMODATION')[1] || 'Calculating accommodation options...'}
+                      aiResponse={
+                        aiJourneyPlan.split('## ACCOMMODATION')[1] ||
+                        'Calculating accommodation options...'
+                      }
                       journeyType="outbound"
                       userName="Traveler"
                     />
@@ -756,12 +825,27 @@ const RoutePlanning = () => {
                     <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2 mb-2">
                         <Hotel className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">Accommodation Required</span>
+                        <span className="text-sm font-medium text-blue-900">
+                          Accommodation Required
+                        </span>
                       </div>
                       <div className="space-y-1 text-xs text-blue-700">
-                        <p>• {numGuests} {numGuests === 1 ? 'traveler' : 'travelers'}</p>
-                        <p>• {Math.ceil(numGuests / 2)} {Math.ceil(numGuests / 2) === 1 ? 'room' : 'rooms'} recommended (2 guests per room)</p>
-                        <p>• {Math.ceil((new Date(returnDate).getTime() - new Date(departure).getTime()) / (1000 * 60 * 60 * 24))} nights</p>
+                        <p>
+                          • {numGuests} {numGuests === 1 ? 'traveler' : 'travelers'}
+                        </p>
+                        <p>
+                          • {Math.ceil(numGuests / 2)}{' '}
+                          {Math.ceil(numGuests / 2) === 1 ? 'room' : 'rooms'} recommended (2 guests
+                          per room)
+                        </p>
+                        <p>
+                          •{' '}
+                          {Math.ceil(
+                            (new Date(returnDate).getTime() - new Date(departure).getTime()) /
+                              (1000 * 60 * 60 * 24)
+                          )}{' '}
+                          nights
+                        </p>
                       </div>
                     </div>
                   )}
@@ -771,13 +855,18 @@ const RoutePlanning = () => {
                     title="Recommended Hotel"
                     location="City Center, 500m from destination"
                     time="Check-in: 15:00"
-                    description={intent === 'urgent' ? 'Quick check-in, near transport' : 'Comfortable stay with local experiences'}
+                    description={
+                      intent === 'urgent'
+                        ? 'Quick check-in, near transport'
+                        : 'Comfortable stay with local experiences'
+                    }
                   />
 
                   {numGuests > 2 && (
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-xs text-muted-foreground">
-                        💡 Tip: For groups of {numGuests}, consider booking connecting rooms or a suite for better coordination.
+                        💡 Tip: For groups of {numGuests}, consider booking connecting rooms or a
+                        suite for better coordination.
                       </p>
                     </div>
                   )}
@@ -800,7 +889,7 @@ const RoutePlanning = () => {
                   ✅ Added to Your Trip
                 </h4>
                 <div className="space-y-2">
-                  {addedPlaces.map((place) => (
+                  {addedPlaces.map(place => (
                     <div key={place.id} className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <span className="text-green-800">{place.name}</span>
@@ -870,7 +959,6 @@ const RoutePlanning = () => {
             </Card>
           </div>
         </div>
-
       </div>
 
       {/* BookOnce AI Chat Widget */}
@@ -879,8 +967,6 @@ const RoutePlanning = () => {
         onClose={() => setIsAISidebarOpen(false)}
         onToggle={() => setIsAISidebarOpen(!isAISidebarOpen)}
       />
-
-
 
       {/* Flight Comparison Modal */}
       <Dialog open={showFlightModal} onOpenChange={setShowFlightModal}>
@@ -891,7 +977,10 @@ const RoutePlanning = () => {
               Compare Flights: {selectedFlightRoute?.from} → {selectedFlightRoute?.to}
             </DialogTitle>
             <DialogDescription>
-              Search real-time flights on multiple platforms • {numGuests} {numGuests === 1 ? 'passenger' : 'passengers'} • {selectedFlightRoute?.date && format(new Date(selectedFlightRoute.date), 'MMM dd, yyyy')}
+              Search real-time flights on multiple platforms • {numGuests}{' '}
+              {numGuests === 1 ? 'passenger' : 'passengers'} •{' '}
+              {selectedFlightRoute?.date &&
+                format(new Date(selectedFlightRoute.date), 'MMM dd, yyyy')}
             </DialogDescription>
           </DialogHeader>
 
@@ -902,37 +991,47 @@ const RoutePlanning = () => {
                 <div>
                   <p className="font-medium text-blue-900 text-sm">No Account Required!</p>
                   <p className="text-xs text-blue-700 mt-1">
-                    Click any platform below to search flights with your details pre-filled. Compare prices and book directly - no API keys or sign-ups needed!
+                    Click any platform below to search flights with your details pre-filled. Compare
+                    prices and book directly - no API keys or sign-ups needed!
                   </p>
                 </div>
               </div>
             </div>
 
-            {selectedFlightRoute && generateFlightLinks(selectedFlightRoute.from, selectedFlightRoute.to, selectedFlightRoute.date).map((platform, index) => (
-              <Card key={index} className={`p-4 hover:shadow-lg transition-all border-2 ${platform.color}`}>
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="text-3xl">{platform.logo}</div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-base mb-1">{platform.name}</h3>
-                      <p className="text-xs text-muted-foreground">{platform.description}</p>
+            {selectedFlightRoute &&
+              generateFlightLinks(
+                selectedFlightRoute.from,
+                selectedFlightRoute.to,
+                selectedFlightRoute.date
+              ).map((platform, index) => (
+                <Card
+                  key={index}
+                  className={`p-4 hover:shadow-lg transition-all border-2 ${platform.color}`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="text-3xl">{platform.logo}</div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-base mb-1">{platform.name}</h3>
+                        <p className="text-xs text-muted-foreground">{platform.description}</p>
+                      </div>
                     </div>
+                    <Button size="sm" asChild className="shrink-0">
+                      <a href={platform.url} target="_blank" rel="noopener noreferrer">
+                        Search Flights
+                        <ExternalLink className="h-3 w-3 ml-1" />
+                      </a>
+                    </Button>
                   </div>
-                  <Button size="sm" asChild className="shrink-0">
-                    <a href={platform.url} target="_blank" rel="noopener noreferrer">
-                      Search Flights
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </a>
-                  </Button>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
           </div>
 
           <div className="mt-6 p-4 bg-muted/50 rounded-lg">
             <p className="text-xs text-muted-foreground">
-              💡 <strong>Pro Tip:</strong> Open multiple tabs to compare prices across platforms. Prices can vary significantly between sites.
-              Each link opens with your search details pre-filled for instant results!
+              💡 <strong>Pro Tip:</strong> Open multiple tabs to compare prices across platforms.
+              Prices can vary significantly between sites. Each link opens with your search details
+              pre-filled for instant results!
             </p>
           </div>
         </DialogContent>
@@ -959,39 +1058,53 @@ interface RouteSegmentProps {
   isClickable?: boolean;
 }
 
-const RouteSegment = ({ icon, mode, from, to, duration, distance, time, color, details, price, travelers, seatsRequired, onClick, isClickable }: RouteSegmentProps) => (
+const RouteSegment = ({
+  icon,
+  mode,
+  from,
+  to,
+  duration,
+  distance,
+  time,
+  color,
+  details,
+  price,
+  travelers,
+  seatsRequired,
+  onClick,
+  isClickable,
+}: RouteSegmentProps) => (
   <div
-    className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${isClickable ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md' : 'hover:bg-muted/50'
-      }`}
+    className={`flex gap-4 p-4 rounded-lg border bg-card transition-colors ${
+      isClickable
+        ? 'cursor-pointer hover:bg-muted/50 hover:border-primary/50 hover:shadow-md'
+        : 'hover:bg-muted/50'
+    }`}
     onClick={onClick}
   >
     <div className="flex flex-col items-center">
-      <div className={`p-2 rounded-full bg-muted ${color}`}>
-        {icon}
-      </div>
+      <div className={`p-2 rounded-full bg-muted ${color}`}>{icon}</div>
       <div className="w-px h-full bg-border mt-2" />
     </div>
     <div className="flex-1">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-sm">{mode}</span>
-          {isClickable && (
-            <span className="text-xs text-blue-600 font-medium">View Options →</span>
-          )}
+          {isClickable && <span className="text-xs text-blue-600 font-medium">View Options →</span>}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">{time}</span>
           {price && (
-            <span className="text-xs font-medium text-primary">₹{(price * (travelers || 1)).toLocaleString()}</span>
+            <span className="text-xs font-medium text-primary">
+              ₹{(price * (travelers || 1)).toLocaleString()}
+            </span>
           )}
         </div>
       </div>
       <p className="text-sm text-muted-foreground mb-1">
         {from} → {to}
       </p>
-      {details && (
-        <p className="text-xs text-muted-foreground mb-2">{details}</p>
-      )}
+      {details && <p className="text-xs text-muted-foreground mb-2">{details}</p>}
       <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
@@ -1020,9 +1133,7 @@ interface StopCardProps {
 
 const StopCard = ({ icon, title, location, time, description }: StopCardProps) => (
   <div className="flex gap-4 p-4 rounded-lg border bg-card">
-    <div className="p-2 rounded-full bg-muted h-fit">
-      {icon}
-    </div>
+    <div className="p-2 rounded-full bg-muted h-fit">{icon}</div>
     <div className="flex-1">
       <h4 className="font-semibold text-sm mb-1">{title}</h4>
       <p className="text-xs text-muted-foreground mb-1">{location}</p>

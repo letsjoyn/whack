@@ -1,28 +1,28 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { lazy, Suspense } from "react";
-import "@/features/booking/styles/accessibility.css";
-import "leaflet/dist/leaflet.css";
-import { BookOnceAIChatModal } from "@/components/BookOnceAIChatModal";
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { lazy, Suspense } from 'react';
+import '@/features/booking/styles/accessibility.css';
+import 'leaflet/dist/leaflet.css';
+import { BookOnceAIChatModal } from '@/components/BookOnceAIChatModal';
 
 // Lazy load pages for code splitting
-const Index = lazy(() => import("./pages/Index"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Stays = lazy(() => import("./pages/Stays"));
-const TravelUtilities = lazy(() => import("./pages/TravelUtilities"));
-const JourneyPlanner = lazy(() => import("./pages/JourneyPlanner"));
-const RoutePlanning = lazy(() => import("./pages/RoutePlanning"));
-const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
-const BookingHistory = lazy(() => import("./pages/BookingHistory"));
-const UserProfile = lazy(() => import("./pages/UserProfile"));
-const Settings = lazy(() => import("./pages/Settings"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const Index = lazy(() => import('./pages/Index'));
+const Auth = lazy(() => import('./pages/Auth'));
+const Stays = lazy(() => import('./pages/Stays'));
+const TravelUtilities = lazy(() => import('./pages/TravelUtilities'));
+const JourneyPlanner = lazy(() => import('./pages/JourneyPlanner'));
+const RoutePlanning = lazy(() => import('./pages/RoutePlanning'));
+const BookingConfirmation = lazy(() => import('./pages/BookingConfirmation'));
+const BookingHistory = lazy(() => import('./pages/BookingHistory'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
+const Settings = lazy(() => import('./pages/Settings'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,7 +69,10 @@ const App = () => {
                     <Route path="/utilities" element={<TravelUtilities />} />
                     <Route path="/journey" element={<JourneyPlanner />} />
                     <Route path="/journey/plan" element={<RoutePlanning />} />
-                    <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
+                    <Route
+                      path="/booking-confirmation/:bookingId"
+                      element={<BookingConfirmation />}
+                    />
 
                     {/* Protected Routes - Require Authentication */}
                     <Route

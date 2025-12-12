@@ -37,7 +37,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
               Reload Page
             </button>
             <details className="mt-4 text-left">
-              <summary className="cursor-pointer text-sm text-muted-foreground">Error details</summary>
+              <summary className="cursor-pointer text-sm text-muted-foreground">
+                Error details
+              </summary>
               <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto max-h-48">
                 {this.state.error?.stack}
               </pre>

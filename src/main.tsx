@@ -1,10 +1,10 @@
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
-import { registerServiceWorker } from "./utils/registerServiceWorker";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+import { registerServiceWorker } from './utils/registerServiceWorker';
+import { ThemeProvider } from './contexts/ThemeContext';
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <ThemeProvider>
     <App />
   </ThemeProvider>
@@ -12,7 +12,7 @@ createRoot(document.getElementById("root")!).render(
 
 // Register service worker for offline support
 if (import.meta.env.PROD) {
-  registerServiceWorker().catch((error) => {
+  registerServiceWorker().catch(error => {
     console.error('Failed to register service worker:', error);
   });
 }

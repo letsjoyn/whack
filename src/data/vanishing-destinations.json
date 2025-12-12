@@ -207,7 +207,7 @@
     "witnesses": 1234,
     "lastWitness": "6 hours ago",
     "story": "The last Vijayanagara Empire capital. Ancient families still perform rituals in 500-year-old temples. Illegal mining threatens the UNESCO World Heritage site.",
-    "coordinates": [15.3350, 76.4600]
+    "coordinates": [15.335, 76.46]
   },
   {
     "id": 16,
@@ -263,7 +263,7 @@
     "witnesses": 756,
     "lastWitness": "8 hours ago",
     "story": "150-year-old tea gardens face climate change. Rising temperatures push tea cultivation higher up mountains. Traditional workers' families face uncertain futures.",
-    "coordinates": [27.0410, 88.2663]
+    "coordinates": [27.041, 88.2663]
   },
   {
     "id": 20,
@@ -277,7 +277,7 @@
     "witnesses": 423,
     "lastWitness": "2 days ago",
     "story": "Families distill feni from cashew and palm for 400 years. Tourism development replaces cashew groves with hotels. Ancient recipes risk being lost forever.",
-    "coordinates": [15.2993, 74.1240]
+    "coordinates": [15.2993, 74.124]
   },
   {
     "id": 21,
@@ -305,7 +305,7 @@
     "witnesses": 1456,
     "lastWitness": "3 hours ago",
     "story": "Mumbai's original inhabitants, the Koli fishermen, are being pushed out by skyscrapers. Their 2000-year-old fishing traditions face extinction as the sea becomes too polluted.",
-    "coordinates": [19.0760, 72.8777]
+    "coordinates": [19.076, 72.8777]
   },
   {
     "id": 23,
@@ -319,7 +319,7 @@
     "witnesses": 178,
     "lastWitness": "5 days ago",
     "story": "India's most linguistically diverse state. Each tribe has unique traditions. Modern education and migration threaten 26 distinct cultures and languages.",
-    "coordinates": [28.2180, 94.7278]
+    "coordinates": [28.218, 94.7278]
   },
   {
     "id": 24,
@@ -459,7 +459,7 @@
     "witnesses": 89,
     "lastWitness": "3 weeks ago",
     "story": "Only 1,600 Toda people remain in Nilgiri hills. Their sacred relationship with buffalo and unique dairy traditions face extinction as young people adopt modern lifestyles.",
-    "coordinates": [11.3410, 76.7337]
+    "coordinates": [11.341, 76.7337]
   },
   {
     "id": 34,
@@ -468,7 +468,11 @@
     "image": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800",
     "yearsRemaining": 35,
     "threatLevel": "moderate",
-    "threats": ["Tourism Pressure", "Skilled Artisan Migration", "Sandstone Quarrying Restrictions"],
+    "threats": [
+      "Tourism Pressure",
+      "Skilled Artisan Migration",
+      "Sandstone Quarrying Restrictions"
+    ],
     "culture": "Traditional stone carvers, haveli builders, desert architects",
     "witnesses": 678,
     "lastWitness": "5 days ago",
@@ -515,7 +519,7 @@
     "witnesses": 234,
     "lastWitness": "2 weeks ago",
     "story": "Monks perform sacred Cham dances in 400-year-old monasteries. Young monks leave for modern education. Ancient mask-making and dance traditions risk disappearing from Himalayan valleys.",
-    "coordinates": [27.5330, 88.5122]
+    "coordinates": [27.533, 88.5122]
   },
   {
     "id": 38,

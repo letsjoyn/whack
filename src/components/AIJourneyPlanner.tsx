@@ -4,20 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  MapPin, 
-  Sparkles, 
-  Loader2,
-  Route,
-  MessageSquare
-} from 'lucide-react';
+import { MapPin, Sparkles, Loader2, Route, MessageSquare } from 'lucide-react';
 
 const AIJourneyPlanner: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [journeyPlan, setJourneyPlan] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [activeTab, setActiveTab] = useState('form');
-  
+
   // Form state
   const [formData, setFormData] = useState({
     origin: '',
@@ -28,7 +22,7 @@ const AIJourneyPlanner: React.FC = () => {
     travelers: '1',
     intent: 'leisure' as 'urgent' | 'leisure',
 
-    userName: ''
+    userName: '',
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -71,7 +65,9 @@ const AIJourneyPlanner: React.FC = () => {
 - Check into accommodation
 - Explore local area
 
-${formData.returnDate ? `
+${
+  formData.returnDate
+    ? `
 ## RETURN JOURNEY
 
 **From:** ${formData.destination}
@@ -92,7 +88,9 @@ ${formData.returnDate ? `
 - Reach home safely
 - Unpack and rest
 - Share your experience
-` : ''}
+`
+    : ''
+}
       `;
 
       setJourneyPlan(mockPlan);
@@ -163,7 +161,7 @@ ${formData.returnDate ? `
                     id="userName"
                     placeholder="e.g., Alex"
                     value={formData.userName}
-                    onChange={(e) => handleInputChange('userName', e.target.value)}
+                    onChange={e => handleInputChange('userName', e.target.value)}
                   />
                 </div>
                 <div>
@@ -174,7 +172,7 @@ ${formData.returnDate ? `
                     min="1"
                     max="10"
                     value={formData.travelers}
-                    onChange={(e) => handleInputChange('travelers', e.target.value)}
+                    onChange={e => handleInputChange('travelers', e.target.value)}
                   />
                 </div>
               </div>
@@ -187,7 +185,7 @@ ${formData.returnDate ? `
                     id="origin"
                     placeholder="e.g., Mumbai, India"
                     value={formData.origin}
-                    onChange={(e) => handleInputChange('origin', e.target.value)}
+                    onChange={e => handleInputChange('origin', e.target.value)}
                   />
                 </div>
                 <div>
@@ -196,7 +194,7 @@ ${formData.returnDate ? `
                     id="destination"
                     placeholder="e.g., Goa, India"
                     value={formData.destination}
-                    onChange={(e) => handleInputChange('destination', e.target.value)}
+                    onChange={e => handleInputChange('destination', e.target.value)}
                   />
                 </div>
               </div>
@@ -209,7 +207,7 @@ ${formData.returnDate ? `
                     id="departureDate"
                     type="date"
                     value={formData.departureDate}
-                    onChange={(e) => handleInputChange('departureDate', e.target.value)}
+                    onChange={e => handleInputChange('departureDate', e.target.value)}
                   />
                 </div>
                 <div>
@@ -218,7 +216,7 @@ ${formData.returnDate ? `
                     id="departureTime"
                     type="time"
                     value={formData.departureTime}
-                    onChange={(e) => handleInputChange('departureTime', e.target.value)}
+                    onChange={e => handleInputChange('departureTime', e.target.value)}
                   />
                 </div>
                 <div>
@@ -227,7 +225,7 @@ ${formData.returnDate ? `
                     id="returnDate"
                     type="date"
                     value={formData.returnDate}
-                    onChange={(e) => handleInputChange('returnDate', e.target.value)}
+                    onChange={e => handleInputChange('returnDate', e.target.value)}
                   />
                 </div>
               </div>
@@ -254,8 +252,8 @@ ${formData.returnDate ? `
               </div>
 
               {/* Generate Button */}
-              <Button 
-                onClick={generateJourneyPlan} 
+              <Button
+                onClick={generateJourneyPlan}
                 disabled={isLoading}
                 className="w-full bg-gradient-accent hover:opacity-90"
                 size="lg"
@@ -328,7 +326,8 @@ ${formData.returnDate ? `
                 <Route className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">No Journey Plan Yet</h3>
                 <p className="text-muted-foreground mb-4">
-                  Fill out the journey details and generate your AI-powered plan to see the visual journey cards.
+                  Fill out the journey details and generate your AI-powered plan to see the visual
+                  journey cards.
                 </p>
                 <Button onClick={() => setActiveTab('form')} variant="outline">
                   <MapPin className="h-4 w-4 mr-2" />

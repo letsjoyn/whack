@@ -1,9 +1,9 @@
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
-  updateProfile
+  updateProfile,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -21,15 +21,15 @@ export interface EmailAuthResult {
 export const emailAuth = {
   // Register with email and password
   register: async (
-    email: string, 
-    password: string, 
-    firstName: string, 
+    email: string,
+    password: string,
+    firstName: string,
     lastName: string
   ): Promise<EmailAuthResult> => {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       const user = result.user;
-      
+
       // Update profile with name
       await updateProfile(user, {
         displayName: `${firstName} ${lastName}`,
@@ -37,7 +37,7 @@ export const emailAuth = {
 
       // Send verification email
       await sendEmailVerification(user);
-      
+
       return {
         success: true,
         user: {
@@ -50,7 +50,7 @@ export const emailAuth = {
       };
     } catch (error: any) {
       console.error('Email registration error:', error);
-      
+
       let message = 'Registration failed';
       if (error.code === 'auth/email-already-in-use') {
         message = 'This email is already registered';
@@ -59,7 +59,7 @@ export const emailAuth = {
       } else if (error.code === 'auth/weak-password') {
         message = 'Password is too weak (minimum 6 characters)';
       }
-      
+
       return {
         success: false,
         message,
@@ -72,7 +72,7 @@ export const emailAuth = {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const user = result.user;
-      
+
       return {
         success: true,
         user: {
@@ -85,7 +85,7 @@ export const emailAuth = {
       };
     } catch (error: any) {
       console.error('Email sign-in error:', error);
-      
+
       let message = 'Sign-in failed';
       if (error.code === 'auth/user-not-found') {
         message = 'No account found with this email';
@@ -98,7 +98,7 @@ export const emailAuth = {
       } else if (error.code === 'auth/invalid-credential') {
         message = 'Invalid email or password';
       }
-      
+
       return {
         success: false,
         message,

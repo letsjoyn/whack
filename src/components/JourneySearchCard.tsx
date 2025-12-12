@@ -1,11 +1,11 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Calendar, Users, Search, Navigation2, Loader2, Compass, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { format, addDays, isBefore, startOfDay } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from 'framer-motion';
+import { MapPin, Calendar, Users, Search, Navigation2, Loader2, Compass, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { format, addDays, isBefore, startOfDay } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface JourneySearchCardProps {
   onExplore: (params: JourneySearchParams) => void;
@@ -22,22 +22,26 @@ export interface JourneySearchParams {
 }
 
 const POPULAR_DESTINATIONS = [
-  "Mumbai, Maharashtra",
-  "Goa, India",
-  "Delhi, India",
-  "Bangalore, Karnataka",
-  "Jaipur, Rajasthan",
-  "Udaipur, Rajasthan",
-  "Kerala, India",
-  "Manali, Himachal Pradesh",
-  "Rishikesh, Uttarakhand",
-  "Varanasi, Uttar Pradesh"
+  'Mumbai, Maharashtra',
+  'Goa, India',
+  'Delhi, India',
+  'Bangalore, Karnataka',
+  'Jaipur, Rajasthan',
+  'Udaipur, Rajasthan',
+  'Kerala, India',
+  'Manali, Himachal Pradesh',
+  'Rishikesh, Uttarakhand',
+  'Varanasi, Uttar Pradesh',
 ];
 
-const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationName }: JourneySearchCardProps) => {
+const JourneySearchCard = ({
+  onExplore,
+  initialDestination,
+  initialDestinationName,
+}: JourneySearchCardProps) => {
   const navigate = useNavigate();
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
+  const [source, setSource] = useState('');
+  const [destination, setDestination] = useState('');
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
   const [returnDate, setReturnDate] = useState<Date | null>(null);
   const [guests, setGuests] = useState(2);
@@ -45,7 +49,7 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
   const [isSearching, setIsSearching] = useState(false);
   const [tripType, setTripType] = useState<'round-trip' | 'one-way'>('round-trip');
   const [showExploreSuggestion, setShowExploreSuggestion] = useState(true);
-  
+
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [showSourceSuggestions, setShowSourceSuggestions] = useState(false);
   const [showDestSuggestions, setShowDestSuggestions] = useState(false);
@@ -56,9 +60,7 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
   const [tempDepartureDate, setTempDepartureDate] = useState<Date | null>(null);
   const [tempReturnDate, setTempReturnDate] = useState<Date | null>(null);
   const [tempTripType, setTempTripType] = useState<'round-trip' | 'one-way'>('round-trip');
-  
 
-  
   const sourceRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
   const guestRef = useRef<HTMLDivElement>(null);
@@ -91,8 +93,8 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [focusedField]);
 
   useEffect(() => {
@@ -103,12 +105,12 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
 
   const handleDetectLocation = async () => {
     setIsLoadingLocation(true);
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        async position => {
           const { latitude, longitude } = position.coords;
-          
+
           try {
             const cityName = await getCityFromCoords(latitude, longitude);
             setSource(cityName);
@@ -118,30 +120,28 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
           }
           setIsLoadingLocation(false);
         },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("Unable to detect location. Please enter manually.");
+        error => {
+          console.error('Error getting location:', error);
+          alert('Unable to detect location. Please enter manually.');
           setIsLoadingLocation(false);
         }
       );
     } else {
-      alert("Geolocation is not supported by your browser");
+      alert('Geolocation is not supported by your browser');
       setIsLoadingLocation(false);
     }
   };
 
   const getCityFromCoords = async (lat: number, lng: number): Promise<string> => {
     const cities = [
-      { name: "Mumbai, Maharashtra", lat: 19.0760, lng: 72.8777, radius: 0.5 },
-      { name: "Delhi, India", lat: 28.7041, lng: 77.1025, radius: 0.5 },
-      { name: "Bangalore, Karnataka", lat: 12.9716, lng: 77.5946, radius: 0.5 },
-      { name: "Goa, India", lat: 15.2993, lng: 74.1240, radius: 0.5 },
+      { name: 'Mumbai, Maharashtra', lat: 19.076, lng: 72.8777, radius: 0.5 },
+      { name: 'Delhi, India', lat: 28.7041, lng: 77.1025, radius: 0.5 },
+      { name: 'Bangalore, Karnataka', lat: 12.9716, lng: 77.5946, radius: 0.5 },
+      { name: 'Goa, India', lat: 15.2993, lng: 74.124, radius: 0.5 },
     ];
 
     for (const city of cities) {
-      const distance = Math.sqrt(
-        Math.pow(lat - city.lat, 2) + Math.pow(lng - city.lng, 2)
-      );
+      const distance = Math.sqrt(Math.pow(lat - city.lat, 2) + Math.pow(lng - city.lng, 2));
       if (distance < city.radius) {
         return city.name;
       }
@@ -155,65 +155,69 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
 
   const fetchCitySuggestions = async (query: string): Promise<string[]> => {
     if (query.length < 2) return [];
-    
+
     try {
       // Using Nominatim (OpenStreetMap) - completely free, no API key needed
       // Removed featuretype=city to allow ANY location worldwide (cities, addresses, landmarks, etc.)
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?` +
-        `q=${encodeURIComponent(query)}&` +
-        `format=json&` +
-        `addressdetails=1&` +
-        `limit=5`,
+          `q=${encodeURIComponent(query)}&` +
+          `format=json&` +
+          `addressdetails=1&` +
+          `limit=5`,
         {
           headers: {
-            'User-Agent': 'BookOnceApp/1.0' // Required by Nominatim
-          }
+            'User-Agent': 'BookOnceApp/1.0', // Required by Nominatim
+          },
         }
       );
-      
+
       if (!response.ok) {
         // Fallback to local suggestions if API fails
         return POPULAR_DESTINATIONS.filter(dest =>
           dest.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 5);
       }
-      
+
       const data = await response.json();
-      
+
       // Format results to show full location details
       const formatted = data
         .map((place: any) => {
           // Build location string from most specific to least specific
           const parts = [];
-          
+
           // Add specific location (building, attraction, etc.)
-          if (place.name && place.name !== place.address?.city && place.name !== place.address?.country) {
+          if (
+            place.name &&
+            place.name !== place.address?.city &&
+            place.name !== place.address?.country
+          ) {
             parts.push(place.name);
           }
-          
+
           // Add city/town/village
           if (place.address?.city) parts.push(place.address.city);
           else if (place.address?.town) parts.push(place.address.town);
           else if (place.address?.village) parts.push(place.address.village);
-          
+
           // Add state/region if available
           if (place.address?.state) parts.push(place.address.state);
-          
+
           // Always add country
           if (place.address?.country) parts.push(place.address.country);
-          
+
           // If no parts, use display_name
           if (parts.length === 0) {
             return place.display_name.split(',').slice(0, 3).join(',');
           }
-          
+
           return parts.join(', ');
         })
-        .filter((value: string, index: number, self: string[]) => 
-          self.indexOf(value) === index // Remove duplicates
+        .filter(
+          (value: string, index: number, self: string[]) => self.indexOf(value) === index // Remove duplicates
         );
-      
+
       return formatted.slice(0, 5);
     } catch (error) {
       console.error('Error fetching locations:', error);
@@ -226,16 +230,16 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
 
   const handleSourceChange = (value: string) => {
     setSource(value);
-    
+
     if (value.length >= 2) {
       setShowSourceSuggestions(true);
       setShowExploreSuggestion(false);
-      
+
       // Clear previous timer
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-      
+
       // Set new timer for debounced API call
       debounceTimerRef.current = setTimeout(async () => {
         const suggestions = await fetchCitySuggestions(value);
@@ -253,15 +257,15 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
 
   const handleDestChange = (value: string) => {
     setDestination(value);
-    
+
     if (value.length >= 2) {
       setShowDestSuggestions(true);
-      
+
       // Clear previous timer
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-      
+
       // Set new timer for debounced API call
       debounceTimerRef.current = setTimeout(async () => {
         const suggestions = await fetchCitySuggestions(value);
@@ -306,34 +310,36 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
 
   const handleExplore = () => {
     if (!source || !destination || !departureDate) {
-      alert("Please fill in source, destination, and departure date");
+      alert('Please fill in source, destination, and departure date');
       return;
     }
 
     if (tripType === 'round-trip' && !returnDate) {
-      alert("Please select a return date for round-trip");
+      alert('Please select a return date for round-trip');
       return;
     }
 
     setIsSearching(true);
-    
+
     setTimeout(() => {
       onExplore({
         source,
         destination,
         departureDate: departureDate.toISOString().split('T')[0],
         returnDate: returnDate ? returnDate.toISOString().split('T')[0] : '',
-        guests
+        guests,
       });
       setIsSearching(false);
     }, 1000);
   };
 
   const formatDateDisplay = () => {
-    if (!departureDate) return "Add dates";
+    if (!departureDate) return 'Add dates';
     if (tripType === 'one-way' || !returnDate) return format(departureDate, 'MMM dd');
-    
-    const nights = Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    const nights = Math.ceil(
+      (returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
     return `${format(departureDate, 'MMM dd')} - ${format(returnDate, 'MMM dd')} (${nights}n)`;
   };
 
@@ -347,7 +353,7 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
 
   const handleApplyDates = () => {
     if (!tempDepartureDate) return;
-    
+
     if (tempTripType === 'one-way') {
       setDepartureDate(tempDepartureDate);
       setReturnDate(null);
@@ -397,7 +403,7 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                transition={{ duration: 0.3, type: "spring", bounce: 0.3 }}
+                transition={{ duration: 0.3, type: 'spring', bounce: 0.3 }}
                 className="absolute -top-16 left-0 z-50"
               >
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-2xl shadow-xl relative">
@@ -448,14 +454,14 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                 type="text"
                 placeholder="Source"
                 value={source}
-                onChange={(e) => handleSourceChange(e.target.value)}
+                onChange={e => handleSourceChange(e.target.value)}
                 onFocus={handleSourceFocus}
                 className="w-full bg-transparent border-none outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:ring-0"
                 style={{ boxShadow: 'none' }}
               />
             </div>
           </motion.div>
-          
+
           <AnimatePresence>
             {showSourceSuggestions && sourceSuggestions.length > 0 && (
               <motion.div
@@ -478,12 +484,12 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                   )}
                   <div>
                     <div className="font-semibold text-blue-600 text-sm">
-                      {isLoadingLocation ? "Detecting..." : "Detect my location"}
+                      {isLoadingLocation ? 'Detecting...' : 'Detect my location'}
                     </div>
                     <div className="text-xs text-gray-500">Use current GPS location</div>
                   </div>
                 </button>
-                
+
                 {sourceSuggestions.map((suggestion, index) => (
                   <button
                     key={index}
@@ -522,14 +528,14 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                 type="text"
                 placeholder="Destination"
                 value={destination}
-                onChange={(e) => handleDestChange(e.target.value)}
+                onChange={e => handleDestChange(e.target.value)}
                 onFocus={handleDestFocus}
                 className="w-full bg-transparent border-none outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:ring-0"
                 style={{ boxShadow: 'none' }}
               />
             </div>
           </motion.div>
-          
+
           <AnimatePresence>
             {showDestSuggestions && destSuggestions.length > 0 && (
               <motion.div
@@ -574,9 +580,7 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
             <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0" />
             <div className="min-w-0">
               <div className="text-xs font-semibold text-gray-500 mb-0.5">Dates</div>
-              <div className="text-sm font-medium text-gray-900">
-                {formatDateDisplay()}
-              </div>
+              <div className="text-sm font-medium text-gray-900">{formatDateDisplay()}</div>
             </div>
           </motion.div>
 
@@ -594,10 +598,20 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                   <div className="space-y-1">
                     <h4 className="font-medium text-xs">Select your travel dates</h4>
                     <p className="text-[10px] text-gray-500">
-                      {tempTripType === 'one-way' && !tempDepartureDate && 'Choose your departure date'}
-                      {tempTripType === 'round-trip' && !tempDepartureDate && 'Choose your departure date'}
-                      {tempTripType === 'round-trip' && tempDepartureDate && !tempReturnDate && 'Choose your return date'}
-                      {tempTripType === 'round-trip' && tempDepartureDate && tempReturnDate && `${Math.ceil((tempReturnDate.getTime() - tempDepartureDate.getTime()) / (1000 * 60 * 60 * 24))} days selected`}
+                      {tempTripType === 'one-way' &&
+                        !tempDepartureDate &&
+                        'Choose your departure date'}
+                      {tempTripType === 'round-trip' &&
+                        !tempDepartureDate &&
+                        'Choose your departure date'}
+                      {tempTripType === 'round-trip' &&
+                        tempDepartureDate &&
+                        !tempReturnDate &&
+                        'Choose your return date'}
+                      {tempTripType === 'round-trip' &&
+                        tempDepartureDate &&
+                        tempReturnDate &&
+                        `${Math.ceil((tempReturnDate.getTime() - tempDepartureDate.getTime()) / (1000 * 60 * 60 * 24))} days selected`}
                       {tempTripType === 'one-way' && tempDepartureDate && 'One-way trip selected'}
                     </p>
                   </div>
@@ -638,7 +652,7 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                     <CalendarComponent
                       mode="single"
                       selected={tempDepartureDate || undefined}
-                      onSelect={(date) => setTempDepartureDate(date || null)}
+                      onSelect={date => setTempDepartureDate(date || null)}
                       disabled={isDateDisabled}
                       initialFocus
                       numberOfMonths={1}
@@ -678,7 +692,9 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
                       size="sm"
                       className="flex-1 h-8 text-xs"
                       onClick={handleApplyDates}
-                      disabled={!tempDepartureDate || (tempTripType === 'round-trip' && !tempReturnDate)}
+                      disabled={
+                        !tempDepartureDate || (tempTripType === 'round-trip' && !tempReturnDate)
+                      }
                     >
                       Apply
                     </Button>
@@ -773,8 +789,6 @@ const JourneySearchCard = ({ onExplore, initialDestination, initialDestinationNa
       >
         ✨ Complete door-to-door journey planning • AI-powered routing • Real-time updates
       </motion.p>
-
-
     </motion.div>
   );
 };

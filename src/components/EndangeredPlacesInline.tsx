@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
-import { AlertTriangle, Clock, MapPin, Users, ExternalLink, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { EndangeredPlace } from "@/services/EndangeredPlacesService";
-import { useNavigate } from "react-router-dom";
+import { motion } from 'framer-motion';
+import { AlertTriangle, Clock, MapPin, Users, ExternalLink, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { EndangeredPlace } from '@/services/EndangeredPlacesService';
+import { useNavigate } from 'react-router-dom';
 
 interface EndangeredPlacesInlineProps {
   places: EndangeredPlace[];
@@ -13,12 +13,17 @@ interface EndangeredPlacesInlineProps {
 }
 
 const threatColors = {
-  critical: "text-red-600 bg-red-50 border-red-200",
-  high: "text-orange-600 bg-orange-50 border-orange-200",
-  moderate: "text-yellow-600 bg-yellow-50 border-yellow-200"
+  critical: 'text-red-600 bg-red-50 border-red-200',
+  high: 'text-orange-600 bg-orange-50 border-orange-200',
+  moderate: 'text-yellow-600 bg-yellow-50 border-yellow-200',
 };
 
-const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }: EndangeredPlacesInlineProps) => {
+const EndangeredPlacesInline = ({
+  places,
+  destination,
+  isLoading,
+  onAddToTrip,
+}: EndangeredPlacesInlineProps) => {
   const navigate = useNavigate();
 
   const handleViewAllEndangered = () => {
@@ -40,11 +45,13 @@ const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }:
           <div className="text-2xl">🌍</div>
           <div>
             <h3 className="font-semibold text-lg">Endangered Places Near {destination}</h3>
-            <p className="text-sm text-muted-foreground">Loading nearby places that need your witness...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading nearby places that need your witness...
+            </p>
           </div>
         </div>
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse">
               <div className="flex gap-4 p-4 border rounded-lg">
                 <div className="w-20 h-16 bg-gray-200 rounded"></div>
@@ -68,14 +75,17 @@ const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }:
           <div className="text-2xl">🌍</div>
           <div>
             <h3 className="font-semibold text-lg">Endangered Places Near {destination}</h3>
-            <p className="text-sm text-muted-foreground">Discover places that need urgent attention</p>
+            <p className="text-sm text-muted-foreground">
+              Discover places that need urgent attention
+            </p>
           </div>
         </div>
         <div className="text-center py-8">
           <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h4 className="font-medium text-gray-900 mb-2">No Endangered Places Found Nearby</h4>
           <p className="text-sm text-gray-600 mb-4">
-            We couldn't find any endangered places near {destination}, but there are many others around the world.
+            We couldn't find any endangered places near {destination}, but there are many others
+            around the world.
           </p>
           <Button onClick={handleViewAllEndangered} variant="outline" size="sm">
             <ExternalLink className="w-4 h-4 mr-2" />
@@ -122,7 +132,7 @@ const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }:
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              
+
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between mb-2">
@@ -135,13 +145,15 @@ const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }:
                       <span className="truncate">{place.location}</span>
                     </div>
                   </div>
-                  
+
                   {/* Threat Level Badge */}
-                  <div className={`px-2 py-0.5 rounded-full border text-xs font-medium ml-2 ${threatColors[place.threatLevel]}`}>
+                  <div
+                    className={`px-2 py-0.5 rounded-full border text-xs font-medium ml-2 ${threatColors[place.threatLevel]}`}
+                  >
                     {place.threatLevel.toUpperCase()}
                   </div>
                 </div>
-                
+
                 {/* Stats and Add Button */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -160,7 +172,7 @@ const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }:
                       <span>{place.threats.length} threats</span>
                     </div>
                   </div>
-                  
+
                   {onAddToTrip && (
                     <Button
                       size="sm"
@@ -188,8 +200,8 @@ const EndangeredPlacesInline = ({ places, destination, isLoading, onAddToTrip }:
 
       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-xs text-blue-700">
-          💡 <strong>Tip:</strong> Consider adding these endangered places as side visits to your journey. 
-          Every witness helps preserve these precious locations for future generations.
+          💡 <strong>Tip:</strong> Consider adding these endangered places as side visits to your
+          journey. Every witness helps preserve these precious locations for future generations.
         </p>
       </div>
     </Card>

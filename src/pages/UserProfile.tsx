@@ -6,9 +6,22 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  User, Calendar, MapPin, Settings as SettingsIcon,
-  TrendingUp, Hotel, Plane, Clock, ArrowRight,
-  Bell, Mail, Phone, Shield, CreditCard, LogOut, Home
+  User,
+  Calendar,
+  MapPin,
+  Settings as SettingsIcon,
+  TrendingUp,
+  Hotel,
+  Plane,
+  Clock,
+  ArrowRight,
+  Bell,
+  Mail,
+  Phone,
+  Shield,
+  CreditCard,
+  LogOut,
+  Home,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,21 +69,17 @@ export default function UserProfile() {
 
   // Get user initials for avatar
   const userName = user.displayName || user.email?.split('@')[0] || 'User';
-  const userInitials = userName.length >= 2
-    ? `${userName.charAt(0)}${userName.charAt(1)}`.toUpperCase()
-    : userName.charAt(0).toUpperCase();
+  const userInitials =
+    userName.length >= 2
+      ? `${userName.charAt(0)}${userName.charAt(1)}`.toUpperCase()
+      : userName.charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header with Profile Card */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="mb-4"
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="mb-4">
             <Home className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
@@ -322,7 +331,9 @@ export default function UserProfile() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium mb-1">Booking Confirmed</p>
-                      <p className="text-sm text-muted-foreground">Your hotel reservation has been confirmed</p>
+                      <p className="text-sm text-muted-foreground">
+                        Your hotel reservation has been confirmed
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1">2 days ago</p>
                     </div>
                   </div>
@@ -344,7 +355,9 @@ export default function UserProfile() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium mb-1">Profile Updated</p>
-                      <p className="text-sm text-muted-foreground">Changed notification preferences</p>
+                      <p className="text-sm text-muted-foreground">
+                        Changed notification preferences
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1">1 week ago</p>
                     </div>
                   </div>

@@ -67,12 +67,12 @@ export function CancelBooking({
     // Find applicable rule based on days until check-in
     const applicableRule = hotel.cancellationPolicy.rules
       .sort((a, b) => b.daysBeforeCheckIn - a.daysBeforeCheckIn)
-      .find((rule) => daysUntilCheckIn >= rule.daysBeforeCheckIn);
+      .find(rule => daysUntilCheckIn >= rule.daysBeforeCheckIn);
 
     if (!applicableRule) {
       // No rule found, use the most restrictive (0 days)
       const mostRestrictive = hotel.cancellationPolicy.rules.find(
-        (rule) => rule.daysBeforeCheckIn === 0
+        rule => rule.daysBeforeCheckIn === 0
       );
       const percentage = mostRestrictive?.refundPercentage || 0;
       const fee = mostRestrictive?.fee || 0;
@@ -179,7 +179,8 @@ export function CancelBooking({
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span>
-                {format(new Date(checkInDate), 'MMM d, yyyy')} - {format(new Date(booking.checkOutDate), 'MMM d, yyyy')}
+                {format(new Date(checkInDate), 'MMM d, yyyy')} -{' '}
+                {format(new Date(booking.checkOutDate), 'MMM d, yyyy')}
               </span>
             </div>
             <div className="text-sm">
@@ -202,9 +203,11 @@ export function CancelBooking({
                     .sort((a, b) => b.daysBeforeCheckIn - a.daysBeforeCheckIn)
                     .map((rule: CancellationRule, index: number) => (
                       <div key={index} className="text-sm">
-                        • {rule.daysBeforeCheckIn > 0 ? (
+                        •{' '}
+                        {rule.daysBeforeCheckIn > 0 ? (
                           <>
-                            {rule.daysBeforeCheckIn}+ days before check-in: {rule.refundPercentage}% refund
+                            {rule.daysBeforeCheckIn}+ days before check-in: {rule.refundPercentage}%
+                            refund
                             {rule.fee && ` (minus $${rule.fee} fee)`}
                           </>
                         ) : (
@@ -273,7 +276,7 @@ export function CancelBooking({
                   <SelectValue placeholder="Select a reason" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CANCELLATION_REASONS.map((reason) => (
+                  {CANCELLATION_REASONS.map(reason => (
                     <SelectItem key={reason} value={reason}>
                       {reason}
                     </SelectItem>
@@ -290,7 +293,8 @@ export function CancelBooking({
               <AlertTitle>Are you absolutely sure?</AlertTitle>
               <AlertDescription>
                 This action cannot be undone. Your booking will be cancelled and you will receive a
-                refund of ${refundDetails.amount.toFixed(2)} {pricing.currency} within 5-10 business days.
+                refund of ${refundDetails.amount.toFixed(2)} {pricing.currency} within 5-10 business
+                days.
               </AlertDescription>
             </Alert>
           )}

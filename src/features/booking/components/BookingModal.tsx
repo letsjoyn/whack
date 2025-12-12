@@ -4,12 +4,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -18,14 +13,18 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBookingStore } from '../stores/bookingStore';
 import { useAvailability } from '../hooks/useAvailability';
-import { useKeyboardNavigation, useFocusTrap, useFocusRestore } from '../hooks/useKeyboardNavigation';
-import { 
-  announceToScreenReader, 
-  announceLoading, 
-  announceSuccess, 
+import {
+  useKeyboardNavigation,
+  useFocusTrap,
+  useFocusRestore,
+} from '../hooks/useKeyboardNavigation';
+import {
+  announceToScreenReader,
+  announceLoading,
+  announceSuccess,
   announceError,
   announceNavigation,
-  getStepDescription 
+  getStepDescription,
 } from '../utils/screenReaderAnnouncer';
 import { bookingAPIService } from '../services/BookingAPIService';
 import { paymentAPIService } from '../services/PaymentAPIService';
@@ -46,7 +45,10 @@ interface BookingModalProps {
   hotel: Hotel;
   isOpen: boolean;
   onClose: () => void;
-  onBookingComplete?: (bookingId: string, guestInfo?: { email: string; firstName?: string; lastName?: string }) => void;
+  onBookingComplete?: (
+    bookingId: string,
+    guestInfo?: { email: string; firstName?: string; lastName?: string }
+  ) => void;
 }
 
 // ============================================================================
@@ -85,12 +87,7 @@ const STEPS: { key: BookingStep; label: string; description: string }[] = [
 // Component
 // ============================================================================
 
-export function BookingModal({
-  hotel,
-  isOpen,
-  onClose,
-  onBookingComplete,
-}: BookingModalProps) {
+export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: BookingModalProps) {
   const { user, isAuthenticated } = useAuth();
   const {
     currentBooking,
@@ -111,7 +108,7 @@ export function BookingModal({
   const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
   const [guestBookingEmail, setGuestBookingEmail] = useState<string | null>(null);
   const [isCreatingPaymentIntent, setIsCreatingPaymentIntent] = useState(false);
-  
+
   // Refs for accessibility
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -149,7 +146,9 @@ export function BookingModal({
         source: 'hotel_card',
       });
       // Announce to screen readers
-      announceToScreenReader(`Booking modal opened for ${hotel.title}. ${getStepDescription('dates', 1, STEPS.length)}`);
+      announceToScreenReader(
+        `Booking modal opened for ${hotel.title}. ${getStepDescription('dates', 1, STEPS.length)}`
+      );
     }
   }, [isOpen, hotel, currentBooking, startBooking]);
 
@@ -159,7 +158,9 @@ export function BookingModal({
       setAvailability(availability);
       // Announce availability results
       if (availability.available && availability.rooms.length > 0) {
-        announceSuccess(`${availability.rooms.length} room type${availability.rooms.length > 1 ? 's' : ''} available`);
+        announceSuccess(
+          `${availability.rooms.length} room type${availability.rooms.length > 1 ? 's' : ''} available`
+        );
       } else {
         announceError('No rooms available for selected dates');
       }
@@ -225,12 +226,16 @@ export function BookingModal({
           errorMessage: error.message,
           component: 'BookingModal',
         });
-        errorLoggingService.logError(error, {
-          component: 'BookingModal',
-          step: 'rooms',
-          hotelId: hotel.id,
-          action: 'fetch_pricing',
-        }, 'high');
+        errorLoggingService.logError(
+          error,
+          {
+            component: 'BookingModal',
+            step: 'rooms',
+            hotelId: hotel.id,
+            action: 'fetch_pricing',
+          },
+          'high'
+        );
       }
     }
   };
@@ -238,12 +243,12 @@ export function BookingModal({
   // Handle guest info submission
   const handleGuestInfoSubmit = async (info: GuestInfo) => {
     setGuestInfo(info);
-    
+
     // Track guest info completed
     analyticsService.trackGuestInfoCompleted({
       hasAccount: false, // TODO: Check if user is authenticated
     });
-    
+
     // Create payment intent when moving to payment step
     if (currentBooking?.pricing) {
       setIsCreatingPaymentIntent(true);
@@ -346,11 +351,13 @@ export function BookingModal({
 
       // Success - navigate to confirmation page
       if (onBookingComplete) {
-        const guestInfo = !isAuthenticated ? {
-          email: currentBooking.guestInfo.email,
-          firstName: currentBooking.guestInfo.firstName,
-          lastName: currentBooking.guestInfo.lastName,
-        } : undefined;
+        const guestInfo = !isAuthenticated
+          ? {
+              email: currentBooking.guestInfo.email,
+              firstName: currentBooking.guestInfo.firstName,
+              lastName: currentBooking.guestInfo.lastName,
+            }
+          : undefined;
         onBookingComplete(confirmation.bookingId, guestInfo);
       }
 
@@ -400,14 +407,11 @@ export function BookingModal({
   };
 
   // Get current step index
-  const currentStepIndex = STEPS.findIndex(
-    (step) => step.key === currentBooking?.step
-  );
+  const currentStepIndex = STEPS.findIndex(step => step.key === currentBooking?.step);
 
   // Calculate progress percentage
-  const progressPercentage = currentStepIndex >= 0
-    ? ((currentStepIndex + 1) / STEPS.length) * 100
-    : 0;
+  const progressPercentage =
+    currentStepIndex >= 0 ? ((currentStepIndex + 1) / STEPS.length) * 100 : 0;
 
   // Step navigation
   const canGoBack = currentStepIndex > 0 && currentBooking?.step !== 'processing';
@@ -502,10 +506,10 @@ export function BookingModal({
     );
   }
 
-  console.log('BookingModal: Rendering with booking', { 
-    isOpen, 
+  console.log('BookingModal: Rendering with booking', {
+    isOpen,
     step: currentBooking.step,
-    hotel: currentBooking.hotel.title 
+    hotel: currentBooking.hotel.title,
   });
 
   return (
@@ -648,9 +652,7 @@ export function BookingModal({
               {currentBooking.step === 'dates' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      When would you like to stay?
-                    </h3>
+                    <h3 className="text-lg font-semibold mb-2">When would you like to stay?</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Select your check-in and check-out dates
                     </p>
@@ -662,9 +664,7 @@ export function BookingModal({
                     unavailableDates={[]}
                   />
                   {isCheckingAvailability && (
-                    <div className="text-sm text-muted-foreground">
-                      Checking availability...
-                    </div>
+                    <div className="text-sm text-muted-foreground">Checking availability...</div>
                   )}
                   {availabilityError && (
                     <Alert variant="destructive">
@@ -678,9 +678,7 @@ export function BookingModal({
               {currentBooking.step === 'rooms' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      Choose your room
-                    </h3>
+                    <h3 className="text-lg font-semibold mb-2">Choose your room</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Select from available room types
                     </p>
@@ -712,16 +710,24 @@ export function BookingModal({
               {currentBooking.step === 'payment' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      Complete Your Booking
-                    </h3>
+                    <h3 className="text-lg font-semibold mb-2">Complete Your Booking</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Enter your payment details to confirm your reservation
                     </p>
                     {hotel.instantBooking && (
                       <div className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
-                        <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        <svg
+                          className="w-4 h-4 text-green-600 dark:text-green-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
                         </svg>
                         <span className="text-sm font-medium text-green-700 dark:text-green-300">
                           Instant Confirmation - Get confirmed within 30 seconds
@@ -770,7 +776,8 @@ export function BookingModal({
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        Failed to initialize payment. Please try again or go back to review your booking.
+                        Failed to initialize payment. Please try again or go back to review your
+                        booking.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -782,16 +789,28 @@ export function BookingModal({
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
                   <h3 className="text-lg font-semibold">Processing your booking</h3>
                   <p className="text-sm text-muted-foreground text-center">
-                    {hotel.instantBooking 
-                      ? 'Instant confirmation in progress...' 
+                    {hotel.instantBooking
+                      ? 'Instant confirmation in progress...'
                       : 'Please wait while we confirm your reservation...'}
                   </p>
                   {hotel.instantBooking && (
                     <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
                       </svg>
-                      <span className="text-sm font-medium">Instant Booking - Confirmation within 30 seconds</span>
+                      <span className="text-sm font-medium">
+                        Instant Booking - Confirmation within 30 seconds
+                      </span>
                     </div>
                   )}
                   {!hotel.instantBooking && (
@@ -819,13 +838,11 @@ export function BookingModal({
         {currentBooking.step !== 'processing' && (
           <div className="border-t px-6 py-4">
             <div className="flex justify-between items-center gap-4">
-              <div className="text-sm text-muted-foreground hidden sm:block">
-                {hotel.title}
-              </div>
+              <div className="text-sm text-muted-foreground hidden sm:block">{hotel.title}</div>
               <div className="flex gap-2 w-full sm:w-auto">
                 {canGoBack && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={handleBack}
                     className="flex-1 sm:flex-none min-h-[44px]"
                   >

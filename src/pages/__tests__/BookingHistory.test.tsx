@@ -276,7 +276,7 @@ describe('BookingHistory Page', () => {
     it('should retry fetching when retry button clicked', async () => {
       const user = userEvent.setup();
       const getUserBookingsSpy = vi.mocked(bookingAPIService.getUserBookings);
-      
+
       getUserBookingsSpy.mockRejectedValueOnce(new Error('Failed to fetch'));
       getUserBookingsSpy.mockResolvedValueOnce(mockBookings);
 

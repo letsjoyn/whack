@@ -1,6 +1,6 @@
 /**
  * BookOnce AI Service
- * 
+ *
  * AI-powered travel advisor with SambaNova primary and Groq fallback
  * Provides intelligent recommendations for all aspects of travel
  */
@@ -74,7 +74,9 @@ class BookOnceAIService {
       }
     }
 
-    throw new Error('No AI provider configured. Please add VITE_SAMBANOVA_API_KEY or VITE_GROQ_API_KEY to your .env file');
+    throw new Error(
+      'No AI provider configured. Please add VITE_SAMBANOVA_API_KEY or VITE_GROQ_API_KEY to your .env file'
+    );
   }
 
   /**
@@ -91,7 +93,7 @@ class BookOnceAIService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SAMBANOVA_API_KEY}`,
+          Authorization: `Bearer ${SAMBANOVA_API_KEY}`,
         },
         body: JSON.stringify({
           model: SAMBANOVA_MODEL,
@@ -132,7 +134,7 @@ class BookOnceAIService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          Authorization: `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
           model: GROQ_MODEL,
@@ -195,11 +197,21 @@ ${context.returnDate ? `RETURN DATE: ${context.returnDate}` : ''}
 TRAVELERS: ${context.travelers}
 STYLE: ${context.intent === 'urgent' ? 'Fast and efficient - minimize travel time' : 'Leisurely - comfortable and scenic'}
 EXPERIENCE: ${context.visitor === 'first-time' ? 'First-time visitor - include must-see highlights' : 'Returning visitor - suggest new experiences'}
-${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? `
+${
+  context.endangeredPlaces && context.endangeredPlaces.length > 0
+    ? `
 ENDANGERED PLACES TO VISIT:
-${context.endangeredPlaces.map((place: any) => `  - ${place.name} (${place.location}) - ${place.threatLevel.toUpperCase()} threat, ${place.yearsRemaining} years remaining
-    Estimated cost: ₹${place.estimatedCost.toLocaleString()} (includes transport, guide & entry)`).join('\n')}
-TOTAL ENDANGERED PLACES COST: ₹${context.totalEndangeredPlacesCost?.toLocaleString() || 0}` : ''}
+${context.endangeredPlaces
+  .map(
+    (
+      place: any
+    ) => `  - ${place.name} (${place.location}) - ${place.threatLevel.toUpperCase()} threat, ${place.yearsRemaining} years remaining
+    Estimated cost: ₹${place.estimatedCost.toLocaleString()} (includes transport, guide & entry)`
+  )
+  .join('\n')}
+TOTAL ENDANGERED PLACES COST: ₹${context.totalEndangeredPlacesCost?.toLocaleString() || 0}`
+    : ''
+}
 
 Generate a detailed plan with:
 
@@ -221,19 +233,33 @@ ${context.returnDate ? '[Calculate return journey with times]' : '[Not applicabl
 - Group-friendly options for ${context.travelers} people
 
 ## ACCOMMODATION
-${context.returnDate ? `- Hotel recommendations
+${
+  context.returnDate
+    ? `- Hotel recommendations
 - Check-in time
 - Number of rooms needed for ${context.travelers} travelers
-- Cost estimates` : '[Not needed - day trip]'}
+- Cost estimates`
+    : '[Not needed - day trip]'
+}
 
-${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? `## ENDANGERED PLACES VISITS
+${
+  context.endangeredPlaces && context.endangeredPlaces.length > 0
+    ? `## ENDANGERED PLACES VISITS
 Include these special visits in your plan:
-${context.endangeredPlaces.map((place: any) => `- ${place.name}: A ${place.threatLevel} threat site with only ${place.yearsRemaining} years remaining
+${context.endangeredPlaces
+  .map(
+    (
+      place: any
+    ) => `- ${place.name}: A ${place.threatLevel} threat site with only ${place.yearsRemaining} years remaining
   Cost: ₹${place.estimatedCost.toLocaleString()} per group (includes local transport, expert guide, and entry fee)
-  Timing: Schedule during the stay, suggest best time of day`).join('\n')}
+  Timing: Schedule during the stay, suggest best time of day`
+  )
+  .join('\n')}
 
 Total cost for endangered places: ₹${context.totalEndangeredPlacesCost?.toLocaleString() || 0}
-These visits support conservation efforts and local communities.` : ''}
+These visits support conservation efforts and local communities.`
+    : ''
+}
 
 Be specific with times, costs, and practical details!${context.endangeredPlaces && context.endangeredPlaces.length > 0 ? '\nIMPORTANT: Include the endangered places costs in your pricing breakdown!' : ''}`;
 
@@ -403,7 +429,10 @@ Provide practical, step-by-step transportation guidance.`;
 
     try {
       const response = await this.callAI([
-        { role: 'system', content: 'You are a transportation expert. Provide detailed, practical advice.' },
+        {
+          role: 'system',
+          content: 'You are a transportation expert. Provide detailed, practical advice.',
+        },
         { role: 'user', content: prompt },
       ]);
 
@@ -432,7 +461,10 @@ Provide specific restaurant recommendations and local cuisine highlights.`;
 
     try {
       const response = await this.callAI([
-        { role: 'system', content: 'You are a local food expert. Recommend authentic dining experiences.' },
+        {
+          role: 'system',
+          content: 'You are a local food expert. Recommend authentic dining experiences.',
+        },
         { role: 'user', content: prompt },
       ]);
 
@@ -488,7 +520,10 @@ Provide practical, reassuring safety guidance.`;
 
     try {
       const response = await this.callAI([
-        { role: 'system', content: 'You are a travel safety expert. Provide helpful, non-alarmist advice.' },
+        {
+          role: 'system',
+          content: 'You are a travel safety expert. Provide helpful, non-alarmist advice.',
+        },
         { role: 'user', content: prompt },
       ]);
 
@@ -518,7 +553,10 @@ Provide a categorized, practical packing checklist.`;
 
     try {
       const response = await this.callAI([
-        { role: 'system', content: 'You are a packing expert. Create comprehensive, practical checklists.' },
+        {
+          role: 'system',
+          content: 'You are a packing expert. Create comprehensive, practical checklists.',
+        },
         { role: 'user', content: prompt },
       ]);
 
@@ -550,7 +588,10 @@ Provide a detailed budget breakdown with cost-saving tips.`;
 
     try {
       const response = await this.callAI([
-        { role: 'system', content: 'You are a budget travel expert. Provide realistic cost estimates.' },
+        {
+          role: 'system',
+          content: 'You are a budget travel expert. Provide realistic cost estimates.',
+        },
         { role: 'user', content: prompt },
       ]);
 

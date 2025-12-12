@@ -1,13 +1,13 @@
 /**
  * Vagabon AI Chat Integration Tests
  * End-to-end tests for the complete chat flow
- * 
+ *
  * Tests:
  * - Opening modal from navbar
  * - Sending message and receiving response
  * - Clearing chat
  * - Error scenarios
- * 
+ *
  * Requirements: 1.1, 1.2, 2.3, 2.4, 3.1, 3.2, 3.3, 7.1, 7.2
  */
 
@@ -58,14 +58,14 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Reset chat store
     const store = useChatStore.getState();
     store.clearMessages();
     store.setError(null);
     store.setLoading(false);
     store.setOpen(false);
-    
+
     // Setup default mock behavior
     vi.mocked(bookOnceAIService.answerQuestionWithHistory).mockResolvedValue('AI response');
   });
@@ -105,10 +105,13 @@ describe('Vagabon AI Chat - Integration Tests', () => {
       const aiButton = screen.getByRole('button', { name: /vagabond ai/i });
       await user.click(aiButton);
 
-      await waitFor(() => {
-        const input = screen.getByRole('textbox', { name: /message input/i });
-        expect(input).toHaveFocus();
-      }, { timeout: 500 });
+      await waitFor(
+        () => {
+          const input = screen.getByRole('textbox', { name: /message input/i });
+          expect(input).toHaveFocus();
+        },
+        { timeout: 500 }
+      );
     });
   });
 
@@ -129,7 +132,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
       // Type and send message
       const input = screen.getByRole('textbox', { name: /message input/i });
       await user.type(input, 'Hello AI');
-      
+
       const sendButton = screen.getByRole('button', { name: /send message/i });
       await user.click(sendButton);
 
@@ -147,7 +150,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
     it('should show loading indicator while waiting for response', async () => {
       const user = userEvent.setup();
-      
+
       // Make the API call take some time
       vi.mocked(bookOnceAIService.answerQuestionWithHistory).mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve('Delayed response'), 100))
@@ -166,7 +169,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
       // Send message
       const input = screen.getByRole('textbox', { name: /message input/i });
       await user.type(input, 'Test message');
-      
+
       const sendButton = screen.getByRole('button', { name: /send message/i });
       await user.click(sendButton);
 
@@ -219,9 +222,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
       expect(bookOnceAIService.answerQuestionWithHistory).toHaveBeenLastCalledWith(
         'Second message',
         expect.any(Object),
-        expect.arrayContaining([
-          expect.objectContaining({ content: 'First message' }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ content: 'First message' })])
       );
     });
 
@@ -284,7 +285,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
     it('should show confirmation dialog when clearing more than 5 messages', async () => {
       const user = userEvent.setup();
-      
+
       // Pre-populate store with messages
       const store = useChatStore.getState();
       for (let i = 0; i < 6; i++) {
@@ -321,7 +322,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
     it('should clear messages after confirmation', async () => {
       const user = userEvent.setup();
-      
+
       // Pre-populate store with messages
       const store = useChatStore.getState();
       for (let i = 0; i < 6; i++) {
@@ -366,7 +367,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
   describe('Error scenarios', () => {
     it('should display error message when API call fails', async () => {
       const user = userEvent.setup();
-      
+
       // Mock API error
       vi.mocked(bookOnceAIService.answerQuestionWithHistory).mockRejectedValue(
         new Error('API error occurred')
@@ -398,7 +399,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
     it('should handle network errors gracefully', async () => {
       const user = userEvent.setup();
-      
+
       // Mock network error
       vi.mocked(bookOnceAIService.answerQuestionWithHistory).mockRejectedValue(
         new Error('Unable to connect. Please check your internet connection.')
@@ -427,7 +428,7 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
     it('should allow retry after error', async () => {
       const user = userEvent.setup();
-      
+
       // First call fails, second succeeds
       vi.mocked(bookOnceAIService.answerQuestionWithHistory)
         .mockRejectedValueOnce(new Error('Temporary error'))
@@ -465,10 +466,12 @@ describe('Vagabon AI Chat - Integration Tests', () => {
 
     it('should handle service not configured error', async () => {
       const user = userEvent.setup();
-      
+
       // Mock service not configured
       vi.mocked(bookOnceAIService.answerQuestionWithHistory).mockRejectedValue(
-        new Error('AI service is not configured. Please add VITE_SAMBANOVA_API_KEY to your .env file.')
+        new Error(
+          'AI service is not configured. Please add VITE_SAMBANOVA_API_KEY to your .env file.'
+        )
       );
 
       renderApp();

@@ -1,10 +1,25 @@
-import { motion } from "framer-motion";
-import { Home, Building2, Plane, Sparkles, User, Shield, Menu, X, Zap, Calendar, MapIcon, Compass, LogOut, Settings } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useChatStore } from "@/stores/chatStore";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { motion } from 'framer-motion';
+import {
+  Home,
+  Building2,
+  Plane,
+  Sparkles,
+  User,
+  Shield,
+  Menu,
+  X,
+  Zap,
+  Calendar,
+  MapIcon,
+  Compass,
+  LogOut,
+  Settings,
+} from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useChatStore } from '@/stores/chatStore';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface NavbarProps {
   onSafetyClick: () => void;
@@ -28,23 +43,31 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
     };
 
     if (isDashboardOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [isDashboardOpen]);
 
   const navItems = [
-    { icon: Home, label: "Home", href: "/", isRoute: true },
-    { icon: Building2, label: "Explore", href: "/stays", isRoute: true },
-    { icon: Compass, label: "Utilities", href: "/utilities", isRoute: true },
-    { icon: Sparkles, label: "BookOnce AI", href: "#ai", highlight: true, isRoute: false, onClick: () => setChatOpen(true), isActive: isChatOpen },
+    { icon: Home, label: 'Home', href: '/', isRoute: true },
+    { icon: Building2, label: 'Explore', href: '/stays', isRoute: true },
+    { icon: Compass, label: 'Utilities', href: '/utilities', isRoute: true },
+    {
+      icon: Sparkles,
+      label: 'BookOnce AI',
+      href: '#ai',
+      highlight: true,
+      isRoute: false,
+      onClick: () => setChatOpen(true),
+      isActive: isChatOpen,
+    },
   ];
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20 }}
       className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-8"
     >
       <div className="max-w-7xl mx-auto">
@@ -67,13 +90,14 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-3">
-            {navItems.map((item) => {
-              const className = `flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${item.highlight
-                ? item.isActive
-                  ? "bg-gradient-accent text-primary-foreground shadow-glow ring-2 ring-primary/50"
-                  : "bg-gradient-accent text-primary-foreground shadow-glow"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`;
+            {navItems.map(item => {
+              const className = `flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+                item.highlight
+                  ? item.isActive
+                    ? 'bg-gradient-accent text-primary-foreground shadow-glow ring-2 ring-primary/50'
+                    : 'bg-gradient-accent text-primary-foreground shadow-glow'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+              }`;
 
               const content = (
                 <>
@@ -92,7 +116,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                     transition={{
                       duration: 0.5,
                       delay: 0.3,
-                      ease: [0.23, 1, 0.32, 1]
+                      ease: [0.23, 1, 0.32, 1],
                     }}
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
@@ -164,11 +188,12 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={onSafetyClick}
-              className={`p-2 rounded-xl transition-all ${isOffline
-                ? "bg-destructive text-destructive-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`}
-              title={isOffline ? "Safety Mode Active" : "Safety Information"}
+              className={`p-2 rounded-xl transition-all ${
+                isOffline
+                  ? 'bg-destructive text-destructive-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+              }`}
+              title={isOffline ? 'Safety Mode Active' : 'Safety Information'}
             >
               <Shield className="w-5 h-5" />
             </motion.button>
@@ -181,7 +206,7 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary"
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -221,8 +246,12 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
                       className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-xl shadow-lg overflow-hidden z-40"
                     >
                       <div className="p-4 border-b border-border">
-                        <p className="text-sm font-medium text-foreground truncate">{user?.displayName || `${user?.firstName} ${user?.lastName}` || 'User'}</p>
-                        <p className="text-xs text-muted-foreground truncate" title={user?.email}>{user?.email}</p>
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {user?.displayName || `${user?.firstName} ${user?.lastName}` || 'User'}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate" title={user?.email}>
+                          {user?.email}
+                        </p>
                       </div>
 
                       <div className="p-2 space-y-1">
@@ -278,8 +307,8 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
         <motion.div
           initial={false}
           animate={{
-            height: isMenuOpen ? "auto" : 0,
-            opacity: isMenuOpen ? 1 : 0
+            height: isMenuOpen ? 'auto' : 0,
+            opacity: isMenuOpen ? 1 : 0,
           }}
           transition={{ duration: 0.3 }}
           className="md:hidden overflow-hidden"
@@ -288,13 +317,14 @@ const Navbar = ({ onSafetyClick, isOffline, onContextClick, onMapClick }: Navbar
           aria-label="Mobile navigation menu"
         >
           <div className="glass-strong rounded-2xl mt-2 p-4 space-y-2">
-            {navItems.map((item) => {
-              const className = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.highlight
-                ? item.isActive
-                  ? "bg-gradient-accent text-primary-foreground ring-2 ring-primary/50"
-                  : "bg-gradient-accent text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`;
+            {navItems.map(item => {
+              const className = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                item.highlight
+                  ? item.isActive
+                    ? 'bg-gradient-accent text-primary-foreground ring-2 ring-primary/50'
+                    : 'bg-gradient-accent text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+              }`;
 
               const content = (
                 <>

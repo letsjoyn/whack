@@ -53,18 +53,14 @@ export default function BookingHistory() {
     switch (filter) {
       case 'upcoming':
         return bookings.filter(
-          (booking) =>
-            booking.status !== 'cancelled' &&
-            new Date(booking.checkInDate) >= now
+          booking => booking.status !== 'cancelled' && new Date(booking.checkInDate) >= now
         );
       case 'past':
         return bookings.filter(
-          (booking) =>
-            booking.status !== 'cancelled' &&
-            new Date(booking.checkOutDate) < now
+          booking => booking.status !== 'cancelled' && new Date(booking.checkOutDate) < now
         );
       case 'cancelled':
-        return bookings.filter((booking) => booking.status === 'cancelled');
+        return bookings.filter(booking => booking.status === 'cancelled');
       default:
         return bookings;
     }
@@ -76,7 +72,7 @@ export default function BookingHistory() {
 
     const query = searchQuery.toLowerCase();
     return filteredByStatus.filter(
-      (booking) =>
+      booking =>
         booking.hotel.title.toLowerCase().includes(query) ||
         booking.hotel.location.toLowerCase().includes(query) ||
         booking.referenceNumber.toLowerCase().includes(query)
@@ -90,13 +86,11 @@ export default function BookingHistory() {
     switch (sortBy) {
       case 'date-desc':
         return sorted.sort(
-          (a, b) =>
-            new Date(b.checkInDate).getTime() - new Date(a.checkInDate).getTime()
+          (a, b) => new Date(b.checkInDate).getTime() - new Date(a.checkInDate).getTime()
         );
       case 'date-asc':
         return sorted.sort(
-          (a, b) =>
-            new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime()
+          (a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime()
         );
       case 'price-desc':
         return sorted.sort((a, b) => b.pricing.total - a.pricing.total);
@@ -138,9 +132,7 @@ export default function BookingHistory() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold">My Bookings</h1>
-              <p className="text-muted-foreground mt-1">
-                Manage your hotel reservations
-              </p>
+              <p className="text-muted-foreground mt-1">Manage your hotel reservations</p>
             </div>
             <Button
               variant="outline"
@@ -160,12 +152,12 @@ export default function BookingHistory() {
               <Input
                 placeholder="Search by hotel, location, or reference number..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="flex gap-2">
-              <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+              <Select value={sortBy} onValueChange={value => setSortBy(value as SortOption)}>
                 <SelectTrigger className="w-[180px]">
                   <SlidersHorizontal className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Sort by" />
@@ -194,7 +186,7 @@ export default function BookingHistory() {
 
       {/* Tabs and Content */}
       <div className="container mx-auto px-4 py-6">
-        <Tabs value={filter} onValueChange={(value) => setFilter(value as BookingFilter)}>
+        <Tabs value={filter} onValueChange={value => setFilter(value as BookingFilter)}>
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="all">
               All
@@ -256,15 +248,11 @@ export default function BookingHistory() {
                     {searchQuery
                       ? 'No bookings match your search'
                       : filter === 'all'
-                      ? 'No bookings yet'
-                      : `No ${filter} bookings`}
+                        ? 'No bookings yet'
+                        : `No ${filter} bookings`}
                   </p>
                   {searchQuery && (
-                    <Button
-                      variant="link"
-                      onClick={() => setSearchQuery('')}
-                      className="mt-2"
-                    >
+                    <Button variant="link" onClick={() => setSearchQuery('')} className="mt-2">
                       Clear search
                     </Button>
                   )}
@@ -275,7 +263,7 @@ export default function BookingHistory() {
             {/* Bookings List */}
             {!isLoading && !error && sortedBookings.length > 0 && (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {sortedBookings.map((booking) => (
+                {sortedBookings.map(booking => (
                   <BookingCard
                     key={booking.bookingId}
                     booking={booking}

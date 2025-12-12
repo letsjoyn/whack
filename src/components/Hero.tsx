@@ -1,15 +1,15 @@
-import { motion } from "framer-motion";
-import { Search, MapPin, Calendar, Users, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { motion } from 'framer-motion';
+import { Search, MapPin, Calendar, Users, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 interface HeroProps {
   onSearch: (destination: string) => void;
 }
 
 const Hero = ({ onSearch }: HeroProps) => {
-  const [destination, setDestination] = useState("");
-  const [dates, setDates] = useState("");
-  const [guests, setGuests] = useState("2 Guests");
+  const [destination, setDestination] = useState('');
+  const [dates, setDates] = useState('');
+  const [guests, setGuests] = useState('2 Guests');
 
   const handleExplore = () => {
     onSearch(destination);
@@ -48,7 +48,8 @@ const Hero = ({ onSearch }: HeroProps) => {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-            The world's first bio-adaptive travel platform. Your journey evolves with your mood, energy, and desires.
+            The world's first bio-adaptive travel platform. Your journey evolves with your mood,
+            energy, and desires.
           </p>
         </motion.div>
 
@@ -69,7 +70,7 @@ const Hero = ({ onSearch }: HeroProps) => {
                 type="text"
                 placeholder="Where to?"
                 value={destination}
-                onChange={(e) => setDestination(e.target.value)}
+                onChange={e => setDestination(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 bg-secondary/50 rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
               />
             </div>
@@ -83,7 +84,7 @@ const Hero = ({ onSearch }: HeroProps) => {
                 type="text"
                 placeholder="Add dates"
                 value={dates}
-                onChange={(e) => setDates(e.target.value)}
+                onChange={e => setDates(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 bg-secondary/50 rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
               />
             </div>
@@ -95,7 +96,7 @@ const Hero = ({ onSearch }: HeroProps) => {
               </div>
               <select
                 value={guests}
-                onChange={(e) => setGuests(e.target.value)}
+                onChange={e => setGuests(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 bg-secondary/50 rounded-2xl text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all cursor-pointer"
               >
                 <option>1 Guest</option>

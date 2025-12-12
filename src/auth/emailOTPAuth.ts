@@ -73,10 +73,10 @@ export const emailOTPAuth = {
 
       // EmailJS template parameters - MUST match your template exactly
       const templateParams = {
-        email: email,                              // {{email}} in template
+        email: email, // {{email}} in template
         to_name: userName || email.split('@')[0], // {{to_name}} in template
-        otp_code: otp,                            // {{otp_code}} in template
-        expiry_time: '10 minutes',                // {{expiry_time}} in template
+        otp_code: otp, // {{otp_code}} in template
+        expiry_time: '10 minutes', // {{expiry_time}} in template
       };
 
       console.log('📧 Sending OTP to:', email);

@@ -1,6 +1,6 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { Shield, X, AlertTriangle, Wifi, WifiOff, Radio, Phone } from "lucide-react";
-import { useState } from "react";
+import { motion, AnimatePresence } from 'framer-motion';
+import { Shield, X, AlertTriangle, Wifi, WifiOff, Radio, Phone } from 'lucide-react';
+import { useState } from 'react';
 
 interface SafetyMeshProps {
   isOpen: boolean;
@@ -14,13 +14,15 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
 
   const handleSOS = () => {
     setIsBroadcasting(true);
-    
+
     // Simulate broadcast
     setTimeout(() => {
       // Pre-fill SMS with dummy GPS coordinates
-      const gpsCoords = "35.6762,139.6503";
-      const message = encodeURIComponent(`EMERGENCY SOS from BookOnce App. My location: ${gpsCoords}. Please send help!`);
-      window.open(`sms:?body=${message}`, "_blank");
+      const gpsCoords = '35.6762,139.6503';
+      const message = encodeURIComponent(
+        `EMERGENCY SOS from BookOnce App. My location: ${gpsCoords}. Please send help!`
+      );
+      window.open(`sms:?body=${message}`, '_blank');
       setIsBroadcasting(false);
     }, 2000);
   };
@@ -42,14 +44,14 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               className="absolute top-0 left-0 w-full h-full"
               animate={{
                 background: [
-                  "radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)",
-                  "radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0) 0%, transparent 50%)",
+                  'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
+                  'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0) 0%, transparent 50%)',
                 ],
               }}
               transition={{
                 duration: 0.5,
                 repeat: Infinity,
-                repeatType: "reverse",
+                repeatType: 'reverse',
               }}
             />
             {/* Red Police Light */}
@@ -57,14 +59,14 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               className="absolute top-0 right-0 w-full h-full"
               animate={{
                 background: [
-                  "radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0) 0%, transparent 50%)",
-                  "radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 50%)",
+                  'radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0) 0%, transparent 50%)',
+                  'radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 50%)',
                 ],
               }}
               transition={{
                 duration: 0.5,
                 repeat: Infinity,
-                repeatType: "reverse",
+                repeatType: 'reverse',
               }}
             />
           </motion.div>
@@ -72,20 +74,20 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
           {/* Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ 
-              opacity: 1, 
+            animate={{
+              opacity: 1,
               scale: 1,
               transition: {
-                type: "spring",
+                type: 'spring',
                 damping: 20,
                 stiffness: 400,
-                mass: 0.8
-              }
+                mass: 0.8,
+              },
             }}
-            exit={{ 
-              opacity: 0, 
+            exit={{
+              opacity: 0,
               scale: 0.8,
-              transition: { duration: 0.2 }
+              transition: { duration: 0.2 },
             }}
             className="fixed left-[calc(50%-260px)] top-[calc(50%-300px)] -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg z-[60] glass-strong rounded-3xl shadow-2xl max-h-[70vh] overflow-y-auto scrollbar-hide"
             style={{
@@ -94,17 +96,25 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
             }}
           >
             {/* Header */}
-            <div className={`px-4 py-3 border-b border-border flex items-center justify-between ${isOffline ? "bg-destructive/10" : ""}`}>
+            <div
+              className={`px-4 py-3 border-b border-border flex items-center justify-between ${isOffline ? 'bg-destructive/10' : ''}`}
+            >
               <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  isOffline ? "bg-destructive/20" : "bg-success/20"
-                }`}>
-                  <Shield className={`w-4 h-4 ${isOffline ? "text-destructive" : "text-success"}`} />
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    isOffline ? 'bg-destructive/20' : 'bg-success/20'
+                  }`}
+                >
+                  <Shield
+                    className={`w-4 h-4 ${isOffline ? 'text-destructive' : 'text-success'}`}
+                  />
                 </div>
                 <div>
-                  <h3 className="font-serif text-base font-semibold text-foreground">Safety Mesh</h3>
+                  <h3 className="font-serif text-base font-semibold text-foreground">
+                    Safety Mesh
+                  </h3>
                   <p className="text-[10px] text-muted-foreground">
-                    {isOffline ? "Offline Mode" : "All Systems OK"}
+                    {isOffline ? 'Offline Mode' : 'All Systems OK'}
                   </p>
                 </div>
               </div>
@@ -137,13 +147,13 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
                   whileTap={{ scale: 0.95 }}
                   onClick={onToggleOffline}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    isOffline ? "bg-destructive" : "bg-secondary"
+                    isOffline ? 'bg-destructive' : 'bg-secondary'
                   }`}
                 >
                   <motion.div
                     layout
                     className="absolute top-0.5 w-5 h-5 bg-background rounded-full shadow-md"
-                    style={{ left: isOffline ? "calc(100% - 22px)" : "2px" }}
+                    style={{ left: isOffline ? 'calc(100% - 22px)' : '2px' }}
                   />
                 </motion.button>
               </div>
@@ -152,7 +162,7 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               {isOffline && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
+                  animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   className="p-3 rounded-xl bg-warning/10 border border-warning/20"
                 >
@@ -167,10 +177,8 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
 
               {/* SOS Button */}
               <div className="text-center space-y-3">
-                <p className="text-xs text-muted-foreground">
-                  Emergency broadcast
-                </p>
-                
+                <p className="text-xs text-muted-foreground">Emergency broadcast</p>
+
                 <div className="relative inline-block">
                   {/* Broadcasting Rings */}
                   {isBroadcasting && (
@@ -261,15 +269,21 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
                 <div className="space-y-2">
                   <div className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
                     <span className="text-sm">📍</span>
-                    <p className="text-xs text-muted-foreground">Share your live location with trusted contacts</p>
+                    <p className="text-xs text-muted-foreground">
+                      Share your live location with trusted contacts
+                    </p>
                   </div>
                   <div className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
                     <span className="text-sm">🔋</span>
-                    <p className="text-xs text-muted-foreground">Keep your phone charged above 20%</p>
+                    <p className="text-xs text-muted-foreground">
+                      Keep your phone charged above 20%
+                    </p>
                   </div>
                   <div className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
                     <span className="text-sm">💰</span>
-                    <p className="text-xs text-muted-foreground">Keep emergency cash in multiple locations</p>
+                    <p className="text-xs text-muted-foreground">
+                      Keep emergency cash in multiple locations
+                    </p>
                   </div>
                 </div>
               </div>

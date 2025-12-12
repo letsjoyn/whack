@@ -10,11 +10,7 @@ interface TimeSelectorProps {
   className?: string;
 }
 
-export const TimeSelector: React.FC<TimeSelectorProps> = ({
-  value,
-  onChange,
-  className
-}) => {
+export const TimeSelector: React.FC<TimeSelectorProps> = ({ value, onChange, className }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hours, setHours] = useState(9);
   const [minutes, setMinutes] = useState(0);
@@ -27,7 +23,7 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
       const [timeStr] = value.split(':');
       const hour = parseInt(timeStr);
       const min = parseInt(value.split(':')[1] || '0');
-      
+
       if (hour === 0) {
         setHours(12);
         setPeriod('AM');
@@ -55,7 +51,7 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isOpen) return;
-      
+
       switch (event.key) {
         case 'Escape':
           setIsOpen(false);
@@ -114,7 +110,7 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
     } else if (newPeriod === 'PM' && newHours !== 12) {
       hour24 = newHours + 12;
     }
-    
+
     const timeString = `${hour24.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
     onChange(timeString);
   };
@@ -145,7 +141,7 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
     { label: 'Evening', time: '06:00', period: 'PM' },
   ];
 
-  const handleQuickTime = (quickTime: typeof quickTimes[0]) => {
+  const handleQuickTime = (quickTime: (typeof quickTimes)[0]) => {
     const [h, m] = quickTime.time.split(':').map(Number);
     setHours(h === 0 ? 12 : h > 12 ? h - 12 : h);
     setMinutes(m);
@@ -155,15 +151,15 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
   };
 
   return (
-    <div ref={containerRef} className={cn("relative", className)}>
+    <div ref={containerRef} className={cn('relative', className)}>
       {/* Trigger Button */}
       <Button
         variant="outline"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full justify-between h-auto p-4 text-left font-normal transition-all duration-200",
-          "hover:bg-primary/5 hover:border-primary/50 focus:ring-2 focus:ring-primary/20",
-          isOpen && "border-primary bg-primary/5"
+          'w-full justify-between h-auto p-4 text-left font-normal transition-all duration-200',
+          'hover:bg-primary/5 hover:border-primary/50 focus:ring-2 focus:ring-primary/20',
+          isOpen && 'border-primary bg-primary/5'
         )}
       >
         <div className="flex items-center gap-3">
@@ -177,10 +173,12 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
             </div>
           </div>
         </div>
-        <ChevronDown className={cn(
-          "h-4 w-4 transition-transform duration-200 text-muted-foreground", 
-          isOpen && "rotate-180 text-primary"
-        )} />
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 transition-transform duration-200 text-muted-foreground',
+            isOpen && 'rotate-180 text-primary'
+          )}
+        />
       </Button>
 
       {/* Time Picker Modal */}
@@ -190,7 +188,7 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
           <div className="mb-6">
             <h4 className="text-sm font-medium mb-3 text-foreground">Quick Select</h4>
             <div className="grid grid-cols-2 gap-2">
-              {quickTimes.map((qt) => (
+              {quickTimes.map(qt => (
                 <Button
                   key={qt.label}
                   variant="ghost"
@@ -207,7 +205,7 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
           {/* Custom Time Picker */}
           <div className="space-y-4">
             <h4 className="text-sm font-medium text-foreground">Custom Time</h4>
-            
+
             <div className="flex items-center justify-center gap-6 bg-muted/30 rounded-lg p-4">
               {/* Hours */}
               <div className="flex flex-col items-center">
@@ -284,18 +282,16 @@ export const TimeSelector: React.FC<TimeSelectorProps> = ({
             <div className="space-y-3 pt-4 border-t">
               <div className="flex justify-between items-center">
                 <div className="text-sm text-muted-foreground">
-                  Selected: <span className="font-semibold text-foreground">{formatDisplayTime()}</span>
+                  Selected:{' '}
+                  <span className="font-semibold text-foreground">{formatDisplayTime()}</span>
                 </div>
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  size="sm"
-                  className="px-6"
-                >
+                <Button onClick={() => setIsOpen(false)} size="sm" className="px-6">
                   Done
                 </Button>
               </div>
               <div className="text-xs text-muted-foreground">
-                <span className="font-medium">Keyboard shortcuts:</span> ↑↓ hours, Shift+↑↓ minutes, Tab AM/PM, Esc close
+                <span className="font-medium">Keyboard shortcuts:</span> ↑↓ hours, Shift+↑↓ minutes,
+                Tab AM/PM, Esc close
               </div>
             </div>
           </div>

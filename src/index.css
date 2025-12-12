@@ -43,17 +43,21 @@
     --glass: 0 0% 100% / 0.7;
     --glass-border: 0 0% 100% / 0.2;
     --glass-strong: 0 0% 100% / 0.85;
-    
+
     /* Light Mode Custom Tokens */
     --indigo-glow: 239 84% 67% / 0.3;
     --slate-deep: 215 25% 12%;
     --zinc-soft: 240 5% 96%;
-    
+
     /* Light Mode Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(239 84% 67% / 0.1) 0%, hsl(280 80% 60% / 0.1) 100%);
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(239 84% 67% / 0.1) 0%,
+      hsl(280 80% 60% / 0.1) 100%
+    );
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(240 5% 98%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(280 80% 60%) 100%);
-    
+
     /* Light Mode Shadows */
     --shadow-soft: 0 4px 20px -4px hsl(215 25% 12% / 0.08);
     --shadow-medium: 0 8px 30px -8px hsl(215 25% 12% / 0.12);
@@ -74,7 +78,7 @@
     --hover-overlay: 0 0% 0% / 0.05;
     --active-overlay: 0 0% 0% / 0.1;
     --focus-ring: 239 84% 67% / 0.5;
-    
+
     /* Light Mode Status Colors */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -82,7 +86,7 @@
     --warning-foreground: 0 0% 100%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
-    
+
     /* Light Mode Component-Specific */
     --navbar-bg: 0 0% 100% / 0.9;
     --modal-backdrop: 0 0% 0% / 0.4;
@@ -124,23 +128,27 @@
     --glass: 215 25% 12% / 0.7;
     --glass-border: 0 0% 100% / 0.1;
     --glass-strong: 215 25% 12% / 0.85;
-    
+
     /* Dark Mode Custom Tokens */
     --indigo-glow: 239 84% 67% / 0.4;
     --slate-deep: 215 25% 8%;
     --zinc-soft: 215 25% 15%;
-    
+
     /* Dark Mode Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(239 84% 67% / 0.15) 0%, hsl(280 80% 60% / 0.15) 100%);
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(239 84% 67% / 0.15) 0%,
+      hsl(280 80% 60% / 0.15) 100%
+    );
     --gradient-card: linear-gradient(180deg, hsl(215 25% 12%) 0%, hsl(215 25% 10%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(280 80% 60%) 100%);
-    
+
     /* Dark Mode Shadows */
     --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.25);
     --shadow-medium: 0 8px 30px -8px hsl(0 0% 0% / 0.35);
     --shadow-glow: 0 0 40px hsl(239 84% 67% / 0.3);
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.2);
-    
+
     /* Dark Mode Sidebar */
     --sidebar-background: 215 25% 10%;
     --sidebar-foreground: 0 0% 95%;
@@ -155,7 +163,7 @@
     --hover-overlay: 0 0% 100% / 0.05;
     --active-overlay: 0 0% 100% / 0.1;
     --focus-ring: 239 84% 67% / 0.5;
-    
+
     /* Dark Mode Status Colors */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
@@ -163,7 +171,7 @@
     --warning-foreground: 0 0% 98%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 98%;
-    
+
     /* Dark Mode Component-Specific */
     --navbar-bg: 215 25% 12% / 0.8;
     --modal-backdrop: 0 0% 0% / 0.6;
@@ -175,48 +183,48 @@
   .high-contrast {
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
-    
+
     --card: 60 100% 95%;
     --card-foreground: 0 0% 0%;
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    
+
     --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: 60 100% 90%;
     --secondary-foreground: 0 0% 0%;
-    
+
     --muted: 60 100% 90%;
     --muted-foreground: 0 0% 20%;
-    
+
     --accent: 0 0% 0%;
     --accent-foreground: 0 0% 100%;
-    
+
     --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: 0 0% 0%;
     --input: 0 0% 100%;
     --ring: 0 0% 0%;
-    
+
     /* High Contrast Glass Effects */
     --glass: 0 0% 100% / 0.95;
     --glass-border: 0 0% 0% / 1;
     --glass-strong: 0 0% 100% / 1;
-    
+
     /* High Contrast Shadows */
     --shadow-soft: 0 2px 8px hsl(0 0% 0% / 0.5);
     --shadow-medium: 0 4px 16px hsl(0 0% 0% / 0.6);
     --shadow-glow: 0 0 20px hsl(0 0% 0% / 0.8);
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.4);
-    
+
     /* High Contrast Interactive States */
     --hover-overlay: 0 0% 0% / 0.1;
     --active-overlay: 0 0% 0% / 0.2;
     --focus-ring: 0 0% 0% / 1;
-    
+
     /* High Contrast Status Colors */
     --success: 120 100% 25%;
     --success-foreground: 0 0% 100%;
@@ -239,7 +247,9 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
   }
 
   /* Minimal theme transition support - only for specific theme components */
@@ -253,7 +263,7 @@
 
   /* Conservative theme transition - only for theme toggle components */
   .theme-toggle-transition {
-    transition: 
+    transition:
       background-color 0.2s ease,
       color 0.2s ease,
       border-color 0.2s ease;
@@ -271,7 +281,12 @@
     }
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Playfair Display', serif;
   }
 
@@ -290,14 +305,18 @@
     background: hsl(var(--glass));
     backdrop-filter: blur(16px);
     border: 1px solid hsl(var(--glass-border));
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .glass-strong {
     background: hsl(var(--glass-strong));
     backdrop-filter: blur(24px);
     border: 1px solid hsl(var(--glass-border));
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .glass-card {
@@ -306,13 +325,18 @@
     border: 1px solid hsl(var(--glass-border));
     box-shadow: var(--shadow-soft);
     @apply rounded-2xl;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   /* Enhanced Interactive Elements */
   .interactive-hover {
     @apply cursor-pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .interactive-hover:hover {
@@ -336,12 +360,14 @@
   /* Enhanced focus indicators for better accessibility */
   .focus-enhanced {
     position: relative;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
   }
 
   .focus-enhanced:focus-visible {
     outline: none;
-    box-shadow: 
+    box-shadow:
       0 0 0 2px hsl(var(--background)),
       0 0 0 4px hsl(var(--focus-ring)),
       0 4px 12px hsl(var(--focus-ring) / 0.3);
@@ -367,7 +393,9 @@
     background: hsl(var(--navbar-bg));
     backdrop-filter: blur(16px);
     border: 1px solid hsl(var(--border));
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   /* Enhanced Modal Backdrop */
@@ -383,7 +411,10 @@
     color: hsl(var(--foreground));
     border: 1px solid hsl(var(--border));
     box-shadow: var(--shadow-soft);
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   /* Enhanced Dropdowns */
@@ -391,7 +422,9 @@
     background: hsl(var(--dropdown-bg));
     border: 1px solid hsl(var(--border));
     box-shadow: var(--shadow-medium);
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   /* Enhanced Status Indicators */
@@ -428,7 +461,9 @@
 
   /* Enhanced Animations */
   .hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .hover-lift:hover {
@@ -463,7 +498,10 @@
     background: hsl(var(--background));
     border: 1px solid hsl(var(--border));
     color: hsl(var(--foreground));
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
     @apply focus-ring;
   }
 
@@ -478,7 +516,10 @@
     color: hsl(var(--card-foreground));
     border: 1px solid hsl(var(--border));
     box-shadow: var(--shadow-card);
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .card-elevated {
@@ -486,7 +527,12 @@
     color: hsl(var(--card-foreground));
     border: 1px solid hsl(var(--border));
     box-shadow: var(--shadow-medium);
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .card-elevated:hover {
@@ -558,32 +604,32 @@
   }
 
   .status-success::before {
-    content: "✓";
+    content: '✓';
     color: hsl(var(--success));
   }
 
   .status-error::before {
-    content: "✕";
+    content: '✕';
     color: hsl(var(--destructive));
   }
 
   .status-warning::before {
-    content: "⚠";
+    content: '⚠';
     color: hsl(var(--warning));
   }
 
   .status-info::before {
-    content: "ℹ";
+    content: 'ℹ';
     color: hsl(var(--info));
   }
 
   /* Loading states should be announced to screen readers */
-  [aria-busy="true"] {
+  [aria-busy='true'] {
     cursor: wait;
   }
 
-  [aria-busy="true"]::after {
-    content: "";
+  [aria-busy='true']::after {
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -598,22 +644,22 @@
 
   /* Disabled states should be clear */
   [disabled],
-  [aria-disabled="true"] {
+  [aria-disabled='true'] {
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
   }
 
   /* Required fields indicator */
-  [aria-required="true"]::after,
+  [aria-required='true']::after,
   .required::after {
-    content: " *";
+    content: ' *';
     color: hsl(var(--destructive));
     font-weight: bold;
   }
 
   /* Error states */
-  [aria-invalid="true"] {
+  [aria-invalid='true'] {
     border-color: hsl(var(--destructive));
     border-width: 2px;
     box-shadow: 0 0 0 1px hsl(var(--destructive) / 0.2);
@@ -628,14 +674,14 @@
 
     /* Enhance button visibility */
     button,
-    [role="button"] {
+    [role='button'] {
       border: 2px solid hsl(var(--foreground)) !important;
       background: hsl(var(--background)) !important;
       color: hsl(var(--foreground)) !important;
     }
 
     button:hover,
-    [role="button"]:hover {
+    [role='button']:hover {
       background: hsl(var(--foreground)) !important;
       color: hsl(var(--background)) !important;
     }
@@ -739,7 +785,8 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px hsl(239 84% 67% / 0.3);
   }
   50% {
@@ -748,7 +795,8 @@
 }
 
 @keyframes bio-sync {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -759,7 +807,8 @@
 }
 
 @keyframes wave {
-  0%, 100% {
+  0%,
+  100% {
     transform: scaleY(0.5);
   }
   50% {
@@ -786,8 +835,6 @@
     background-position: 200% 0;
   }
 }
-
-
 
 /* Calendar date range styling */
 .rdp-day_range_start:not(.rdp-day_range_end) {
@@ -883,7 +930,9 @@
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(12px);
   padding: 0;
   overflow: hidden;
@@ -925,7 +974,7 @@
 .dark .custom-popup .leaflet-popup-tip {
   background: hsl(var(--card));
   border-color: hsl(var(--border));
-}/* Moda
+} /* Moda
 l positioning fixes */
 .modal-container {
   position: fixed;
@@ -965,12 +1014,12 @@ l positioning fixes */
   .modal-container {
     padding: 0.5rem;
   }
-  
+
   .tutorial-modal,
   .review-modal {
     max-width: 100%;
   }
-}/* Custom c
+} /* Custom c
 lose button styling for map popups */
 .leaflet-popup-close-button {
   position: absolute !important;
@@ -1048,7 +1097,7 @@ lose button styling for map popups */
     font-size: 18px !important;
     line-height: 26px !important;
   }
-  
+
   .custom-popup .leaflet-popup-content > div {
     padding-right: 36px !important;
   }

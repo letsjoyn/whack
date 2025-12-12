@@ -1,6 +1,6 @@
 /**
  * Free Routing Service
- * 
+ *
  * Uses OpenRouteService API - FREE with optional API key
  * Free tier: 2000 requests/day, 40 requests/minute (with key)
  * Without key: Limited requests
@@ -55,7 +55,7 @@ class FreeRoutingService {
     const timeSinceLastRequest = now - this.lastRequestTime;
 
     if (timeSinceLastRequest < this.MIN_REQUEST_INTERVAL) {
-      await new Promise((resolve) =>
+      await new Promise(resolve =>
         setTimeout(resolve, this.MIN_REQUEST_INTERVAL - timeSinceLastRequest)
       );
     }
@@ -122,7 +122,7 @@ class FreeRoutingService {
       return result;
     } catch (error) {
       console.error('OpenRouteService routing error:', error);
-      
+
       // Return straight line as fallback
       return this.getStraightLineRoute(request);
     }
@@ -143,10 +143,7 @@ class FreeRoutingService {
 
     if (route.segments && route.segments[0].steps) {
       route.segments[0].steps.forEach((step: any, index: number) => {
-        const stepCoords = coordinates.slice(
-          step.way_points[0],
-          step.way_points[1] + 1
-        );
+        const stepCoords = coordinates.slice(step.way_points[0], step.way_points[1] + 1);
 
         stepCoords.forEach((coord, coordIndex) => {
           steps.push({
@@ -162,7 +159,7 @@ class FreeRoutingService {
       });
     } else {
       // No detailed steps, just use coordinates
-      coordinates.forEach((coord) => {
+      coordinates.forEach(coord => {
         steps.push({
           lat: coord[1],
           lng: coord[0],
@@ -268,12 +265,7 @@ class FreeRoutingService {
   /**
    * Calculate distance between two points (Haversine formula)
    */
-  private calculateDistance(
-    lat1: number,
-    lng1: number,
-    lat2: number,
-    lng2: number
-  ): number {
+  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371e3; // Earth's radius in meters
     const φ1 = (lat1 * Math.PI) / 180;
     const φ2 = (lat2 * Math.PI) / 180;

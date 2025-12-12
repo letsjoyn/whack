@@ -159,5 +159,5 @@ export const selectMessages = (state: ChatStore) => state.messages;
 export const selectIsLoading = (state: ChatStore) => state.isLoading;
 export const selectError = (state: ChatStore) => state.error;
 export const selectIsOpen = (state: ChatStore) => state.isOpen;
-export const selectLastMessage = (state: ChatStore) => 
+export const selectLastMessage = (state: ChatStore) =>
   state.messages.length > 0 ? state.messages[state.messages.length - 1] : null;

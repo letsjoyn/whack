@@ -24,7 +24,7 @@ describe('EndangeredPlacesService', () => {
     expect(places).toBeDefined();
     expect(Array.isArray(places)).toBe(true);
     expect(places.length).toBeGreaterThan(0);
-    
+
     // Check if first place has required properties
     if (places.length > 0) {
       const firstPlace = places[0];
@@ -39,7 +39,7 @@ describe('EndangeredPlacesService', () => {
   it('should filter places by threat level', () => {
     const criticalPlaces = service.getEndangeredPlacesByThreat('critical');
     expect(Array.isArray(criticalPlaces)).toBe(true);
-    
+
     // All returned places should have critical threat level
     criticalPlaces.forEach(place => {
       expect(place.threatLevel).toBe('critical');
@@ -49,7 +49,7 @@ describe('EndangeredPlacesService', () => {
   it('should handle location matching when geocoding fails', async () => {
     // Mock fetch to simulate API failure
     (global.fetch as any).mockRejectedValue(new Error('API Error'));
-    
+
     const places = await service.findNearbyEndangeredPlaces('Mumbai');
     expect(Array.isArray(places)).toBe(true);
     // Should still return some places even if geocoding fails
@@ -59,11 +59,13 @@ describe('EndangeredPlacesService', () => {
     // Mock successful geocoding response
     (global.fetch as any).mockResolvedValue({
       ok: true,
-      json: async () => [{
-        lat: '19.0760',
-        lon: '72.8777',
-        display_name: 'Mumbai, Maharashtra, India'
-      }]
+      json: async () => [
+        {
+          lat: '19.0760',
+          lon: '72.8777',
+          display_name: 'Mumbai, Maharashtra, India',
+        },
+      ],
     });
 
     const places = await service.findNearbyEndangeredPlaces('Mumbai');

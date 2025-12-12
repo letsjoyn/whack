@@ -224,7 +224,7 @@
     "energy": 8,
     "social": 10,
     "budget": 1,
-    "coordinates": [52.5200, 13.4050]
+    "coordinates": [52.52, 13.405]
   },
   {
     "id": 9,
@@ -269,7 +269,7 @@
     "energy": 8,
     "social": 6,
     "budget": 8,
-    "coordinates": [40.7128, -74.0060],
+    "coordinates": [40.7128, -74.006],
     "instantBooking": true,
     "cancellationPolicy": {
       "type": "moderate",
@@ -379,7 +379,7 @@
     "energy": 9,
     "social": 8,
     "budget": 7,
-    "coordinates": [40.7580, -73.9855],
+    "coordinates": [40.758, -73.9855],
     "instantBooking": true,
     "cancellationPolicy": {
       "type": "flexible",
@@ -399,8 +399,8 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_nyc_014"
-  },  
-{
+  },
+  {
     "id": 15,
     "title": "Thames View Luxury",
     "location": "London, UK",
@@ -471,9 +471,9 @@
     "checkOutTime": "11:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_london_016"
-  },  {
-  
-  "id": 17,
+  },
+  {
+    "id": 17,
     "title": "Covent Garden Boutique",
     "location": "London, UK",
     "price": 350,
@@ -509,9 +509,9 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_london_017"
-  },  {
-  
-  "id": 18,
+  },
+  {
+    "id": 18,
     "title": "Shibuya Neon Nights",
     "location": "Tokyo, Japan",
     "price": 220,
@@ -543,9 +543,9 @@
     "checkOutTime": "11:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_tokyo_018"
-  },  {
-  
-  "id": 19,
+  },
+  {
+    "id": 19,
     "title": "Ginza Luxury Suites",
     "location": "Tokyo, Japan",
     "price": 480,
@@ -581,8 +581,8 @@
     "checkOutTime": "12:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_tokyo_019"
-  }, 
- {
+  },
+  {
     "id": 20,
     "title": "Eiffel Tower View Palace",
     "location": "Paris, France",
@@ -653,9 +653,9 @@
     "checkOutTime": "11:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_paris_021"
-  },  {
-    
-"id": 22,
+  },
+  {
+    "id": 22,
     "title": "Le Marais Boutique",
     "location": "Paris, France",
     "price": 320,
@@ -691,8 +691,8 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_paris_022"
-  },  {
-
+  },
+  {
     "id": 23,
     "title": "Sydney Harbour Luxury",
     "location": "Sydney, Australia",
@@ -729,8 +729,8 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_sydney_023"
-  },  {
-
+  },
+  {
     "id": 24,
     "title": "Bondi Beach Surf Lodge",
     "location": "Sydney, Australia",
@@ -763,9 +763,9 @@
     "checkOutTime": "11:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_sydney_024"
-  },  {
-    
-"id": 25,
+  },
+  {
+    "id": 25,
     "title": "Darling Harbour Modern",
     "location": "Sydney, Australia",
     "price": 320,
@@ -801,8 +801,8 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_sydney_025"
-  },  {
-
+  },
+  {
     "id": 26,
     "title": "Santorini Sunset Villa",
     "location": "Santorini, Greece",
@@ -839,8 +839,8 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_santorini_026"
-  },  {
-
+  },
+  {
     "id": 27,
     "title": "Oia Cliffside Retreat",
     "location": "Santorini, Greece",
@@ -877,9 +877,9 @@
     "checkOutTime": "11:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_santorini_027"
-  },  {
-    
-"id": 28,
+  },
+  {
+    "id": 28,
     "title": "Bali Jungle Eco Resort",
     "location": "Bali, Indonesia",
     "price": 280,
@@ -891,7 +891,7 @@
     "energy": 2,
     "social": 3,
     "budget": 6,
-    "coordinates": [-8.3405, 115.0920],
+    "coordinates": [-8.3405, 115.092],
     "instantBooking": true,
     "cancellationPolicy": {
       "type": "flexible",
@@ -911,9 +911,9 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_bali_028"
-  },  {
-   
- "id": 29,
+  },
+  {
+    "id": 29,
     "title": "Seminyak Beach Club Hotel",
     "location": "Bali, Indonesia",
     "price": 350,
@@ -949,8 +949,8 @@
     "checkOutTime": "12:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_bali_029"
-  }, 
- {
+  },
+  {
     "id": 30,
     "title": "Miami Beach Art Deco",
     "location": "Miami, USA",
@@ -987,8 +987,8 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_miami_030"
-  },  
-{
+  },
+  {
     "id": 31,
     "title": "South Beach Luxury Resort",
     "location": "Miami, USA",
@@ -1001,7 +1001,7 @@
     "energy": 5,
     "social": 4,
     "budget": 9,
-    "coordinates": [25.7814, -80.1300],
+    "coordinates": [25.7814, -80.13],
     "instantBooking": true,
     "cancellationPolicy": {
       "type": "strict",
@@ -1025,8 +1025,8 @@
     "checkOutTime": "12:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_miami_031"
-  },  {
-
+  },
+  {
     "id": 32,
     "title": "Cancun All-Inclusive Paradise",
     "location": "Cancun, Mexico",
@@ -1063,9 +1063,9 @@
     "checkOutTime": "12:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_cancun_032"
-  },  {
- 
-   "id": 33,
+  },
+  {
+    "id": 33,
     "title": "Aspen Ski Lodge Luxury",
     "location": "Aspen, USA",
     "price": 850,
@@ -1101,8 +1101,8 @@
     "checkOutTime": "11:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_aspen_033"
-  },  {
-
+  },
+  {
     "id": 34,
     "title": "Chamonix Alpine Chalet",
     "location": "Chamonix, France",
@@ -1139,8 +1139,8 @@
     "checkOutTime": "11:00",
     "providerId": "expedia",
     "providerHotelId": "hotel_chamonix_034"
-  }, 
- {
+  },
+  {
     "id": 35,
     "title": "Banff Mountain Lodge",
     "location": "Banff, Canada",
@@ -1173,8 +1173,8 @@
     "checkOutTime": "11:00",
     "providerId": "booking_com",
     "providerHotelId": "hotel_banff_035"
-  },  {
-
+  },
+  {
     "id": 36,
     "title": "Zermatt Matterhorn View",
     "location": "Zermatt, Switzerland",

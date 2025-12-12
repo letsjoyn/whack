@@ -1,30 +1,30 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import JourneySearchCard, { JourneySearchParams } from "@/components/JourneySearchCard";
-import MapView from "@/components/MapView";
-import EchoModal from "@/components/EchoModal";
-import LocalShadowWidget from "@/components/LocalShadowWidget";
-import SafetyMesh from "@/components/SafetyMesh";
-import VanishingDestinations from "@/components/VanishingDestinations";
-import { ContextLayerPanel } from "@/components/ContextLayer";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import JourneySearchCard, { JourneySearchParams } from '@/components/JourneySearchCard';
+import MapView from '@/components/MapView';
+import EchoModal from '@/components/EchoModal';
+import LocalShadowWidget from '@/components/LocalShadowWidget';
+import SafetyMesh from '@/components/SafetyMesh';
+import VanishingDestinations from '@/components/VanishingDestinations';
+import { ContextLayerPanel } from '@/components/ContextLayer';
 
-import echoesData from "@/data/echoes.json";
-import Hyperspeed from "@/components/Hyperspeed";
+import echoesData from '@/data/echoes.json';
+import Hyperspeed from '@/components/Hyperspeed';
 
 const Index = () => {
   const [searchParams] = useSearchParams();
-  
+
   // State
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [isNearby, setIsNearby] = useState(true);
   const [isContextOpen, setIsContextOpen] = useState(false);
-  
+
   // Echo Modal State
-  const [selectedEcho, setSelectedEcho] = useState<typeof echoesData[0] | null>(null);
+  const [selectedEcho, setSelectedEcho] = useState<(typeof echoesData)[0] | null>(null);
   const [isEchoModalOpen, setIsEchoModalOpen] = useState(false);
 
   // Get destination from URL params (from Stays page)
@@ -34,21 +34,19 @@ const Index = () => {
   // High contrast mode when offline
   useEffect(() => {
     if (isOffline) {
-      document.documentElement.classList.add("high-contrast");
+      document.documentElement.classList.add('high-contrast');
     } else {
-      document.documentElement.classList.remove("high-contrast");
+      document.documentElement.classList.remove('high-contrast');
     }
   }, [isOffline]);
 
-
-
-  const handleEchoClick = (echo: typeof echoesData[0]) => {
+  const handleEchoClick = (echo: (typeof echoesData)[0]) => {
     setSelectedEcho(echo);
     setIsEchoModalOpen(true);
   };
 
   const handleJourneyExplore = (params: JourneySearchParams) => {
-    console.log("Journey search params:", params);
+    console.log('Journey search params:', params);
     // Navigate to journey planner with search parameters
     const searchParams = new URLSearchParams({
       from: params.source,
@@ -61,10 +59,12 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-background transition-colors duration-500 ${isOffline ? "high-contrast" : ""}`}>
+    <div
+      className={`min-h-screen bg-background transition-colors duration-500 ${isOffline ? 'high-contrast' : ''}`}
+    >
       {/* Navigation */}
-      <Navbar 
-        onSafetyClick={() => setIsSafetyOpen(true)} 
+      <Navbar
+        onSafetyClick={() => setIsSafetyOpen(true)}
         isOffline={isOffline}
         onContextClick={() => setIsContextOpen(!isContextOpen)}
         onMapClick={() => setIsMapOpen(true)}
@@ -76,7 +76,7 @@ const Index = () => {
         <div className="absolute inset-0">
           <Hyperspeed />
         </div>
-        
+
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background pointer-events-none" />
 
@@ -106,13 +106,14 @@ const Index = () => {
             </h1>
 
             <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto mb-8">
-              Book your perfect journey in one place. Complete travel booking platform that adapts to your mood, energy, and desires.
+              Book your perfect journey in one place. Complete travel booking platform that adapts
+              to your mood, energy, and desires.
             </p>
           </motion.div>
 
           {/* Journey Search Card */}
-          <JourneySearchCard 
-            onExplore={handleJourneyExplore} 
+          <JourneySearchCard
+            onExplore={handleJourneyExplore}
             initialDestination={initialDestination || undefined}
             initialDestinationName={initialDestinationName || undefined}
           />
@@ -136,13 +137,22 @@ const Index = () => {
               <span className="font-serif text-xl font-semibold text-foreground">BookOnce</span>
             </div>
             <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
-              Book your perfect journey in one place. Complete travel booking platform for modern travelers.
+              Book your perfect journey in one place. Complete travel booking platform for modern
+              travelers.
             </p>
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">About</a>
-              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+              <a href="#" className="hover:text-foreground transition-colors">
+                About
+              </a>
+              <a href="#" className="hover:text-foreground transition-colors">
+                Privacy
+              </a>
+              <a href="#" className="hover:text-foreground transition-colors">
+                Terms
+              </a>
+              <a href="#" className="hover:text-foreground transition-colors">
+                Contact
+              </a>
             </div>
             <p className="text-xs text-muted-foreground mt-8">
               © 2024 BookOnce. Built for hackathon demonstration.
@@ -155,10 +165,7 @@ const Index = () => {
       <LocalShadowWidget />
 
       {/* Context Layer Panel */}
-      <ContextLayerPanel 
-        isOpen={isContextOpen} 
-        onClose={() => setIsContextOpen(false)} 
-      />
+      <ContextLayerPanel isOpen={isContextOpen} onClose={() => setIsContextOpen(false)} />
 
       {/* Map View (Modal) */}
       <MapView
