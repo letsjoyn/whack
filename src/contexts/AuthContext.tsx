@@ -1,9 +1,12 @@
 /**
  * Authentication Context
  * Provides authentication state and methods throughout the application
+ * Integrated with Firebase Authentication
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { auth } from '@/firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import type { UserProfile } from '@/types/booking';
 
 interface AuthContextType {
@@ -12,7 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
 }
 
@@ -39,30 +42,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [lastActivity, setLastActivity] = useState(Date.now());
 
   /**
-   * Initialize auth state from localStorage
+   * Initialize auth state from Firebase
    */
   useEffect(() => {
-    const initAuth = () => {
-      try {
-        const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-        const userData = localStorage.getItem(USER_DATA_KEY);
+    if (!auth) {
+      console.warn('Firebase auth not initialized');
+      setIsLoading(false);
+      return;
+    }
 
-        if (accessToken && userData) {
-          const parsedUser = JSON.parse(userData);
-          setUser(parsedUser);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      try {
+        if (firebaseUser) {
+          // User is logged in
+          const userData: UserProfile = {
+            userId: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            firstName: firebaseUser.displayName?.split(' ')[0] || 'User',
+            lastName: firebaseUser.displayName?.split(' ')[1] || '',
+            phone: firebaseUser.phoneNumber || '',
+            notificationPreferences: {
+              email: {
+                enabled: true,
+                types: [
+                  'booking_confirmation',
+                  'booking_modification',
+                  'booking_cancellation',
+                  'check_in_reminder',
+                  'booking_status_change',
+                  'hotel_cancellation',
+                ],
+              },
+              push: {
+                enabled: false,
+                types: [
+                  'booking_status_change',
+                  'check_in_reminder',
+                  'hotel_cancellation',
+                ],
+              },
+            },
+          };
+          
+          localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+          setUser(userData);
+        } else {
+          // User is logged out
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+          localStorage.removeItem(REFRESH_TOKEN_KEY);
+          localStorage.removeItem(USER_DATA_KEY);
+          setUser(null);
         }
       } catch (error) {
         console.error('Failed to initialize auth:', error);
-        // Clear invalid data
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
-        localStorage.removeItem(USER_DATA_KEY);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
-    };
+    });
 
-    initAuth();
+    return unsubscribe;
   }, []);
 
   /**
@@ -95,66 +134,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, lastActivity]);
 
   /**
-   * Login user
+   * Login user with Firebase
    */
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // In production, this would call an API endpoint
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
 
-      // Mock JWT tokens
-      const accessToken = `mock_access_token_${Date.now()}`;
-      const refreshToken = `mock_refresh_token_${Date.now()}`;
-
-      // Mock user data
-      const userData: UserProfile = {
-        userId: `user_${Date.now()}`,
-        email,
-        firstName: email.split('@')[0],
-        lastName: 'User',
-        phone: '+1 (555) 123-4567',
-        notificationPreferences: {
-          email: {
-            enabled: true,
-            types: [
-              'booking_confirmation',
-              'booking_modification',
-              'booking_cancellation',
-              'check_in_reminder',
-              'booking_status_change',
-              'hotel_cancellation',
-            ],
-          },
-          push: {
-            enabled: false,
-            types: [
-              'booking_status_change',
-              'check_in_reminder',
-              'hotel_cancellation',
-            ],
-          },
-        },
-      };
-
-      // Store tokens and user data
+      // Get ID token for API calls
+      const accessToken = await firebaseUser.getIdToken();
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-      localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
 
-      setUser(userData);
+      // User data will be set by onAuthStateChanged
       setLastActivity(Date.now());
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
-      throw new Error('Login failed. Please check your credentials.');
+      throw new Error(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
 
   /**
-   * Register new user
+   * Register new user with Firebase
    */
   const register = async (
     email: string,
@@ -164,67 +167,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     setIsLoading(true);
     try {
-      // In production, this would call an API endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
 
-      // Mock JWT tokens
-      const accessToken = `mock_access_token_${Date.now()}`;
-      const refreshToken = `mock_refresh_token_${Date.now()}`;
-
-      // Create user data
-      const userData: UserProfile = {
-        userId: `user_${Date.now()}`,
-        email,
-        firstName,
-        lastName,
-        notificationPreferences: {
-          email: {
-            enabled: true,
-            types: [
-              'booking_confirmation',
-              'booking_modification',
-              'booking_cancellation',
-              'check_in_reminder',
-              'booking_status_change',
-              'hotel_cancellation',
-            ],
-          },
-          push: {
-            enabled: false,
-            types: [
-              'booking_status_change',
-              'check_in_reminder',
-              'hotel_cancellation',
-            ],
-          },
-        },
-      };
-
-      // Store tokens and user data
+      // Get ID token for API calls
+      const accessToken = await firebaseUser.getIdToken();
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-      localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
 
-      setUser(userData);
+      // User data will be set by onAuthStateChanged
       setLastActivity(Date.now());
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration failed:', error);
-      throw new Error('Registration failed. Please try again.');
+      throw new Error(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   /**
-   * Logout user
+   * Logout user from Firebase
    */
-  const logout = () => {
-    // Clear tokens and user data
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_DATA_KEY);
-
-    setUser(null);
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      // Clear tokens and user data
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_DATA_KEY);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw new Error('Logout failed. Please try again.');
+    }
   };
 
   /**

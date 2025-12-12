@@ -942,13 +942,16 @@ npm run build
 
 ### Login Page
 - **Location**: `src/pages/Auth.tsx`
-- **Component**: `src/components/AuthModal.tsx`
 - **Features**:
-  - Email/password authentication
-  - Social login integration
-  - Account creation
-  - Password recovery
+  - ✅ **Firebase Email/Password Authentication**
+  - ✅ **Google OAuth Sign-In**
+  - ✅ **Phone OTP Authentication**
+  - ✅ **Email OTP Verification**
+  - Password strength indicator
+  - Session timeout (30 minutes)
+  - Responsive design with animations
 - **Access**: Navigate to `/auth` or click "Sign In" in the navbar
+- **Firebase Integration**: Uses Firebase Authentication for secure user management
 
 ### Dashboard
 - **Location**: `src/pages/Index.tsx` (Home/Dashboard)
@@ -987,6 +990,72 @@ npm run build
   - Expense tracker
   - Travel checklist
 - **Access**: Main navigation menu
+
+---
+
+## 🔐 Authentication System
+
+### Firebase Setup
+BookOnce uses **Firebase Authentication** for secure user management:
+
+**Firebase Configuration** (in `.env`):
+```env
+VITE_FIREBASE_API_KEY=AIzaSyA0jwCCRw-Sh8r6dX1ULDbQ5QhfUccmh_U
+VITE_FIREBASE_AUTH_DOMAIN=book-once.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=book-once
+VITE_FIREBASE_STORAGE_BUCKET=book-once.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=401504323538
+VITE_FIREBASE_APP_ID=1:401504323538:web:c1c6e30bf1163d19116a0b
+VITE_FIREBASE_MEASUREMENT_ID=G-XD47BPPMBL
+```
+
+### Authentication Methods
+
+#### 1. Email/Password
+- **File**: `src/auth/emailAuth.ts`
+- **Service**: Firebase Authentication
+- **Features**:
+  - Secure password hashing
+  - Email verification
+  - Password reset support
+
+#### 2. Google OAuth
+- **File**: `src/auth/googleAuth.ts`
+- **Service**: Firebase Google Provider
+- **Features**:
+  - One-click sign-in
+  - Automatic profile creation
+  - Secure token handling
+
+#### 3. Phone OTP
+- **File**: `src/auth/phoneAuth.ts`
+- **Service**: Firebase Phone Authentication
+- **Features**:
+  - SMS-based verification
+  - reCAPTCHA protection
+  - 10-minute OTP expiry
+
+#### 4. Email OTP
+- **File**: `src/services/AuthService.ts`
+- **Service**: Resend or Gmail
+- **Features**:
+  - 6-digit OTP codes
+  - 15-minute expiry
+  - Resend functionality
+
+### Auth Context
+- **Location**: `src/contexts/AuthContext.tsx`
+- **Features**:
+  - Global authentication state
+  - Session management
+  - Token refresh
+  - 30-minute inactivity timeout
+  - User profile management
+
+### Protected Routes
+- Implemented in main router
+- Redirects unauthenticated users to `/auth`
+- Preserves user session across page refreshes
 
 ---
 
