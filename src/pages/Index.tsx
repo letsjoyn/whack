@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import JourneySearchCard, { JourneySearchParams } from '@/components/JourneySearchCard';
 import MapView from '@/components/MapView';
+import SquaresBackground from '@/components/SquaresBackground';
 import EchoModal from '@/components/EchoModal';
 import LocalShadowWidget from '@/components/LocalShadowWidget';
 import SafetyMesh from '@/components/SafetyMesh';
@@ -11,7 +12,7 @@ import VanishingDestinations from '@/components/VanishingDestinations';
 import { ContextLayerPanel } from '@/components/ContextLayer';
 
 import echoesData from '@/data/echoes.json';
-import Hyperspeed from '@/components/Hyperspeed';
+// Hyperspeed background removed to disable landing animations/background image
 
 const Index = () => {
   const [searchParams] = useSearchParams();
@@ -71,13 +72,11 @@ const Index = () => {
 
       {/* Hero Section with Journey Search */}
       <section className="relative min-h-screen flex items-center justify-center overflow-x-hidden">
-        {/* Hyperspeed background (replaces static background image) */}
+        {/* Background and animations removed — show plain page background */}
+        {/* Squares background animation (subtle, theme-friendly) */}
         <div className="absolute inset-0">
-          <Hyperspeed />
+          <SquaresBackground />
         </div>
-
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background pointer-events-none" />
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-24">

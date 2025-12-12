@@ -6,10 +6,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react'; // Added useEffect here
 import '@/features/booking/styles/accessibility.css';
 import 'leaflet/dist/leaflet.css';
 import { BookOnceAIChatModal } from '@/components/BookOnceAIChatModal';
+
+// Lenis Imports
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import('./pages/Index'));
@@ -44,6 +48,31 @@ const PageLoader = () => (
 );
 
 const App = () => {
+  // --- LENIS SMOOTH SCROLL SETUP ---
+  useEffect(() => {
+    // Initialize Lenis
+    const lenis = new Lenis();
+
+    // Listen for the scroll event (optional, useful for debugging)
+    lenis.on('scroll', e => {
+      // You can remove this console log if it gets annoying
+      // console.log(e);
+    });
+
+    // Use requestAnimationFrame to continuously update the scroll
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    // Cleanup function to prevent memory leaks if App unmounts
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
