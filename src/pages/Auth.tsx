@@ -218,41 +218,93 @@ const Auth = () => {
   // Render Email OTP Flow
   if (mode === 'email-otp') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-accent/5 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <Button
-              variant="ghost"
-              className="absolute left-4 top-4"
-              onClick={() => setMode('login')}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <CardTitle className="text-2xl font-bold">Login with Email OTP</CardTitle>
-            <CardDescription>We'll send a verification code to your email</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="otp-email">Email Address</Label>
-              <Input
-                id="otp-email"
-                type="email"
-                placeholder="you@example.com"
-                value={otpEmail}
-                onChange={e => setOtpEmail(e.target.value)}
-              />
+      <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+        {/* Left Side - Branding */}
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/3 to-secondary/5">
+            <div className="absolute top-10 left-10 w-20 h-20 bg-primary/10 rounded-full blur-2xl animate-pulse"></div>
+            <div className="absolute top-1/4 right-20 w-16 h-16 bg-accent/15 rounded-full blur-xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-secondary/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+
+          <div className="relative z-10 flex flex-col justify-center items-center p-12 min-h-full">
+            <div className="text-center">
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <img
+                  src="/logo-bookonce.svg"
+                  alt="BookOnce Logo"
+                  className="relative w-16 h-16 mx-auto drop-shadow-lg"
+                />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-3">
+                Secure Login
+              </h2>
+              <p className="text-lg text-muted-foreground font-medium">We'll send you a verification code</p>
             </div>
-            <Button onClick={handleSendEmailOTP} className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Mail className="h-4 w-4 mr-2" />
-              )}
-              Send OTP
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        {/* Right Side - OTP Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gradient-to-br from-background to-muted/20 min-h-screen">
+          <div className="w-full max-w-md">
+            <Card className="relative overflow-hidden shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-primary/5 pointer-events-none"></div>
+              <div className="absolute inset-0 shadow-inner pointer-events-none"></div>
+
+              <CardHeader className="text-center pb-6 relative z-10">
+                <Button
+                  variant="ghost"
+                  className="absolute left-4 top-4 hover:bg-muted/50 transition-colors"
+                  onClick={() => setMode('login')}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+                <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+                    <Mail className="text-white text-lg" />
+                  </div>
+                </div>
+                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                  Login with Email OTP
+                </CardTitle>
+                <CardDescription className="text-base text-muted-foreground">
+                  We'll send a verification code to your email
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="relative z-10 px-8 pb-8 space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="otp-email" className="text-sm font-medium text-foreground">
+                    Email Address
+                  </Label>
+                  <Input
+                    id="otp-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={otpEmail}
+                    onChange={e => setOtpEmail(e.target.value)}
+                    className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
+                  />
+                </div>
+                <Button
+                  onClick={handleSendEmailOTP}
+                  className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Mail className="h-4 w-4 mr-2" />
+                  )}
+                  Send OTP
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -260,89 +312,242 @@ const Auth = () => {
   // Render Email OTP Verification
   if (mode === 'email-otp-verify') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-accent/5 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <Button
-              variant="ghost"
-              className="absolute left-4 top-4"
-              onClick={() => setMode('email-otp')}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <CardTitle className="text-2xl font-bold">Verify OTP</CardTitle>
-            <CardDescription>Enter the 6-digit code sent to {otpEmail}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email-otp">Enter OTP</Label>
-              <Input
-                id="email-otp"
-                type="text"
-                placeholder="123456"
-                maxLength={6}
-                className="text-center text-2xl tracking-widest"
-                value={emailOtp}
-                onChange={e => setEmailOtp(e.target.value.replace(/\D/g, ''))}
-              />
-            </div>
+      <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+        {/* Left Side - Branding */}
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/3 to-secondary/5">
+            <div className="absolute top-10 left-10 w-20 h-20 bg-primary/10 rounded-full blur-2xl animate-pulse"></div>
+            <div className="absolute top-1/4 right-20 w-16 h-16 bg-accent/15 rounded-full blur-xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-secondary/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
 
-            {otpTimer > 0 && (
-              <p className="text-sm text-muted-foreground text-center">
-                Code expires in {formatTime(otpTimer)}
-              </p>
-            )}
-
-            <Button onClick={handleVerifyEmailOTP} className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Verify & Login
-            </Button>
-
+          <div className="relative z-10 flex flex-col justify-center items-center p-12 min-h-full">
             <div className="text-center">
-              {otpTimer === 0 ? (
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110"></div>
+                <img
+                  src="/logo-bookonce.svg"
+                  alt="BookOnce Logo"
+                  className="relative w-16 h-16 mx-auto drop-shadow-lg"
+                />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-3">
+                Verify Your Email
+              </h2>
+              <p className="text-lg text-muted-foreground font-medium">Enter the code we sent to your email</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side - OTP Verification */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gradient-to-br from-background to-muted/20 min-h-screen">
+          <div className="w-full max-w-md">
+            <Card className="relative overflow-hidden shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-primary/5 pointer-events-none"></div>
+              <div className="absolute inset-0 shadow-inner pointer-events-none"></div>
+
+              <CardHeader className="text-center pb-6 relative z-10">
                 <Button
-                  variant="link"
-                  onClick={() => {
-                    setEmailOtp('');
-                    handleSendEmailOTP();
-                  }}
+                  variant="ghost"
+                  className="absolute left-4 top-4 hover:bg-muted/50 transition-colors"
+                  onClick={() => setMode('email-otp')}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+                <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+                    <span className="text-white text-lg">🔐</span>
+                  </div>
+                </div>
+                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                  Verify OTP
+                </CardTitle>
+                <CardDescription className="text-base text-muted-foreground">
+                  Enter the 6-digit code sent to {otpEmail}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="relative z-10 px-8 pb-8 space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email-otp" className="text-sm font-medium text-foreground">
+                    Enter OTP
+                  </Label>
+                  <Input
+                    id="email-otp"
+                    type="text"
+                    placeholder="123456"
+                    maxLength={6}
+                    className="text-center text-3xl tracking-widest h-14 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm font-mono"
+                    value={emailOtp}
+                    onChange={e => setEmailOtp(e.target.value.replace(/\D/g, ''))}
+                  />
+                </div>
+
+                {otpTimer > 0 && (
+                  <div className="text-center p-3 bg-muted/30 rounded-lg border border-muted/50">
+                    <p className="text-sm text-muted-foreground font-medium">
+                      Code expires in <span className="font-bold text-primary">{formatTime(otpTimer)}</span>
+                    </p>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleVerifyEmailOTP}
+                  className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                   disabled={isLoading}
                 >
-                  Resend OTP
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Verify & Login
                 </Button>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Didn't receive the code? Check your spam folder
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+
+                <div className="text-center">
+                  {otpTimer === 0 ? (
+                    <Button
+                      variant="link"
+                      className="text-primary hover:text-primary/80 font-medium"
+                      onClick={() => {
+                        setEmailOtp('');
+                        handleSendEmailOTP();
+                      }}
+                      disabled={isLoading}
+                    >
+                      Resend OTP
+                    </Button>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Didn't receive the code? Check your spam folder
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   // Main Auth Page (Login/Signup)
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-accent/5 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Welcome to BookOnce</CardTitle>
-          <CardDescription>Sign in or create an account to continue</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+      {/* Left Side - Branding & Info */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/3 to-secondary/5">
+          {/* Floating Shapes */}
+          <div className="absolute top-10 left-10 w-20 h-20 bg-primary/10 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute top-1/4 right-20 w-16 h-16 bg-accent/15 rounded-full blur-xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-secondary/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-3/4 right-10 w-12 h-12 bg-primary/12 rounded-full blur-lg animate-ping" style={{ animationDelay: '0.5s' }}></div>
+
+          {/* Geometric Patterns */}
+          <div className="absolute top-20 right-1/3 w-2 h-2 bg-primary/30 rounded-full"></div>
+          <div className="absolute top-40 left-1/3 w-1 h-1 bg-accent/40 rounded-full"></div>
+          <div className="absolute bottom-40 right-1/4 w-3 h-3 bg-secondary/25 rounded-full"></div>
+          <div className="absolute bottom-1/3 left-20 w-2 h-2 bg-primary/35 rounded-full"></div>
+        </div>
+
+        {/* Glass Morphism Overlay */}
+        <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+
+        <div className="relative z-10 flex flex-col justify-center items-center p-8 pl-44 min-h-full">
+          {/* Logo Section */}
+          <div className="mb-6 text-center">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-3">
+              BookOnce
+            </h1>
+            <p className="text-xl text-muted-foreground font-medium">Your Ultimate Travel Companion</p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 gap-4 max-w-sm">
+            <div className="group flex items-center gap-4 p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="text-2xl">✈️</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground mb-1">AI-Powered Planning</h3>
+                <p className="text-sm text-muted-foreground">Smart itineraries tailored to your preferences</p>
+              </div>
+            </div>
+
+            <div className="group flex items-center gap-4 p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="text-2xl">🛡️</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground mb-1">Safety First</h3>
+                <p className="text-sm text-muted-foreground">24/7 emergency support and safety features</p>
+              </div>
+            </div>
+
+            <div className="group flex items-center gap-4 p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="text-2xl">🌍</span>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground mb-1">Global Coverage</h3>
+                <p className="text-sm text-muted-foreground">Explore destinations worldwide with confidence</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Auth Forms */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gradient-to-br from-background to-muted/20 min-h-screen relative">
+        <div className="w-full max-w-md">
+          {/* Floating decorative elements */}
+          <div className="absolute top-20 right-20 w-4 h-4 bg-primary/20 rounded-full blur-sm animate-pulse hidden lg:block"></div>
+          <div className="absolute bottom-32 left-16 w-3 h-3 bg-accent/15 rounded-full blur-sm animate-bounce hidden lg:block" style={{ animationDelay: '1.5s' }}></div>
+
+          <Card className="relative overflow-hidden shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+            {/* Card gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-primary/5 pointer-events-none"></div>
+
+            {/* Subtle inner shadow */}
+            <div className="absolute inset-0 shadow-inner pointer-events-none"></div>
+
+            <CardHeader className="text-center pb-6 relative z-10">
+              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg">✈️</span>
+                </div>
+              </div>
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                Welcome Back
+              </CardTitle>
+              <CardDescription className="text-base text-muted-foreground">
+                Sign in to your account or create a new one
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="relative z-10 px-8 pb-8">
+              <Tabs defaultValue="login" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-8 h-12 bg-muted/50 p-1 rounded-xl">
+                  <TabsTrigger
+                    value="login"
+                    className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200"
+                  >
+                    Login
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="signup"
+                    className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200"
+                  >
+                    Sign Up
+                  </TabsTrigger>
+                </TabsList>
 
             {/* Login Tab */}
-            <TabsContent value="login" className="space-y-4">
-              <form onSubmit={handleEmailLogin} className="space-y-4">
+            <TabsContent value="login" className="space-y-6 mt-6">
+              <form onSubmit={handleEmailLogin} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email" className="text-sm font-medium text-foreground">
+                    Email Address
+                  </Label>
                   <Input
                     id="login-email"
                     type="email"
@@ -350,10 +555,13 @@ const Auth = () => {
                     value={loginEmail}
                     onChange={e => setLoginEmail(e.target.value)}
                     required
+                    className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password" className="text-sm font-medium text-foreground">
+                    Password
+                  </Label>
                   <div className="relative">
                     <Input
                       id="login-password"
@@ -362,36 +570,46 @@ const Auth = () => {
                       value={loginPassword}
                       onChange={e => setLoginPassword(e.target.value)}
                       required
+                      className="h-12 pr-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-0 top-0 h-full px-3"
+                      className="absolute right-1 top-1 h-10 w-10 hover:bg-muted/50 transition-colors"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Login with Email
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                  disabled={isLoading}
+                >
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Sign In
                 </Button>
               </form>
 
-              <div className="relative">
+              <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+                  <span className="w-full border-t border-muted" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                  <span className="bg-background px-4 text-muted-foreground font-medium">Or continue with</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" onClick={handleGoogleLogin} disabled={isLoading}>
-                  <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
+                <Button
+                  variant="outline"
+                  onClick={handleGoogleLogin}
+                  disabled={isLoading}
+                  className="h-12 border-2 hover:bg-muted/50 transition-all duration-200 hover:shadow-md"
+                >
+                  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -411,40 +629,53 @@ const Auth = () => {
                   </svg>
                   Google
                 </Button>
-                <Button variant="outline" onClick={() => setMode('email-otp')} disabled={isLoading}>
-                  <Mail className="h-4 w-4 mr-2" />
+                <Button
+                  variant="outline"
+                  onClick={() => setMode('email-otp')}
+                  disabled={isLoading}
+                  className="h-12 border-2 hover:bg-muted/50 transition-all duration-200 hover:shadow-md"
+                >
+                  <Mail className="h-5 w-5 mr-2" />
                   Email OTP
                 </Button>
               </div>
             </TabsContent>
 
             {/* Signup Tab */}
-            <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleEmailSignup} className="space-y-4">
+            <TabsContent value="signup" className="space-y-6 mt-6">
+              <form onSubmit={handleEmailSignup} className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">First Name</Label>
+                    <Label htmlFor="first-name" className="text-sm font-medium text-foreground">
+                      First Name
+                    </Label>
                     <Input
                       id="first-name"
                       placeholder="John"
                       value={firstName}
                       onChange={e => setFirstName(e.target.value)}
                       required
+                      className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name</Label>
+                    <Label htmlFor="last-name" className="text-sm font-medium text-foreground">
+                      Last Name
+                    </Label>
                     <Input
                       id="last-name"
                       placeholder="Doe"
                       value={lastName}
                       onChange={e => setLastName(e.target.value)}
                       required
+                      className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email" className="text-sm font-medium text-foreground">
+                    Email Address
+                  </Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -452,10 +683,13 @@ const Auth = () => {
                     value={signupEmail}
                     onChange={e => setSignupEmail(e.target.value)}
                     required
+                    className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="text-sm font-medium text-foreground">
+                    Password
+                  </Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -463,10 +697,13 @@ const Auth = () => {
                     value={signupPassword}
                     onChange={e => setSignupPassword(e.target.value)}
                     required
+                    className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password" className="text-sm font-medium text-foreground">
+                    Confirm Password
+                  </Label>
                   <Input
                     id="confirm-password"
                     type="password"
@@ -474,30 +711,35 @@ const Auth = () => {
                     value={signupConfirmPassword}
                     onChange={e => setSignupConfirmPassword(e.target.value)}
                     required
+                    className="h-12 border-2 border-muted focus:border-primary/50 transition-colors bg-background/50 backdrop-blur-sm"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                  disabled={isLoading}
+                >
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                   Create Account
                 </Button>
               </form>
 
-              <div className="relative">
+              <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+                  <span className="w-full border-t border-muted" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                  <span className="bg-background px-4 text-muted-foreground font-medium">Or continue with</span>
                 </div>
               </div>
 
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full h-12 border-2 hover:bg-muted/50 transition-all duration-200 hover:shadow-md"
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
               >
-                <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -522,6 +764,8 @@ const Auth = () => {
         </CardContent>
       </Card>
     </div>
+  </div>
+</div>
   );
 };
 

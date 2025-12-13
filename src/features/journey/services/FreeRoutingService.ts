@@ -64,6 +64,41 @@ class FreeRoutingService {
   }
 
   /**
+   * Search for a location using Nominatim (OpenStreetMap)
+   */
+  async searchLocation(query: string): Promise<any[]> {
+    if (!query || query.length < 3) return [];
+
+    const cacheKey = `search_${query.toLowerCase().trim()}`;
+    const cached = cacheStore.get(cacheKey);
+    if (cached) {
+      return cached as any[];
+    }
+
+    await this.waitForRateLimit();
+
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'BookOnce-Travel-Planner/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Geocoding failed');
+      }
+
+      const data = await response.json();
+      cacheStore.set(cacheKey, data, this.CACHE_DURATION);
+      return data;
+    } catch (error) {
+      console.error('Location search failed:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get route between two points
    */
   async getRoute(request: RouteRequest): Promise<RouteResult> {
@@ -121,11 +156,99 @@ class FreeRoutingService {
 
       return result;
     } catch (error) {
-      console.error('OpenRouteService routing error:', error);
+      console.warn('OpenRouteService routing failed, trying OSRM fallback:', error);
 
-      // Return straight line as fallback
-      return this.getStraightLineRoute(request);
+      // Fallback to OSRM (Open Source Routing Machine) - Public API (No key needed)
+      try {
+        return await this.getOSRMRoute(request);
+      } catch (osrmError) {
+        console.error('OSRM fallback failed:', osrmError);
+        // Final fallback to straight line
+        return this.getStraightLineRoute(request);
+      }
     }
+  }
+
+  /**
+   * Get route using OSRM Public API (No API key required)
+   */
+  private async getOSRMRoute(request: RouteRequest): Promise<RouteResult> {
+    // OSRM Public Server (Demo)
+    const baseUrl = 'https://router.project-osrm.org/route/v1/driving';
+    const coords = `${request.origin.lng},${request.origin.lat};${request.destination.lng},${request.destination.lat}`;
+    const url = `${baseUrl}/${coords}?overview=full&geometries=geojson&steps=true`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`OSRM failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.routes || data.routes.length === 0) {
+      throw new Error('OSRM returned no routes');
+    }
+
+    return this.parseOSRMResponse(data);
+  }
+
+  /**
+   * Parse OSRM response
+   */
+  private parseOSRMResponse(data: any): RouteResult {
+    const route = data.routes[0];
+    const geometry = route.geometry; // GeoJSON LineString
+
+    // Parse steps
+    const steps: RouteStep[] = [];
+    const coordinates: [number, number][] = geometry.coordinates; // [lng, lat]
+
+    if (route.legs && route.legs[0].steps) {
+      route.legs[0].steps.forEach((step: any) => {
+        // OSRM steps are detailed, we map them to our format
+        steps.push({
+          lat: step.maneuver.location[1],
+          lng: step.maneuver.location[0],
+          instruction: step.maneuver.type + (step.maneuver.modifier ? ' ' + step.maneuver.modifier : '') + (step.name ? ' on ' + step.name : ''),
+          distance: step.distance,
+          duration: step.duration,
+          name: step.name
+        });
+      });
+    }
+
+    // Add all geometry points as intermediate steps for smooth map drawing
+    // We only keep a subsample if it's too large to prevent performance issues
+    // But for "detailed path", we want most of them.
+    const pathSteps: RouteStep[] = coordinates.map(coord => ({
+      lat: coord[1],
+      lng: coord[0]
+    }));
+
+    // OSRM bbox is [minLng, minLat, maxLng, maxLat] - same as we need
+    // but sometimes it's not present, so we calculate
+    let bbox: [number, number, number, number] = [-180, -90, 180, 90];
+    if (route.bbox) {
+      bbox = route.bbox;
+    } else {
+      const lats = coordinates.map(c => c[1]);
+      const lngs = coordinates.map(c => c[0]);
+      bbox = [
+        Math.min(...lngs),
+        Math.min(...lats),
+        Math.max(...lngs),
+        Math.max(...lats)
+      ];
+    }
+
+    return {
+      distance: route.distance,
+      duration: route.duration,
+      steps: pathSteps, // Use full geometry for map drawing
+      summary: `${(route.distance / 1000).toFixed(1)} km, ${Math.round(route.duration / 60)} min (via OSRM)`,
+      bbox: bbox
+    };
   }
 
   /**

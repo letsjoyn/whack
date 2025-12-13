@@ -88,7 +88,7 @@ class GeminiAIService {
       this.genAI = new GoogleGenerativeAI(this.apiKey);
 
       // Use the stable Gemini model that works with v1beta API
-      const modelName = import.meta.env.VITE_GEMINI_MODEL || 'gemini-pro';
+      const modelName = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
       const maxTokens = parseInt(import.meta.env.VITE_GEMINI_MAX_TOKENS) || 2048;
       const temperature = parseFloat(import.meta.env.VITE_GEMINI_TEMPERATURE) || 0.7;
 

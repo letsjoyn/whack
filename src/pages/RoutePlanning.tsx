@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -28,6 +29,7 @@ import {
   RefreshCw,
   Map,
   ExternalLink,
+  Bed,
   AlertTriangle,
   Zap,
 } from 'lucide-react';
@@ -78,6 +80,7 @@ const RoutePlanning = () => {
   // Map state
   const [originLocation, setOriginLocation] = useState<Location | null>(null);
   const [destinationLocation, setDestinationLocation] = useState<Location | null>(null);
+  const [highlightedMapLocation, setHighlightedMapLocation] = useState<Location | null>(null);
   const [routeSteps, setRouteSteps] = useState<RouteStep[] | null>(null);
   const [mapLoading, setMapLoading] = useState(true);
 
@@ -104,6 +107,18 @@ const RoutePlanning = () => {
     cost: number;
     modes: number;
   } | null>(null);
+
+  // Parse AI Response
+  const parsedPlan = useMemo(() => {
+    if (!aiJourneyPlan) return null;
+    try {
+      const clean = aiJourneyPlan.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(clean);
+    } catch (e) {
+      console.warn('Failed to parse AI Plan JSON', e);
+      return null;
+    }
+  }, [aiJourneyPlan]);
 
   // Calculate pricing based on number of travelers and added places
   const calculatePricing = () => {
@@ -561,8 +576,8 @@ const RoutePlanning = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left: Route Timeline */}
           <div className="lg:col-span-2 space-y-4">
-            <Card className="p-6">
-              <div className="mb-6">
+            <Card className="p-4 sm:p-6">
+              <div className="mb-4 sm:mb-6">
                 <h2 className="text-lg font-bold">Your Door-to-Door Route</h2>
               </div>
 
@@ -574,366 +589,96 @@ const RoutePlanning = () => {
                   <TabsTrigger value="stay">Accommodation</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="outbound" className="space-y-4 mt-4">                  {aiPlanLoading ? (
-                  <div className="flex flex-col items-center justify-center p-8 space-y-3">
-                    <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">
-                      Generating AI-powered route...
-                    </p>
-                  </div>
-                ) : aiPlanError ? (
-                  <Card className="p-4 border-blue-200 bg-blue-50">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-blue-900 mb-1">
-                          {aiPlanError.includes('rate limit')
-                            ? '⏱️ AI Service Busy'
-                            : 'AI Plan Unavailable'}
-                        </p>
-                        <p className="text-xs text-blue-700 mb-2">
-                          {aiPlanError.includes('rate limit')
-                            ? 'The AI service is experiencing high demand. Your journey is still planned using our reliable routing system below.'
-                            : aiPlanError}
-                        </p>
-                        {aiPlanError.includes('rate limit') && (
-                          <div className="text-xs text-blue-600 space-y-1">
-                            <p>✓ All transport modes calculated</p>
-                            <p>✓ Timing based on your {departureTime} departure</p>
-                            <p>✓ Optimized for {intent === 'urgent' ? 'speed' : 'comfort'}</p>
-                          </div>
-                        )}
-                      </div>
+                {/* Outbound Tab */}
+                <TabsContent value="outbound" className="space-y-4 mt-4">
+                  {aiPlanLoading ? (
+                    <div className="flex flex-col items-center justify-center p-8 space-y-3">
+                      <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">Generating route...</p>
                     </div>
-                  </Card>
-                ) : aiJourneyPlan ? (
-                  <JourneyVisualization
-                    aiResponse={
-                      aiJourneyPlan
-                        .split('## RETURN JOURNEY')[0]
-                        .split('## STOPS & FOOD')[0]
-                        .split('## ACCOMMODATION')[0]
-                    }
-                    journeyType="outbound"
-                    userName="Traveler"
-                    onSummaryUpdate={setJourneySummary}
-                  />
-                ) : null}
-
-                  {/* Fallback: Outbound Route segments - Show if AI plan failed or is empty */}
-                  {(!aiJourneyPlan || aiPlanError) && !aiPlanLoading && (
-                    <>
-                      <RouteSegment
-                        icon={<Footprints className="h-5 w-5" />}
-                        mode="Walk"
-                        from="Your Home"
-                        to="Metro Station"
-                        duration="8 min"
-                        distance="650 m"
-                        time={segmentTimes.walk1}
-                        color="text-green-500"
-                        travelers={numGuests}
-                      />
-
-                      <RouteSegment
-                        icon={<Train className="h-5 w-5" />}
-                        mode="Metro"
-                        from="Central Station"
-                        to="Airport Station"
-                        duration="25 min"
-                        distance="18 km"
-                        time={segmentTimes.metro}
-                        color="text-blue-500"
-                        details="Line 3 - Direction Airport"
-                        price={60}
-                        travelers={numGuests}
-                        seatsRequired={true}
-                      />
-
-                      <RouteSegment
-                        icon={<Plane className="h-5 w-5" />}
-                        mode="Flight"
-                        from={from}
-                        to={to}
-                        duration="2h 30min"
-                        distance="1,200 km"
-                        time={segmentTimes.flight}
-                        color="text-purple-500"
-                        details={`AI 101 - Economy • ${numGuests} ${numGuests === 1 ? 'passenger' : 'passengers'}`}
-                        price={intent === 'urgent' ? 8500 : 5500}
-                        travelers={numGuests}
-                        seatsRequired={true}
-                        isClickable={true}
-                        onClick={() => handleFlightClick(from, to, segmentTimes.flight, departure)}
-                      />
-
-                      <RouteSegment
-                        icon={<Bus className="h-5 w-5" />}
-                        mode="Bus"
-                        from="Airport"
-                        to="City Center"
-                        duration="35 min"
-                        distance="22 km"
-                        time={segmentTimes.bus}
-                        color="text-orange-500"
-                        price={40}
-                        travelers={numGuests}
-                        seatsRequired={true}
-                      />
-
-                      <RouteSegment
-                        icon={<Footprints className="h-5 w-5" />}
-                        mode="Walk"
-                        from="Bus Stop"
-                        to="Your Destination"
-                        duration="5 min"
-                        distance="400 m"
-                        time={segmentTimes.walk2}
-                        color="text-green-500"
-                        travelers={numGuests}
-                      />
-
-                      {/* Added Endangered Places as Side Visits */}
-                      {addedPlaces.map((place, index) => {
-                        const placeCost =
-                          place.threatLevel === 'critical'
-                            ? 2300
-                            : place.threatLevel === 'high'
-                              ? 1800
-                              : 1600;
-                        return (
-                          <RouteSegment
-                            key={place.id}
-                            icon={<AlertTriangle className="h-5 w-5" />}
-                            mode="Side Visit"
-                            from="Your Destination"
-                            to={place.name}
-                            duration="2-3 hours"
-                            distance="Local area"
-                            time="During stay"
-                            color="text-orange-600"
-                            details={`${place.threatLevel.toUpperCase()} - ${place.yearsRemaining} years remaining • Includes transport, guide & entry`}
-                            price={placeCost}
-                            travelers={numGuests}
-                          />
-                        );
-                      })}
-                    </>
+                  ) : parsedPlan?.outbound ? (
+                    <JourneyVisualization
+                      steps={parsedPlan.outbound}
+                      journeyType="outbound"
+                      onSummaryUpdate={setJourneySummary}
+                    />
+                  ) : (
+                    <div className="text-center p-4 text-muted-foreground">
+                      {aiPlanError || "No route available."}
+                    </div>
                   )}
                 </TabsContent>
 
+                {/* Return Tab */}
                 {returnDate && (
                   <TabsContent value="return" className="space-y-4 mt-4">
-                    <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                      <p className="text-sm font-medium">
-                        {format(new Date(returnDate), 'EEEE, MMMM dd, yyyy')}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {to} → {from}
-                      </p>
-                    </div>
-
-                    {aiJourneyPlan && aiJourneyPlan.includes('## RETURN JOURNEY') && (
+                    {parsedPlan?.return && parsedPlan.return.length > 0 ? (
                       <JourneyVisualization
-                        aiResponse={
-                          aiJourneyPlan
-                            .split('## RETURN JOURNEY')[1]
-                            ?.split('## STOPS & FOOD')[0]
-                            ?.split('## ACCOMMODATION')[0] || 'Calculating return journey...'
-                        }
+                        steps={parsedPlan.return}
                         journeyType="return"
-                        userName="Traveler"
-                        onSummaryUpdate={setJourneySummary}
                       />
+                    ) : (
+                      <div className="text-center p-8 text-muted-foreground text-sm">
+                        No return journey planned yet.
+                      </div>
                     )}
-
-                    {/* Return Route segments (reversed) */}
-                    <RouteSegment
-                      icon={<Footprints className="h-5 w-5" />}
-                      mode="Walk"
-                      from="Your Hotel"
-                      to="Bus Stop"
-                      duration="5 min"
-                      distance="400 m"
-                      time="08:00"
-                      color="text-green-500"
-                    />
-
-                    <RouteSegment
-                      icon={<Bus className="h-5 w-5" />}
-                      mode="Bus"
-                      from="City Center"
-                      to="Airport"
-                      duration="35 min"
-                      distance="22 km"
-                      time="08:10"
-                      color="text-orange-500"
-                    />
-
-                    <RouteSegment
-                      icon={<Plane className="h-5 w-5" />}
-                      mode="Flight"
-                      from={to}
-                      to={from}
-                      duration="2h 30min"
-                      distance="1,200 km"
-                      time="10:00"
-                      color="text-purple-500"
-                      details="AI 202 - Economy"
-                    />
-
-                    <RouteSegment
-                      icon={<Train className="h-5 w-5" />}
-                      mode="Metro"
-                      from="Airport Station"
-                      to="Central Station"
-                      duration="25 min"
-                      distance="18 km"
-                      time="13:00"
-                      color="text-blue-500"
-                      details="Line 3 - Direction City"
-                    />
-
-                    <RouteSegment
-                      icon={<Footprints className="h-5 w-5" />}
-                      mode="Walk"
-                      from="Metro Station"
-                      to="Your Home"
-                      duration="8 min"
-                      distance="650 m"
-                      time="13:30"
-                      color="text-green-500"
-                    />
                   </TabsContent>
                 )}
 
+                {/* Stops & Food Tab */}
                 <TabsContent value="stops" className="space-y-4 mt-4">
-                  {aiJourneyPlan && aiJourneyPlan.includes('## STOPS & FOOD') && (
-                    <JourneyVisualization
-                      aiResponse={
-                        aiJourneyPlan
-                          .split('## STOPS & FOOD')[1]
-                          ?.split('## ACCOMMODATION')[0]
-                          ?.split('## RETURN JOURNEY')[0] || 'Calculating meal stops...'
-                      }
-                      journeyType="outbound"
-                      userName="Traveler"
-                      onSummaryUpdate={setJourneySummary}
-                    />
-                  )}
-
-                  {numGuests >= 4 && (
-                    <div className="mb-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Users className="h-4 w-4 text-orange-600" />
-                        <span className="text-sm font-medium text-orange-900">Group Dining</span>
+                  <div className="grid gap-3">
+                    {parsedPlan?.dining?.map((place: any, i: number) => (
+                      <div key={i} className="flex items-start gap-4 p-3 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+                        <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
+                          <Utensils className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm">{place.title}</h4>
+                          <p className="text-xs text-muted-foreground">{place.description}</p>
+                          <div className="flex gap-2 mt-2 text-xs">
+                            <Badge variant="outline">{place.time}</Badge>
+                            <Badge variant="secondary">{place.cost}</Badge>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-xs text-orange-700">
-                        For groups of {numGuests}, we recommend restaurants with group seating.
-                        Reservations suggested.
-                      </p>
-                    </div>
-                  )}
-
-                  <StopCard
-                    icon={<Utensils className="h-5 w-5 text-orange-500" />}
-                    title="Breakfast Stop"
-                    location="Airport Terminal 2"
-                    time="09:45 - 10:15"
-                    description={
-                      intent === 'urgent'
-                        ? `Quick grab-and-go options for ${numGuests} ${numGuests === 1 ? 'person' : 'people'}`
-                        : `Local cuisine recommendations • Table for ${numGuests}`
-                    }
-                  />
-
-                  <StopCard
-                    icon={<Utensils className="h-5 w-5 text-orange-500" />}
-                    title="Lunch"
-                    location="Near destination"
-                    time="14:30"
-                    description={
-                      visitor === 'first-time'
-                        ? `Popular local restaurant • Seating for ${numGuests}`
-                        : `Your favorite from last visit • Party of ${numGuests}`
-                    }
-                  />
-
-                  {numGuests >= 6 && (
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">
-                        💡 Tip: Large groups may qualify for set menus or group discounts at select
-                        restaurants.
-                      </p>
-                    </div>
-                  )}
+                    )) || <div className="text-center p-4 text-muted-foreground text-sm">No dining recommendations available.</div>}
+                  </div>
                 </TabsContent>
 
+                {/* Accommodation Tab */}
                 <TabsContent value="stay" className="space-y-4 mt-4">
-                  {aiJourneyPlan && aiJourneyPlan.includes('## ACCOMMODATION') && (
-                    <JourneyVisualization
-                      aiResponse={
-                        aiJourneyPlan.split('## ACCOMMODATION')[1] ||
-                        'Calculating accommodation options...'
-                      }
-                      journeyType="outbound"
-                      userName="Traveler"
-                      onSummaryUpdate={setJourneySummary}
-                    />
-                  )}
-
-                  {returnDate && (
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Hotel className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">
-                          Accommodation Required
-                        </span>
+                  <div className="grid gap-3">
+                    {parsedPlan?.accommodation?.map((place: any, i: number) => (
+                      <div key={i} className="flex items-start gap-4 p-3 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                          <Bed className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm">{place.title}</h4>
+                          <p className="text-xs text-muted-foreground">{place.location}</p>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{place.description}</p>
+                          <div className="flex gap-2 mt-2 text-xs">
+                            <Badge variant="outline">Check-in: {place.checkIn}</Badge>
+                            <Badge variant="secondary">{place.cost}</Badge>
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-1 text-xs text-blue-700">
-                        <p>
-                          • {numGuests} {numGuests === 1 ? 'traveler' : 'travelers'}
-                        </p>
-                        <p>
-                          • {Math.ceil(numGuests / 2)}{' '}
-                          {Math.ceil(numGuests / 2) === 1 ? 'room' : 'rooms'} recommended (2 guests
-                          per room)
-                        </p>
-                        <p>
-                          •{' '}
-                          {Math.ceil(
-                            (new Date(returnDate).getTime() - new Date(departure).getTime()) /
-                            (1000 * 60 * 60 * 24)
-                          )}{' '}
-                          nights
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <StopCard
-                    icon={<Hotel className="h-5 w-5 text-blue-500" />}
-                    title="Recommended Hotel"
-                    location="City Center, 500m from destination"
-                    time="Check-in: 15:00"
-                    description={
-                      intent === 'urgent'
-                        ? 'Quick check-in, near transport'
-                        : 'Comfortable stay with local experiences'
-                    }
-                  />
-
-                  {numGuests > 2 && (
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">
-                        💡 Tip: For groups of {numGuests}, consider booking connecting rooms or a
-                        suite for better coordination.
-                      </p>
-                    </div>
-                  )}
+                    )) || <div className="text-center p-4 text-muted-foreground text-sm">No accommodation recommendations available.</div>}
+                  </div>
                 </TabsContent>
               </Tabs>
             </Card>
+
+
+
+
+
+
+
+
+
+
 
             {/* Endangered Places Section */}
             <EndangeredPlacesInline
@@ -944,27 +689,29 @@ const RoutePlanning = () => {
             />
 
             {/* Added Places to Trip */}
-            {addedPlaces.length > 0 && (
-              <Card className="p-4 bg-green-50 border-green-200">
-                <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
-                  ✅ Added to Your Trip
-                </h4>
-                <div className="space-y-2">
-                  {addedPlaces.map(place => (
-                    <div key={place.id} className="flex items-center gap-2 text-sm">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-green-800">{place.name}</span>
-                      <button
-                        onClick={() => setAddedPlaces(prev => prev.filter(p => p.id !== place.id))}
-                        className="ml-auto text-green-600 hover:text-green-800 text-xs"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
+            {
+              addedPlaces.length > 0 && (
+                <Card className="p-4 bg-green-50 border-green-200">
+                  <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+                    ✅ Added to Your Trip
+                  </h4>
+                  <div className="space-y-2">
+                    {addedPlaces.map(place => (
+                      <div key={place.id} className="flex items-center gap-2 text-sm">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-green-800">{place.name}</span>
+                        <button
+                          onClick={() => setAddedPlaces(prev => prev.filter(p => p.id !== place.id))}
+                          className="ml-auto text-green-600 hover:text-green-800 text-xs"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )
+            }
           </div>
 
           {/* Right: Map & Info */}
@@ -975,25 +722,27 @@ const RoutePlanning = () => {
                 <Map className="h-4 w-4" />
                 Route Map
               </h3>
-              {mapLoading ? (
-                <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <RefreshCw className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Loading map...</p>
+              {
+                mapLoading ? (
+                  <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <RefreshCw className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Loading map...</p>
+                    </div>
                   </div>
-                </div>
-              ) : originLocation && destinationLocation ? (
-                <JourneyMap
-                  origin={originLocation}
-                  destination={destinationLocation}
-                  route={routeSteps || undefined}
-                  height="400px"
-                />
-              ) : (
-                <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                  <p className="text-sm text-muted-foreground">Unable to load map</p>
-                </div>
-              )}
+                ) : originLocation && destinationLocation ? (
+                  <JourneyMap
+                    origin={originLocation}
+                    destination={destinationLocation}
+                    route={routeSteps || undefined}
+                    height="400px"
+                  />
+                ) : (
+                  <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
+                    <p className="text-sm text-muted-foreground">Unable to load map</p>
+                  </div>
+                )
+              }
             </Card>
 
             {/* Journey Summary Card */}
@@ -1151,7 +900,7 @@ const RoutePlanning = () => {
 
 // Route Segment Component
 interface RouteSegmentProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   mode: string;
   from: string;
   to: string;
@@ -1232,7 +981,7 @@ const RouteSegment = ({
 
 // Stop Card Component
 interface StopCardProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   location: string;
   time: string;

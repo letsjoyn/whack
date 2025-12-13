@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { motion } from 'framer-motion';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import JourneySearchCard, { JourneySearchParams } from '@/components/JourneySearchCard';
 import MapView from '@/components/MapView';
@@ -51,6 +51,8 @@ const Index = () => {
     setIsEchoModalOpen(true);
   };
 
+  const navigate = useNavigate();
+
   const handleJourneyExplore = (params: JourneySearchParams) => {
     console.log('Journey search params:', params);
     // Navigate to journey planner with search parameters
@@ -61,7 +63,7 @@ const Index = () => {
       return: params.returnDate,
       guests: params.guests.toString(),
     });
-    window.location.href = `/journey?${searchParams.toString()}`;
+    navigate(`/journey?${searchParams.toString()}`);
   };
 
   return (
@@ -95,11 +97,10 @@ const Index = () => {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.5 }}
-              className={`inline-flex items-center justify-center px-4 py-2 rounded-md mb-6 ${
-                resolvedTheme === 'light' 
-                  ? 'bg-[#f5f7fa] text-[#5b6e7a] border border-[#e1e8ed]' 
+              className={`inline-flex items-center justify-center px-4 py-2 rounded-md mb-6 ${resolvedTheme === 'light'
+                  ? 'bg-[#f5f7fa] text-[#5b6e7a] border border-[#e1e8ed]'
                   : 'bg-white/10 text-white'
-              }`}
+                }`}
             >
               <span className={`text-sm font-medium ${resolvedTheme === 'light' ? 'text-[#5b6e7a]' : 'text-white'}`}>
                 Complete door-to-door journey planning • One Click • Zero Hassle
@@ -127,9 +128,8 @@ const Index = () => {
             </h1>
 
             <p
-              className={`text-base md:text-lg ${
-                resolvedTheme === 'light' ? 'text-[#5b6e7a]' : 'text-muted-foreground'
-              } max-w-2xl mx-auto mb-8`}
+              className={`text-base md:text-lg ${resolvedTheme === 'light' ? 'text-[#5b6e7a]' : 'text-muted-foreground'
+                } max-w-2xl mx-auto mb-8`}
             >
               Plan unforgettable trips with personalised recommendations and seamless booking.
             </p>
