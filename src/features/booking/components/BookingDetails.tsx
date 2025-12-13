@@ -31,12 +31,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { BookingConfirmation } from '@/types/booking';
 import { ModifyBooking } from './ModifyBooking';
 import { CancelBooking } from './CancelBooking';
-// import { DisruptionRecovery } from './DisruptionRecovery';
+import { DisruptionRecovery } from './DisruptionRecovery';
 
 interface BookingDetailsProps {
   booking: BookingConfirmation;
@@ -50,6 +49,18 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
   const [isCancelling, setIsCancelling] = useState(false);
   const [isRecovering, setIsRecovering] = useState(false);
   const [currentBooking, setCurrentBooking] = useState<BookingConfirmation>(booking);
+
+  // Lock body scroll when dialog is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift
+      return () => {
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+      };
+    }
+  }, [isOpen]);
 
   const {
     hotel,
@@ -456,12 +467,12 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
       />
 
       {/* Disruption Recovery Modal */}
-      {/* <DisruptionRecovery
+      <DisruptionRecovery
         booking={currentBooking}
         isOpen={isRecovering}
         onClose={() => setIsRecovering(false)}
         onRecoveryComplete={handleRecoveryComplete}
-      /> */}
+      />
     </>
   );
 }
