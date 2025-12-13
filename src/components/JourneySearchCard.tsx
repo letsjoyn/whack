@@ -65,6 +65,8 @@ const JourneySearchCard = ({
   const destRef = useRef<HTMLDivElement>(null);
   const guestRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
+  const [sourceDropdownPos, setSourceDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const [destDropdownPos, setDestDropdownPos] = useState({ top: 0, left: 0, width: 0 });
 
   // Set initial destination from props
   useEffect(() => {
@@ -96,6 +98,27 @@ const JourneySearchCard = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [focusedField]);
+
+  // Update dropdown positions on scroll/resize
+  useEffect(() => {
+    const updatePositions = () => {
+      if (showSourceSuggestions && sourceRef.current) {
+        const rect = sourceRef.current.getBoundingClientRect();
+        setSourceDropdownPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+      }
+      if (showDestSuggestions && destRef.current) {
+        const rect = destRef.current.getBoundingClientRect();
+        setDestDropdownPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+      }
+    };
+
+    window.addEventListener('scroll', updatePositions, true);
+    window.addEventListener('resize', updatePositions);
+    return () => {
+      window.removeEventListener('scroll', updatePositions, true);
+      window.removeEventListener('resize', updatePositions);
+    };
+  }, [showSourceSuggestions, showDestSuggestions]);
 
   useEffect(() => {
     setTempDepartureDate(departureDate);
@@ -285,6 +308,10 @@ const JourneySearchCard = ({
     }
     setShowSourceSuggestions(true);
     setFocusedField('source');
+    if (sourceRef.current) {
+      const rect = sourceRef.current.getBoundingClientRect();
+      setSourceDropdownPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+    }
   };
 
   const handleDestFocus = () => {
@@ -293,6 +320,10 @@ const JourneySearchCard = ({
     }
     setShowDestSuggestions(true);
     setFocusedField('destination');
+    if (destRef.current) {
+      const rect = destRef.current.getBoundingClientRect();
+      setDestDropdownPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+    }
   };
 
   const selectSourceSuggestion = (suggestion: string) => {
@@ -390,12 +421,12 @@ const JourneySearchCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-6xl mx-auto"
+      className="w-full max-w-6xl mx-auto relative z-50"
     >
       {/* Compact Horizontal Search Bar */}
-      <div className="bg-white rounded-full shadow-2xl p-2 flex items-center gap-2">
+      <div className="bg-white rounded-full shadow-2xl p-2 flex items-center gap-2 relative">
         {/* Source */}
-        <div ref={sourceRef} className="relative flex-1">
+        <div ref={sourceRef} className="relative flex-1 overflow-visible">
           {/* Cute Explore Suggestion Tooltip */}
           <AnimatePresence>
             {showExploreSuggestion && source.length === 0 && (
@@ -469,8 +500,13 @@ const JourneySearchCard = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="absolute w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden"
-                style={{ zIndex: 9999 }}
+                className="fixed bg-white rounded-xl shadow-xl border border-gray-200 overflow-y-auto overflow-x-hidden max-h-96 z-[9999]"
+                style={{ 
+                  top: `${sourceDropdownPos.top}px`, 
+                  left: `${sourceDropdownPos.left}px`, 
+                  width: `${sourceDropdownPos.width}px`,
+                  zIndex: 9999 
+                }}
               >
                 <button
                   onClick={handleDetectLocation}
@@ -508,7 +544,7 @@ const JourneySearchCard = ({
         <div className="w-px h-12 bg-gray-200" />
 
         {/* Destination */}
-        <div ref={destRef} className="relative flex-1">
+        <div ref={destRef} className="relative flex-1 overflow-visible">
           <motion.div
             animate={{
               scale: focusedField === 'destination' ? 1.02 : 1,
@@ -543,8 +579,13 @@ const JourneySearchCard = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="absolute w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden"
-                style={{ zIndex: 9999 }}
+                className="fixed bg-white rounded-xl shadow-xl border border-gray-200 overflow-y-auto overflow-x-hidden max-h-96 z-[9999]"
+                style={{ 
+                  top: `${destDropdownPos.top}px`, 
+                  left: `${destDropdownPos.left}px`, 
+                  width: `${destDropdownPos.width}px`,
+                  zIndex: 9999 
+                }}
               >
                 {destSuggestions.map((suggestion, index) => (
                   <button

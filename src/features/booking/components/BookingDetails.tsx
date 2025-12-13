@@ -20,6 +20,8 @@ import {
   Edit,
   XCircle,
   AlertTriangle,
+  MessageCircle,
+  Shield,
 } from 'lucide-react';
 import {
   Dialog,
@@ -36,6 +38,8 @@ import type { BookingConfirmation } from '@/types/booking';
 import { ModifyBooking } from './ModifyBooking';
 import { CancelBooking } from './CancelBooking';
 import { DisruptionRecovery } from './DisruptionRecovery';
+import LocalShadowWidget from '@/components/LocalShadowWidget';
+import SafetyMesh from '@/components/SafetyMesh';
 
 interface BookingDetailsProps {
   booking: BookingConfirmation;
@@ -48,6 +52,9 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
   const [isModifying, setIsModifying] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isRecovering, setIsRecovering] = useState(false);
+  const [showLocalSupport, setShowLocalSupport] = useState(false);
+  const [showSafetyMesh, setShowSafetyMesh] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
   const [currentBooking, setCurrentBooking] = useState<BookingConfirmation>(booking);
 
   // Lock body scroll when dialog is open
@@ -416,6 +423,29 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
                 <Share2 className="h-3 w-3 mr-1" />
                 <span className="text-xs">Share</span>
               </Button>
+
+              {/* Local Support Chat */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowLocalSupport(true)}
+                className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
+              >
+                <MessageCircle className="h-3 w-3 mr-1" />
+                <span className="text-xs">Local Support</span>
+              </Button>
+
+              {/* Safety Mesh */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSafetyMesh(true)}
+                className="border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+              >
+                <Shield className="h-3 w-3 mr-1" />
+                <span className="text-xs">Safety Mesh</span>
+              </Button>
+
               {canModify && (
                 <Button variant="outline" size="sm" onClick={handleModify}>
                   <Edit className="h-3 w-3 mr-1" />
@@ -472,6 +502,17 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
         isOpen={isRecovering}
         onClose={() => setIsRecovering(false)}
         onRecoveryComplete={handleRecoveryComplete}
+      />
+
+      {/* Local Support Chat */}
+      {showLocalSupport && <LocalShadowWidget />}
+
+      {/* Safety Mesh */}
+      <SafetyMesh
+        isOpen={showSafetyMesh}
+        onClose={() => setShowSafetyMesh(false)}
+        isOffline={isOffline}
+        onToggleOffline={() => setIsOffline(!isOffline)}
       />
     </>
   );
