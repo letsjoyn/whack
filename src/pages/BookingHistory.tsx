@@ -125,9 +125,9 @@ export default function BookingHistory() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen bg-background overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="border-b bg-card">
+      <div className="border-b bg-card shrink-0">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -185,10 +185,11 @@ export default function BookingHistory() {
       </div>
 
       {/* Tabs and Content */}
-      <div className="container mx-auto px-4 py-6">
-        <Tabs value={filter} onValueChange={value => setFilter(value as BookingFilter)}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="all">
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="container mx-auto px-4 py-6 h-full flex flex-col">
+          <Tabs value={filter} onValueChange={value => setFilter(value as BookingFilter)} className="h-full flex flex-col">
+            <TabsList className="grid w-full grid-cols-4 mb-6 shrink-0">
+              <TabsTrigger value="all">
               All
               {filter === 'all' && bookings.length > 0 && (
                 <span className="ml-2 text-xs">({bookings.length})</span>
@@ -214,8 +215,8 @@ export default function BookingHistory() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value={filter} className="mt-0">
-            {/* Loading State */}
+            <TabsContent value={filter} className="flex-1 min-h-0 overflow-y-auto mt-0 data-[state=inactive]:hidden">
+              {/* Loading State */}
             {isLoading && (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -262,7 +263,7 @@ export default function BookingHistory() {
 
             {/* Bookings List */}
             {!isLoading && !error && sortedBookings.length > 0 && (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pb-4">
                 {sortedBookings.map(booking => (
                   <BookingCard
                     key={booking.bookingId}
@@ -272,8 +273,9 @@ export default function BookingHistory() {
                 ))}
               </div>
             )}
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
 
       {/* Booking Details Modal */}
