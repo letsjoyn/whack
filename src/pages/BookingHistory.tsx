@@ -190,89 +190,89 @@ export default function BookingHistory() {
           <Tabs value={filter} onValueChange={value => setFilter(value as BookingFilter)} className="h-full flex flex-col">
             <TabsList className="grid w-full grid-cols-4 mb-6 shrink-0">
               <TabsTrigger value="all">
-              All
-              {filter === 'all' && bookings.length > 0 && (
-                <span className="ml-2 text-xs">({bookings.length})</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="upcoming">
-              Upcoming
-              {filter === 'upcoming' && sortedBookings.length > 0 && (
-                <span className="ml-2 text-xs">({sortedBookings.length})</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="past">
-              Past
-              {filter === 'past' && sortedBookings.length > 0 && (
-                <span className="ml-2 text-xs">({sortedBookings.length})</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="cancelled">
-              Cancelled
-              {filter === 'cancelled' && sortedBookings.length > 0 && (
-                <span className="ml-2 text-xs">({sortedBookings.length})</span>
-              )}
-            </TabsTrigger>
-          </TabsList>
+                All
+                {filter === 'all' && bookings.length > 0 && (
+                  <span className="ml-2 text-xs">({bookings.length})</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="upcoming">
+                Upcoming
+                {filter === 'upcoming' && sortedBookings.length > 0 && (
+                  <span className="ml-2 text-xs">({sortedBookings.length})</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="past">
+                Past
+                {filter === 'past' && sortedBookings.length > 0 && (
+                  <span className="ml-2 text-xs">({sortedBookings.length})</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="cancelled">
+                Cancelled
+                {filter === 'cancelled' && sortedBookings.length > 0 && (
+                  <span className="ml-2 text-xs">({sortedBookings.length})</span>
+                )}
+              </TabsTrigger>
+            </TabsList>
 
             <TabsContent value={filter} className="flex-1 min-h-0 overflow-y-auto mt-0 data-[state=inactive]:hidden">
               {/* Loading State */}
-            {isLoading && (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">Loading bookings...</p>
+              {isLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">Loading bookings...</p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Error State */}
-            {error && (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center max-w-md">
-                  <p className="text-destructive mb-4">
-                    Failed to load bookings. Please try again.
-                  </p>
-                  <Button onClick={handleRefresh} variant="outline">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Retry
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Empty State */}
-            {!isLoading && !error && sortedBookings.length === 0 && (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center max-w-md">
-                  <p className="text-muted-foreground mb-2">
-                    {searchQuery
-                      ? 'No bookings match your search'
-                      : filter === 'all'
-                        ? 'No bookings yet'
-                        : `No ${filter} bookings`}
-                  </p>
-                  {searchQuery && (
-                    <Button variant="link" onClick={() => setSearchQuery('')} className="mt-2">
-                      Clear search
+              {/* Error State */}
+              {error && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center max-w-md">
+                    <p className="text-destructive mb-4">
+                      Failed to load bookings. Please try again.
+                    </p>
+                    <Button onClick={handleRefresh} variant="outline">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Retry
                     </Button>
-                  )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Bookings List */}
-            {!isLoading && !error && sortedBookings.length > 0 && (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pb-4">
-                {sortedBookings.map(booking => (
-                  <BookingCard
-                    key={booking.bookingId}
-                    booking={booking}
-                    onClick={() => handleBookingClick(booking)}
-                  />
-                ))}
-              </div>
-            )}
+              {/* Empty State */}
+              {!isLoading && !error && sortedBookings.length === 0 && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center max-w-md">
+                    <p className="text-muted-foreground mb-2">
+                      {searchQuery
+                        ? 'No bookings match your search'
+                        : filter === 'all'
+                          ? 'No bookings yet'
+                          : `No ${filter} bookings`}
+                    </p>
+                    {searchQuery && (
+                      <Button variant="link" onClick={() => setSearchQuery('')} className="mt-2">
+                        Clear search
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Bookings List */}
+              {!isLoading && !error && sortedBookings.length > 0 && (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pb-4">
+                  {sortedBookings.map(booking => (
+                    <BookingCard
+                      key={booking.bookingId}
+                      booking={booking}
+                      onClick={() => handleBookingClick(booking)}
+                    />
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

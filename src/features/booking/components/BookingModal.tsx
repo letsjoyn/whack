@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ import {
 } from '../utils/screenReaderAnnouncer';
 import { bookingAPIService } from '../services/BookingAPIService';
 import { paymentAPIService } from '../services/PaymentAPIService';
+import { razorpayService } from '../services/RazorpayService';
 import { analyticsService } from '../services/AnalyticsService';
 import { errorLoggingService } from '../services/ErrorLoggingService';
 import { DateSelector } from './DateSelector';
@@ -89,6 +91,7 @@ const STEPS: { key: BookingStep; label: string; description: string }[] = [
 
 export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: BookingModalProps) {
   const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const {
     currentBooking,
     startBooking,
@@ -102,6 +105,8 @@ export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: Book
     error,
     clearError,
   } = useBookingStore();
+
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -246,47 +251,83 @@ export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: Book
 
     // Track guest info completed
     analyticsService.trackGuestInfoCompleted({
-      hasAccount: false, // TODO: Check if user is authenticated
+      hasAccount: isAuthenticated,
     });
 
-    // Create payment intent when moving to payment step
-    if (currentBooking?.pricing) {
-      setIsCreatingPaymentIntent(true);
-      announceLoading('Preparing payment form');
-      try {
-        const paymentIntent = await paymentAPIService.createPaymentIntent(
-          Math.round(currentBooking.pricing.total * 100), // Convert to cents
-          currentBooking.pricing.currency.toLowerCase(),
-          {
-            hotelId: hotel.id.toString(),
-            hotelName: hotel.title,
-            guestEmail: info.email,
-            guestName: `${info.firstName} ${info.lastName}`,
-          }
-        );
-        setPaymentClientSecret(paymentIntent.clientSecret);
-        updateBookingStep('payment');
-        announceSuccess('Payment form ready');
-      } catch (err) {
-        console.error('Failed to create payment intent:', err);
-        const error = err instanceof Error ? err : new Error('Unknown error');
-        analyticsService.trackBookingError({
-          step: 'guest-info',
-          errorType: 'payment_intent_creation_failed',
-          errorMessage: error.message,
-          component: 'BookingModal',
-        });
-        errorLoggingService.logPaymentError(error, undefined, {
-          hotelId: hotel.id,
-          step: 'payment_intent_creation',
-        });
-        // Show error but still allow proceeding (for demo purposes)
-        updateBookingStep('payment');
-      } finally {
-        setIsCreatingPaymentIntent(false);
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store booking data in sessionStorage to resume after login
+      sessionStorage.setItem('pendingBooking', JSON.stringify({
+        hotelId: hotel.id,
+        hotelTitle: hotel.title,
+        guestInfo: info,
+        checkInDate: currentBooking.checkInDate,
+        checkOutDate: currentBooking.checkOutDate,
+        selectedRoom: currentBooking.selectedRoom,
+        pricing: currentBooking.pricing,
+      }));
+
+      // Redirect to login page
+      toast({
+        title: 'Login Required',
+        description: 'Please login to continue with payment',
+      });
+
+      navigate('/auth?redirect=continue-booking');
+      onClose();
+      return;
+    }
+
+    // Directly open Razorpay checkout
+    updateBookingStep('payment');
+    announceSuccess('Opening payment gateway');
+
+    try {
+      if (!currentBooking?.pricing) {
+        throw new Error('Missing pricing information');
       }
-    } else {
-      updateBookingStep('payment');
+
+      // Track payment started
+      analyticsService.trackPaymentSubmitted({
+        paymentMethod: 'razorpay',
+      });
+
+      // Open Razorpay checkout
+      await razorpayService.openCheckout(
+        currentBooking.pricing.total,
+        {
+          firstName: info.firstName,
+          lastName: info.lastName,
+          email: info.email,
+          phone: info.phone,
+        },
+        hotel.title,
+        async (paymentId: string, orderId: string, signature: string) => {
+          // Payment successful - verify and complete booking
+          const verified = await razorpayService.verifyPayment(orderId, paymentId, signature);
+          if (verified) {
+            await handlePaymentSuccess(paymentId);
+          } else {
+            handlePaymentError('Payment verification failed');
+          }
+        },
+        () => {
+          // Payment dismissed/cancelled
+          announceError('Payment cancelled');
+          updateBookingStep('guest-info');
+        }
+      );
+    } catch (err) {
+      console.error('Failed to open payment gateway:', err);
+      const error = err instanceof Error ? err : new Error('Unknown error');
+      analyticsService.trackBookingError({
+        step: 'payment',
+        errorType: 'payment_gateway_failed',
+        errorMessage: error.message,
+        component: 'BookingModal',
+      });
+      announceError('Failed to open payment gateway. Please try again.');
+      updateBookingStep('guest-info');
     }
   };
 
@@ -349,20 +390,28 @@ export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: Book
       // Announce success
       announceSuccess('Booking confirmed successfully');
 
-      // Success - navigate to confirmation page
-      if (onBookingComplete) {
-        const guestInfo = !isAuthenticated
-          ? {
-              email: currentBooking.guestInfo.email,
-              firstName: currentBooking.guestInfo.firstName,
-              lastName: currentBooking.guestInfo.lastName,
-            }
-          : undefined;
-        onBookingComplete(confirmation.bookingId, guestInfo);
-      }
+      // Show success notification
+      toast({
+        title: '🎉 Booking Confirmed!',
+        description: `Your booking at ${hotel.title} has been confirmed. Reference: ${confirmation.referenceNumber}`,
+        duration: 5000,
+      });
+
+      // Clear pending booking from sessionStorage
+      sessionStorage.removeItem('pendingBooking');
 
       // Close modal
       handleClose();
+
+      // Navigate to booking history (dashboard) to show confirmed booking
+      setTimeout(() => {
+        navigate('/booking-history');
+      }, 1000);
+
+      // Call completion callback if provided
+      if (onBookingComplete) {
+        onBookingComplete(confirmation.bookingId);
+      }
     } catch (err) {
       console.error('Booking submission failed:', err);
       const error = err instanceof Error ? err : new Error('Unknown error');
@@ -710,9 +759,9 @@ export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: Book
               {currentBooking.step === 'payment' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Complete Your Booking</h3>
+                    <h3 className="text-lg font-semibold mb-2">Payment Gateway Opened</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Enter your payment details to confirm your reservation
+                      Razorpay payment window has been opened. Please complete your payment securely.
                     </p>
                     {hotel.instantBooking && (
                       <div className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
@@ -759,28 +808,19 @@ export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: Book
                         {currentBooking.guestInfo.firstName} {currentBooking.guestInfo.lastName}
                       </span>
                     </div>
+                    <div className="flex justify-between text-base font-semibold border-t pt-2 mt-2">
+                      <span>Total Amount</span>
+                      <span>₹{currentBooking.pricing?.total.toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
 
-                  {/* Payment Form */}
-                  {isCreatingPaymentIntent && <PaymentFormLoading />}
-                  {!isCreatingPaymentIntent && paymentClientSecret && currentBooking.pricing && (
-                    <PaymentFormWrapper
-                      amount={Math.round(currentBooking.pricing.total * 100)}
-                      currency={currentBooking.pricing.currency.toLowerCase()}
-                      clientSecret={paymentClientSecret}
-                      onSuccess={handlePaymentSuccess}
-                      onError={handlePaymentError}
-                    />
-                  )}
-                  {!isCreatingPaymentIntent && !paymentClientSecret && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Failed to initialize payment. Please try again or go back to review your
-                        booking.
-                      </AlertDescription>
-                    </Alert>
-                  )}
+                  {/* Payment Info */}
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Complete the payment in the Razorpay window that has opened. If the payment window didn't open, please disable your popup blocker and try again.
+                    </AlertDescription>
+                  </Alert>
                 </div>
               )}
 

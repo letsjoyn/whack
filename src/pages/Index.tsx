@@ -76,7 +76,7 @@ const Index = () => {
       />
 
       {/* Hero Section with Journey Search */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-x-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-x-hidden overflow-y-visible">
         {/* Background and animations removed — show plain page background */}
         {/* Squares background animation (subtle, theme-friendly) */}
         <div className="absolute inset-0">
@@ -84,7 +84,7 @@ const Index = () => {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-24">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-24 overflow-visible">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

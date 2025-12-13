@@ -34,6 +34,7 @@ import {
 import { endangeredPlacesService, EndangeredPlace } from '@/services/EndangeredPlacesService';
 import EndangeredPlacesInline from '@/components/EndangeredPlacesInline';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import {
   JourneyMap,
@@ -46,11 +47,13 @@ import { bookOnceAIService } from '@/features/journey/services/BookOnceAIService
 import JourneyVisualization from '@/components/JourneyVisualization';
 import { BookOnceAISidebar } from '@/components/BookOnceAISidebar';
 import { ContextLayerPanel } from '@/components/ContextLayer';
+import { razorpayService } from '@/features/booking/services/RazorpayService';
 
 const RoutePlanning = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
 
   // Get data from URL params
   const from = searchParams.get('from') || '';
@@ -141,6 +144,91 @@ const RoutePlanning = () => {
   };
 
   const pricing = calculatePricing();
+
+  // Handle confirm and pay
+  const handleConfirmAndPay = async () => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store journey data in sessionStorage to resume after login
+      sessionStorage.setItem('pendingJourney', JSON.stringify({
+        from,
+        to,
+        departure,
+        returnDate,
+        guests,
+        intent,
+        visitor,
+        amount: journeySummary?.cost || pricing.total,
+      }));
+
+      toast({
+        title: 'Login Required',
+        description: 'Please login to continue with payment',
+      });
+
+      navigate('/auth?redirect=continue-journey');
+      return;
+    }
+
+    try {
+      const totalAmount = journeySummary?.cost || pricing.total;
+
+      // Get user info or use default
+      const guestInfo = {
+        firstName: user?.displayName?.split(' ')[0] || 'Guest',
+        lastName: user?.displayName?.split(' ').slice(1).join(' ') || 'User',
+        email: user?.email || 'guest@bookonce.com',
+        phone: user?.phoneNumber || '+91 9876543210',
+      };
+
+      // Open Razorpay checkout
+      await razorpayService.openCheckout(
+        totalAmount,
+        guestInfo,
+        `Journey from ${from} to ${to}`,
+        async (paymentId: string, orderId: string, signature: string) => {
+          // Payment successful
+          const verified = await razorpayService.verifyPayment(orderId, paymentId, signature);
+          if (verified) {
+            // Clear pending journey data
+            sessionStorage.removeItem('pendingJourney');
+
+            toast({
+              title: '🎉 Journey Booking Confirmed!',
+              description: `Your journey from ${from} to ${to} has been confirmed!`,
+              duration: 5000,
+            });
+
+            // Navigate to booking history
+            setTimeout(() => {
+              navigate('/booking-history');
+            }, 1500);
+          } else {
+            toast({
+              title: 'Payment Verification Failed',
+              description: 'Please contact support.',
+              variant: 'destructive',
+            });
+          }
+        },
+        () => {
+          // Payment dismissed/cancelled
+          toast({
+            title: 'Payment Cancelled',
+            description: 'You can try again when ready.',
+            variant: 'destructive',
+          });
+        }
+      );
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: 'Payment Error',
+        description: 'Failed to open payment gateway. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   // Load endangered places after planning is complete
   useEffect(() => {
@@ -998,7 +1086,7 @@ const RoutePlanning = () => {
 
             {/* Confirm and Pay Button */}
             <Button
-              onClick={() => navigate('/booking-confirmation')}
+              onClick={handleConfirmAndPay}
               className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all"
             >
               Confirm and Pay ₹{journeySummary?.cost?.toLocaleString() || pricing.total.toLocaleString()}

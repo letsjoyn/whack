@@ -98,10 +98,6 @@ const App = () => {
                     <Route path="/utilities" element={<TravelUtilities />} />
                     <Route path="/journey" element={<JourneyPlanner />} />
                     <Route path="/journey/plan" element={<RoutePlanning />} />
-                    <Route
-                      path="/booking-confirmation/:bookingId"
-                      element={<BookingConfirmation />}
-                    />
 
                     {/* Protected Routes - Require Authentication */}
                     <Route
