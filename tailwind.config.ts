@@ -110,6 +110,12 @@ export default {
           900: '#0f172a',
           950: '#020617',
         },
+        'safety-mesh': {
+          'millbrook': '#613f33',
+          'my-pink': '#d69d84',
+          'rock-blue': '#9fb9c8',
+          'amethyst-smoke': '#948ca6',
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

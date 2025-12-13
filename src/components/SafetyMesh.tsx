@@ -44,8 +44,8 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               className="absolute top-0 left-0 w-full h-full"
               animate={{
                 background: [
-                  'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
-                  'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0) 0%, transparent 50%)',
+                  'rgba(159, 185, 200, 0.3)',
+                  'rgba(159, 185, 200, 0)',
                 ],
               }}
               transition={{
@@ -59,8 +59,8 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               className="absolute top-0 right-0 w-full h-full"
               animate={{
                 background: [
-                  'radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0) 0%, transparent 50%)',
-                  'radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 50%)',
+                  'rgba(97, 63, 51, 0)',
+                  'rgba(97, 63, 51, 0.3)',
                 ],
               }}
               transition={{
@@ -129,7 +129,17 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
             </div>
 
             {/* Content */}
-            <div className="p-4 space-y-4">
+            <div 
+              className="p-4 space-y-4"
+              style={{
+                '--destructive': '12 31% 29%',
+                '--success': '15 50% 69%',
+                '--info': '200 28% 70%',
+                '--warning': '252 13% 59%',
+                '--secondary': '200 28% 70%',
+                '--accent': '15 50% 69%'
+              } as React.CSSProperties}
+            >
               {/* Offline Toggle */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
                 <div className="flex items-center gap-2">
@@ -225,7 +235,7 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center"
+                  className="p-3 rounded-xl bg-safety-mesh-millbrook/20 hover:bg-safety-mesh-millbrook/30 transition-colors text-center border border-safety-mesh-millbrook/30"
                 >
                   <span className="text-xl mb-1 block">🏥</span>
                   <span className="text-xs font-medium text-foreground">Hospital</span>
@@ -233,7 +243,7 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center"
+                  className="p-3 rounded-xl bg-safety-mesh-my-pink/20 hover:bg-safety-mesh-my-pink/30 transition-colors text-center border border-safety-mesh-my-pink/30"
                 >
                   <span className="text-xl mb-1 block">🚔</span>
                   <span className="text-xs font-medium text-foreground">Police</span>
@@ -241,7 +251,7 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-center"
+                  className="p-3 rounded-xl bg-safety-mesh-rock-blue/20 hover:bg-safety-mesh-rock-blue/30 transition-colors text-center border border-safety-mesh-rock-blue/30"
                 >
                   <span className="text-xl mb-1 block">🚕</span>
                   <span className="text-xs font-medium text-foreground">Taxi</span>
@@ -267,19 +277,19 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-foreground">Safety Tips</h4>
                 <div className="space-y-2">
-                  <div className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
+                  <div className="flex items-start gap-2 p-2 rounded-lg bg-safety-mesh-amethyst-smoke/30">
                     <span className="text-sm">📍</span>
                     <p className="text-xs text-muted-foreground">
                       Share your live location with trusted contacts
                     </p>
                   </div>
-                  <div className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
+                  <div className="flex items-start gap-2 p-2 rounded-lg bg-safety-mesh-amethyst-smoke/30">
                     <span className="text-sm">🔋</span>
                     <p className="text-xs text-muted-foreground">
                       Keep your phone charged above 20%
                     </p>
                   </div>
-                  <div className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
+                  <div className="flex items-start gap-2 p-2 rounded-lg bg-safety-mesh-amethyst-smoke/30">
                     <span className="text-sm">💰</span>
                     <p className="text-xs text-muted-foreground">
                       Keep emergency cash in multiple locations
@@ -289,7 +299,7 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
               </div>
 
               {/* Local Guardian */}
-              <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-safety-mesh-amethyst-smoke/10 to-safety-mesh-my-pink/10 border border-safety-mesh-amethyst-smoke/20">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">👤</span>
@@ -303,7 +313,7 @@ const SafetyMesh = ({ isOpen, onClose, isOffline, onToggleOffline }: SafetyMeshP
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full py-2 px-4 rounded-lg bg-gradient-accent text-primary-foreground text-sm font-medium"
+                  className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-safety-mesh-my-pink to-safety-mesh-rock-blue text-primary-foreground text-sm font-medium"
                 >
                   Connect Now
                 </motion.button>
