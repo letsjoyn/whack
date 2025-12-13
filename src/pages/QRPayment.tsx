@@ -26,7 +26,7 @@ export default function QRPayment() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsProcessing(true);
-      
+
       // Simulate payment processing
       setTimeout(() => {
         setIsProcessing(false);
@@ -45,9 +45,8 @@ export default function QRPayment() {
           duration: 4000,
         });
 
-        // Redirect to dashboard after 2 seconds
         setTimeout(() => {
-          navigate('/booking-history');
+          navigate('/booking-history?newBooking=true');
         }, 2000);
       }, 1500);
     }, 3000);

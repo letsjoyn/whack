@@ -22,7 +22,12 @@ import {
   AlertTriangle,
   MessageCircle,
   Shield,
+  CloudSun,
+  Plane,
+  Zap,
+  RefreshCw,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -56,6 +61,22 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
   const [showSafetyMesh, setShowSafetyMesh] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [currentBooking, setCurrentBooking] = useState<BookingConfirmation>(booking);
+  const [isPushing, setIsPushing] = useState(false);
+
+  // Handle push to marketplace
+  const handlePushToMarket = () => {
+    setIsPushing(true);
+    // Simulate finding a buyer
+    setTimeout(() => {
+      setIsPushing(false);
+      toast.success('🎉 Sold Instantly!', {
+        description: 'Your booking has been transferred to @urgent_traveler_88. Funds will be credited shortly.',
+        duration: 5000,
+      });
+      // In a real app, update status to 'transferred' or similar
+      onClose();
+    }, 2500);
+  };
 
   // Lock body scroll when dialog is open
   useEffect(() => {
@@ -237,6 +258,33 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
                         <span className="text-muted-foreground">({hotel.reviews} reviews)</span>
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Live Trip Context */}
+              <div className="bg-muted/30 p-4 rounded-lg border border-primary/10">
+                <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-primary">
+                  <Zap className="h-4 w-4" /> Live Trip Context
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <CloudSun className="h-5 w-5 text-orange-500 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-medium">Weather Forecast</p>
+                      <p className="text-sm">24°C, Sunny</p>
+                      <p className="text-[10px] text-muted-foreground">Perfect for walking</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Plane className="h-5 w-5 text-blue-500 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-medium">Flight Status</p>
+                      <p className="text-sm text-green-600">On Time</p>
+                      <p className="text-[10px] text-muted-foreground">AI-202 arriving 14:30</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -452,6 +500,26 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
                   <span className="text-xs">Modify</span>
                 </Button>
               )}
+
+              {/* Instant Resell (Push to Market) */}
+              {!isCancelled && !isPushing && (
+                <Button
+                  onClick={handlePushToMarket}
+                  className="col-span-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0"
+                >
+                  <Zap className="h-3 w-3 mr-1" />
+                  <span className="text-xs">
+                    Can't go? Instant Resell (High Demand)
+                  </span>
+                </Button>
+              )}
+              {isPushing && (
+                <Button disabled className="col-span-2">
+                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                  <span className="text-xs">Finding Buyers...</span>
+                </Button>
+              )}
+
               {canModify && (
                 <Button
                   variant="outline"

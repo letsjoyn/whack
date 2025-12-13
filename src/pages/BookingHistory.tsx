@@ -3,7 +3,8 @@
  * Displays user's booking history with filtering, search, and sorting
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search, SlidersHorizontal, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,22 @@ export default function BookingHistory() {
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
     retry: 2,
   });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-open latest booking if redirected from payment
+  useEffect(() => {
+    if (searchParams.get('newBooking') === 'true' && bookings.length > 0) {
+      // Assuming the first booking is the latest one since default sort is date-desc
+      // If the API doesn't return sorted, we might need to sort here finding the max createdAt/checkIn
+      const latestBooking = bookings[0]; // Simplified for demo
+      setSelectedBooking(latestBooking);
+
+      // Clean up the URL
+      searchParams.delete('newBooking');
+      setSearchParams(searchParams);
+    }
+  }, [bookings, searchParams, setSearchParams]);
 
   // Filter bookings based on status
   const filteredByStatus = useMemo(() => {
