@@ -52,7 +52,7 @@ import { ContextLayerPanel } from '@/components/ContextLayer';
 
 const RoutePlanning = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
 
@@ -186,6 +186,28 @@ const RoutePlanning = () => {
 
     // User is authenticated, navigate to QR payment
     const totalAmount = journeySummary?.cost || pricing.total;
+
+    // Save pending booking to localStorage for persistence across pages
+    const pendingBooking = {
+      id: `BK${Date.now()}`,
+      referenceNumber: `VGN-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+      status: 'pending_payment',
+      from,
+      to,
+      // For Demo: Force specific dates
+      date: '2025-12-17T09:00:00.000Z',
+      returnDate: '2025-12-19T11:00:00.000Z',
+      amount: totalAmount,
+      guests: numGuests,
+      coordinates: destinationLocation || { lat: 28.6139, lng: 77.2090 }, // Default to Delhi if missing
+      hotel: {
+        title: 'Determined by AI',
+        location: to,
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000'
+      }
+    };
+    localStorage.setItem('pendingBooking', JSON.stringify(pendingBooking));
+
     const params = new URLSearchParams({
       amount: totalAmount.toString(),
       description: `Journey from ${from} to ${to}`,
@@ -230,10 +252,28 @@ const RoutePlanning = () => {
         title: 'Already Added',
         description: `${place.name} is already in your trip.`,
         variant: 'destructive',
-        duration: 2000,
       });
     }
   };
+
+  const [showCrowdAlert, setShowCrowdAlert] = useState(false);
+
+  // Trigger crowd alert when destination is likely crowded (Mock logic)
+  useEffect(() => {
+    const safeAlternatives = ['Rishikesh', 'Udaipur', 'Coorg', 'Gokarna'];
+    const isSafe = safeAlternatives.some(safe => to && to.includes(safe));
+    const storageKey = `crowdAlertShown_${to}`;
+
+    if (to && !showCrowdAlert && !isSafe && !sessionStorage.getItem(storageKey)) {
+      console.log('Triggering crowd alert for:', to);
+      // Simulate checking crowd levels
+      const timer = setTimeout(() => {
+        setShowCrowdAlert(true);
+        sessionStorage.setItem(storageKey, 'true');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [to]);
 
   // Load map data
   useEffect(() => {
@@ -503,6 +543,56 @@ const RoutePlanning = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* Crowd Alert Dialog */}
+      <Dialog open={showCrowdAlert} onOpenChange={setShowCrowdAlert}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-orange-600">
+              <AlertTriangle className="h-5 w-5" />
+              High Footfall Alert: {to}
+            </DialogTitle>
+            <DialogDescription>
+              {to} is expected to be very crowded during your selected dates due to local events.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <p className="text-sm font-medium">Consider these less crowded, scenic alternatives nearby:</p>
+            <div className="grid gap-2">
+              {['Rishikesh (Pure Nature)', 'Udaipur (Lake Views)', 'Coorg (Hill Station)', 'Gokarna (Beach Vibes)'].map((loc, i) => (
+                <Button
+                  key={i}
+                  variant="outline"
+                  className="justify-start h-auto py-2 px-3 text-left hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200"
+                  onClick={() => {
+                    const placeName = loc.split(' (')[0];
+                    setSearchParams(prev => {
+                      const newParams = new URLSearchParams(prev);
+                      newParams.set('to', placeName);
+                      return newParams;
+                    });
+
+                    toast({
+                      title: 'Destination Updated',
+                      description: `Switched trip to ${placeName}. Recalculating route...`
+                    });
+                    setShowCrowdAlert(false);
+                  }}
+                >
+                  <MapPin className="h-4 w-4 mr-2 opacity-50" />
+                  {loc}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 mt-2">
+            <Button variant="ghost" onClick={() => setShowCrowdAlert(false)} className="text-muted-foreground hover:text-foreground">
+              Stay with {to}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* Small Context Layer Button - Top Right (hidden when panel is open) */}
       {!isContextOpen && (
         <button

@@ -157,8 +157,8 @@ const mockBookings: BookingConfirmation[] = [
     referenceNumber: 'VGN-2024-003',
     hotel: {
       id: 3,
-      title: 'Mountain Retreat Lodge',
-      location: 'Aspen, Colorado',
+      title: 'Delhi',
+      location: 'New Delhi, India',
       price: 350,
       rating: 4.8,
       reviews: 189,

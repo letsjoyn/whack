@@ -114,76 +114,61 @@ const EndangeredPlacesInline = ({
         </Button>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {places.slice(0, 3).map((place, index) => (
           <motion.div
             key={place.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.1 }}
-            className="group border rounded-lg overflow-hidden hover:shadow-md transition-all"
+            className="group relative border rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-card"
           >
-            <div className="flex gap-4 p-4">
-              {/* Image */}
-              <div className="w-20 h-16 flex-shrink-0 rounded overflow-hidden">
-                <img
-                  src={place.image}
-                  alt={place.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+            {/* Image Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity z-10" />
+
+            {/* Image */}
+            <div className="h-48 overflow-hidden">
+              <img
+                src={place.image}
+                alt={place.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+            </div>
+
+            {/* Threat Badge */}
+            <div className="absolute top-3 right-3 z-20">
+              <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-sm backdrop-blur-md ${place.threatLevel === 'critical' ? 'bg-red-500/90' :
+                  place.threatLevel === 'high' ? 'bg-orange-500/90' : 'bg-yellow-500/90'
+                }`}>
+                {place.threatLevel}
+              </span>
+            </div>
+
+            {/* Content */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 z-20 text-white">
+              <h4 className="font-bold text-lg leading-tight mb-1 group-hover:text-primary-foreground transition-colors">{place.name}</h4>
+
+              <div className="flex items-center gap-1 text-xs text-gray-200 mb-3">
+                <MapPin className="w-3 h-3" />
+                <span className="truncate max-w-[150px]">{place.location}</span>
               </div>
 
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                      {place.name}
-                    </h4>
-                    <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
-                      <MapPin className="w-3 h-3" />
-                      <span className="truncate">{place.location}</span>
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-2 py-1 rounded-md">
+                  <Clock className="w-3 h-3 text-red-300" />
+                  <span className="text-[10px] font-medium">{place.yearsRemaining} yrs left</span>
+                </div>
 
-                  {/* Threat Level Badge */}
-                  <div
-                    className={`px-2 py-0.5 rounded-full border text-xs font-medium ml-2 ${threatColors[place.threatLevel]}`}
+                {onAddToTrip && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 text-xs bg-white/90 hover:bg-white text-black border-0 shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300"
+                    onClick={() => handlePlaceClick(place)}
                   >
-                    {place.threatLevel.toUpperCase()}
-                  </div>
-                </div>
-
-                {/* Stats and Add Button */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span className="font-medium text-red-600">
-                        {place.yearsRemaining} years left
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="w-3 h-3" />
-                      <span>{place.witnesses} witnesses</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />
-                      <span>{place.threats.length} threats</span>
-                    </div>
-                  </div>
-
-                  {onAddToTrip && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs h-6 px-2 border-blue-300 text-blue-700 hover:bg-blue-50"
-                      onClick={() => handlePlaceClick(place)}
-                    >
-                      Add to Trip
-                    </Button>
-                  )}
-                </div>
+                    Add +
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>

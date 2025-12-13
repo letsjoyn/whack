@@ -5,7 +5,7 @@
  * Shows origin, destination, and route between them
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -267,12 +267,60 @@ export function JourneyMap({
     };
   }, [origin, destination, route]); // Re-run when these change
 
+  const [is3D, setIs3D] = useState(false);
+
+  // Update styles when 3D mode changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Counter-rotate markers in 3D mode so they stand up
+    const markers = document.querySelectorAll('.custom-marker, .moving-arrow');
+    markers.forEach((el) => {
+      (el as HTMLElement).style.transform = is3D
+        ? `${(el as HTMLElement).style.transform} rotateX(-45deg)`
+        : (el as HTMLElement).style.transform.replace(' rotateX(-45deg)', '');
+      (el as HTMLElement).style.transition = 'transform 0.5s';
+    });
+  }, [is3D]);
+
   return (
-    <div
-      ref={mapContainerRef}
-      className={`rounded-lg overflow-hidden border border-gray-200 shadow-sm ${className}`}
-      style={{ height, width: '100%' }}
-    />
+    <div className="relative group perspective-1000" style={{ perspective: '1200px' }}>
+      <div
+        ref={mapContainerRef}
+        className={`rounded-lg overflow-hidden border border-gray-200 shadow-sm ${className} transition-all duration-1000 ease-in-out`}
+        style={{
+          height,
+          width: '100%',
+          transform: is3D ? 'rotateX(45deg) scale(0.9) translateY(-10px)' : 'rotateX(0deg) scale(1)',
+          boxShadow: is3D ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' : '',
+          transformStyle: 'preserve-3d',
+        }}
+      />
+
+      {/* 3D Toggle Control */}
+      <button
+        onClick={() => setIs3D(!is3D)}
+        className="absolute bottom-6 right-6 z-[400] bg-white/90 backdrop-blur-sm text-gray-800 p-2.5 rounded-xl shadow-lg font-bold text-xs hover:bg-white hover:scale-105 transition-all flex items-center gap-2 border border-gray-100"
+      >
+        {is3D ? (
+          <>
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            2D Flat View
+          </>
+        ) : (
+          <>
+            <span className="text-lg">🧊</span>
+            3D Immersive
+          </>
+        )}
+      </button>
+
+      {/* Overlay Gradient for Depth in 3D */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-1000 bg-gradient-to-t from-black/10 to-transparent rounded-lg"
+        style={{ opacity: is3D ? 1 : 0 }}
+      />
+    </div>
   );
 }
 

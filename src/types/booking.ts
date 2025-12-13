@@ -147,7 +147,7 @@ export interface BookingConfirmation {
   guestInfo: GuestInfo;
   roomDetails: RoomOption;
   pricing: PricingDetails;
-  status: 'confirmed' | 'pending' | 'cancelled';
+  status: 'confirmed' | 'pending' | 'cancelled' | 'market_listed';
   confirmationSentAt: string;
   createdAt: string;
   updatedAt: string;
@@ -176,12 +176,12 @@ export interface PaymentIntent {
   amount: number;
   currency: string;
   status:
-    | 'requires_payment_method'
-    | 'requires_confirmation'
-    | 'requires_action'
-    | 'processing'
-    | 'succeeded'
-    | 'canceled';
+  | 'requires_payment_method'
+  | 'requires_confirmation'
+  | 'requires_action'
+  | 'processing'
+  | 'succeeded'
+  | 'canceled';
   clientSecret: string;
 }
 

@@ -63,20 +63,82 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
   const [currentBooking, setCurrentBooking] = useState<BookingConfirmation>(booking);
   const [isPushing, setIsPushing] = useState(false);
 
-  // Handle push to marketplace
-  const handlePushToMarket = () => {
+  const [simulationStep, setSimulationStep] = useState<0 | 1 | 2 | 3>(0);
+
+  // Handle simulated business disruption (Flight Delay)
+  const handleSimulateDisruption = () => {
     setIsPushing(true);
-    // Simulate finding a buyer
+    setSimulationStep(1); // Step 1: Detection
+
+    // Step 1: Detect Delay
+    toast('⚠️ Flight Delay Detected', {
+      description: 'AI-202 is delayed by 4 hours. Assessing impact...',
+      duration: 2000,
+    });
+
     setTimeout(() => {
-      setIsPushing(false);
-      toast.success('🎉 Sold Instantly!', {
-        description: 'Your booking has been transferred to @urgent_traveler_88. Funds will be credited shortly.',
-        duration: 5000,
+      setSimulationStep(2); // Step 2: Optimization
+      // Step 2: Auto-adjustment
+      toast.info('🤖 Auto-Optimizing Trip', {
+        description: 'Arrival now 18:30. Hotel check-in window notified.',
+        duration: 2000,
       });
-      // In a real app, update status to 'transferred' or similar
-      onClose();
-    }, 2500);
+
+      // Step 3: Urgent reallocation (Simulated)
+      setTimeout(() => {
+        setSimulationStep(3); // Step 3: Resolution
+        // Update local storage
+        const existing = JSON.parse(localStorage.getItem('user_bookings') || '[]');
+        const updated = existing.map((b: any) => {
+          if (b.id === booking.bookingId || b.id === (booking as any).id) {
+            return { ...b, status: 'market_listed', soldTo: 'Auto-Reallocated to Urgent Queue' };
+          }
+          return b;
+        });
+        localStorage.setItem('user_bookings', JSON.stringify(updated));
+
+        setIsPushing(false);
+
+        toast.success('⚡ Urgent Match Found', {
+          description: 'Room re-allocated to urgent traveler @business_user_01. Full credit applied to your wallet.',
+          duration: 5000,
+        });
+
+        setTimeout(() => {
+          onClose();
+          if (onBookingUpdate) onBookingUpdate();
+          setSimulationStep(0); // Reset
+        }, 1500);
+
+      }, 3000);
+    }, 3000);
   };
+
+  const [weather, setWeather] = useState<{ temp: number; description: string } | null>(null);
+
+  // Fetch real weather data
+  useEffect(() => {
+    // Access hotel from currentBooking directly
+    if (currentBooking.hotel.coordinates && currentBooking.hotel.coordinates.length === 2 && currentBooking.hotel.coordinates[0] !== 0) {
+      const [lat, lng] = currentBooking.hotel.coordinates;
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.current) return;
+          const code = data.current.weather_code;
+          let description = 'Clear sky';
+          if (code > 0 && code <= 3) description = 'Partly cloudy';
+          if (code > 3 && code <= 48) description = 'Foggy';
+          if (code > 50) description = 'Rainy';
+
+          setWeather({
+            temp: Math.round(data.current.temperature_2m),
+            description
+          });
+        })
+        .catch(err => console.error('Failed to fetch weather', err));
+    }
+  }, [currentBooking.hotel.coordinates]);
 
   // Lock body scroll when dialog is open
   useEffect(() => {
@@ -101,6 +163,9 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
     pricing,
     confirmationSentAt,
   } = currentBooking;
+
+  // ... rest of logic
+
 
   // Calculate number of nights
   const numberOfNights = differenceInDays(new Date(checkOutDate), new Date(checkInDate));
@@ -218,6 +283,79 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
             </div>
           </DialogHeader>
 
+          {/* Simulation Overlay */}
+          {simulationStep > 0 && (
+            <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+              <div className="w-full max-w-sm space-y-8">
+                <div className="text-center">
+                  <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4 animate-bounce" />
+                  <h3 className="text-xl font-bold">Disruption Detected</h3>
+                  <p className="text-muted-foreground">Flight AI-202 Delayed (4h)</p>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Flow Diagram */}
+                  <div className="relative">
+                    {/* Vertical Line */}
+                    <div className="absolute left-[19px] top-8 bottom-8 w-0.5 bg-gray-200 -z-10" />
+
+                    {/* Step 1: Disruption */}
+                    <div className={`flex items-start gap-4 transition-all duration-500 ${simulationStep >= 1 ? 'opacity-100' : 'opacity-30'}`}>
+                      <div className={`mt-1 h-10 w-10 rounded-full flex flex-col items-center justify-center border-2 bg-white z-10 ${simulationStep >= 1 ? 'border-red-500 text-red-500' : 'border-gray-200'}`}>
+                        <Plane className="h-5 w-5 transform rotate-45" />
+                      </div>
+                      <div className={`bg-white p-3 rounded-lg border flex-1 shadow-sm ${simulationStep === 1 ? 'ring-2 ring-red-500/20' : ''}`}>
+                        <p className="font-bold text-sm text-red-900">Flight Delayed (4hr)</p>
+                        <p className="text-xs text-muted-foreground">Arrival pushed to 18:30. Connection missed.</p>
+                      </div>
+                    </div>
+
+                    {/* Spacer Arrow */}
+                    <div className="h-6" />
+
+                    {/* Step 2: Optimization */}
+                    <div className={`flex items-start gap-4 transition-all duration-500 ${simulationStep >= 2 ? 'opacity-100' : 'opacity-30'}`}>
+                      <div className={`mt-1 h-10 w-10 rounded-full flex flex-col items-center justify-center border-2 bg-white z-10 ${simulationStep >= 2 ? 'border-blue-500 text-blue-500' : 'border-gray-200'}`}>
+                        <RefreshCw className={`h-5 w-5 ${simulationStep === 2 ? 'animate-spin' : ''}`} />
+                      </div>
+                      <div className={`bg-white p-3 rounded-lg border flex-1 shadow-sm ${simulationStep === 2 ? 'ring-2 ring-blue-500/20' : ''}`}>
+                        <p className="font-bold text-sm text-blue-900">AI Re-Booking</p>
+                        <p className="text-xs text-muted-foreground">Original hotel room marked as 'Vacant'.</p>
+                      </div>
+                    </div>
+
+                    {/* Spacer Arrow */}
+                    <div className="h-6" />
+
+                    {/* Step 3: Marketplace */}
+                    <div className={`flex items-start gap-4 transition-all duration-500 ${simulationStep >= 3 ? 'opacity-100' : 'opacity-30'}`}>
+                      <div className={`mt-1 h-10 w-10 rounded-full flex flex-col items-center justify-center border-2 bg-white z-10 ${simulationStep >= 3 ? 'border-green-500 text-green-500' : 'border-gray-200'}`}>
+                        <Users className="h-5 w-5" />
+                      </div>
+                      <div className={`bg-white p-3 rounded-lg border flex-1 shadow-sm ${simulationStep === 3 ? 'ring-2 ring-green-500/20' : ''}`}>
+                        <p className="font-bold text-sm text-green-900">Urgent Match Found</p>
+                        <p className="text-xs text-muted-foreground">@urgent_traveler_01 purchased your room.</p>
+                        <div className="mt-2 flex items-center gap-2 text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded w-fit">
+                          <span>💰 You saved $120</span>
+                          <span>•</span>
+                          <span>🏨 Hotel saved revenue</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {simulationStep === 3 && (
+                  <div className="text-center animate-in fade-in zoom-in duration-500">
+                    <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold text-sm">
+                      <Zap className="h-4 w-4 fill-green-800" /> Resolution Actioned
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
             <div className="space-y-4 pr-4 pb-2">
               {/* Cancelled Alert */}
@@ -274,8 +412,8 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
                     <CloudSun className="h-5 w-5 text-orange-500 mt-0.5" />
                     <div>
                       <p className="text-xs font-medium">Weather Forecast</p>
-                      <p className="text-sm">24°C, Sunny</p>
-                      <p className="text-[10px] text-muted-foreground">Perfect for walking</p>
+                      <p className="text-sm">{weather ? `${weather.temp}°C, ${weather.description}` : 'Loading...'}</p>
+                      <p className="text-[10px] text-muted-foreground">{weather ? 'Live data' : 'Fetching...'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -501,22 +639,22 @@ export function BookingDetails({ booking, isOpen, onClose, onBookingUpdate }: Bo
                 </Button>
               )}
 
-              {/* Instant Resell (Push to Market) */}
+              {/* Simulation Mode: Trigger Disruption */}
               {!isCancelled && !isPushing && (
                 <Button
-                  onClick={handlePushToMarket}
-                  className="col-span-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 border-0"
+                  onClick={handleSimulateDisruption}
+                  className="col-span-2 bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 border-0"
                 >
-                  <Zap className="h-3 w-3 mr-1" />
+                  <AlertTriangle className="h-3 w-3 mr-1" />
                   <span className="text-xs">
-                    Can't go? Instant Resell (High Demand)
+                    Simulate Flight Delay (Demo)
                   </span>
                 </Button>
               )}
               {isPushing && (
                 <Button disabled className="col-span-2">
                   <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                  <span className="text-xs">Finding Buyers...</span>
+                  <span className="text-xs">AI Optimizing Trip...</span>
                 </Button>
               )}
 

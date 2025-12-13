@@ -21,7 +21,7 @@ import { BookingCard, BookingDetails } from '@/features/booking/components';
 import { bookingAPIService } from '@/features/booking/services/BookingAPIService';
 import type { BookingConfirmation } from '@/types/booking';
 
-type BookingFilter = 'all' | 'upcoming' | 'past' | 'cancelled';
+type BookingFilter = 'all' | 'upcoming' | 'past' | 'cancelled' | 'sold';
 type SortOption = 'date-desc' | 'date-asc' | 'price-desc' | 'price-asc' | 'status';
 
 export default function BookingHistory() {
@@ -78,6 +78,8 @@ export default function BookingHistory() {
         );
       case 'cancelled':
         return bookings.filter(booking => booking.status === 'cancelled');
+      case 'sold':
+        return bookings.filter(booking => booking.status === 'market_listed');
       default:
         return bookings;
     }
@@ -227,6 +229,12 @@ export default function BookingHistory() {
               <TabsTrigger value="cancelled">
                 Cancelled
                 {filter === 'cancelled' && sortedBookings.length > 0 && (
+                  <span className="ml-2 text-xs">({sortedBookings.length})</span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="sold">
+                Sold (Market)
+                {filter === 'sold' && sortedBookings.length > 0 && (
                   <span className="ml-2 text-xs">({sortedBookings.length})</span>
                 )}
               </TabsTrigger>

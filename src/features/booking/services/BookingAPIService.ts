@@ -685,6 +685,38 @@ export class BookingAPIService {
         },
       ];
 
+      // Merge with localStorage bookings
+      if (typeof window !== 'undefined') {
+        const localBookings = JSON.parse(localStorage.getItem('user_bookings') || '[]').map((b: any) => ({
+          bookingId: b.id,
+          referenceNumber: b.referenceNumber,
+          hotel: {
+            id: 99,
+            title: b.hotel.title,
+            location: b.hotel.location || 'Unknown Location',
+            price: b.amount,
+            rating: 4.5,
+            reviews: 12,
+            image: b.hotel.image,
+            amenities: ['WiFi', 'Pool'],
+            tags: ['Featured'],
+            checkInTime: '14:00',
+            checkOutTime: '11:00',
+            coordinates: b.coordinates ? [b.coordinates.lat, b.coordinates.lng] : [28.6139, 77.2090]
+          },
+          checkInDate: new Date(b.date).toISOString(),
+          checkOutDate: b.returnDate ? new Date(b.returnDate).toISOString() : new Date(new Date(b.date).getTime() + 86400000).toISOString(),
+          guestInfo: { firstName: 'User', lastName: 'Name', email: 'user@example.com', phone: '', country: 'US' },
+          roomDetails: { name: 'Standard Room', description: 'Comfortable room', capacity: b.guests, bedType: 'Queen', size: 30, amenities: [], basePrice: b.amount, available: 1 },
+          pricing: { baseRate: b.amount, numberOfNights: 1, subtotal: b.amount, total: b.amount, taxes: [], fees: [], currency: 'INR' },
+          status: b.status,
+          confirmationSentAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }));
+        return [...localBookings, ...mockBookings];
+      }
+
       return mockBookings;
     },
     { action: 'getUserBookings', component: 'BookingAPIService' }

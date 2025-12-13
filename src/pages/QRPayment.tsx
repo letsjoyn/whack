@@ -32,6 +32,20 @@ export default function QRPayment() {
         setIsProcessing(false);
         setPaymentComplete(true);
 
+        // Confirm pending booking
+        const pending = localStorage.getItem('pendingBooking');
+        if (pending) {
+          const booking = JSON.parse(pending);
+          booking.status = 'confirmed';
+
+          // Add to permanent bookings list
+          const existing = JSON.parse(localStorage.getItem('user_bookings') || '[]');
+          localStorage.setItem('user_bookings', JSON.stringify([booking, ...existing]));
+
+          // Clean up pending
+          localStorage.removeItem('pendingBooking');
+        }
+
         // Clear pending data
         if (type === 'booking') {
           sessionStorage.removeItem('pendingBooking');
