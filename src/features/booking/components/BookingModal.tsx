@@ -29,7 +29,6 @@ import {
 } from '../utils/screenReaderAnnouncer';
 import { bookingAPIService } from '../services/BookingAPIService';
 import { paymentAPIService } from '../services/PaymentAPIService';
-import { razorpayService } from '../services/RazorpayService';
 import { analyticsService } from '../services/AnalyticsService';
 import { errorLoggingService } from '../services/ErrorLoggingService';
 import { DateSelector } from './DateSelector';
@@ -278,57 +277,30 @@ export function BookingModal({ hotel, isOpen, onClose, onBookingComplete }: Book
       return;
     }
 
-    // Directly open Razorpay checkout
-    updateBookingStep('payment');
-    announceSuccess('Opening payment gateway');
-
-    try {
-      if (!currentBooking?.pricing) {
-        throw new Error('Missing pricing information');
-      }
-
-      // Track payment started
-      analyticsService.trackPaymentSubmitted({
-        paymentMethod: 'razorpay',
-      });
-
-      // Open Razorpay checkout
-      await razorpayService.openCheckout(
-        currentBooking.pricing.total,
-        {
-          firstName: info.firstName,
-          lastName: info.lastName,
-          email: info.email,
-          phone: info.phone,
-        },
-        hotel.title,
-        async (paymentId: string, orderId: string, signature: string) => {
-          // Payment successful - verify and complete booking
-          const verified = await razorpayService.verifyPayment(orderId, paymentId, signature);
-          if (verified) {
-            await handlePaymentSuccess(paymentId);
-          } else {
-            handlePaymentError('Payment verification failed');
-          }
-        },
-        () => {
-          // Payment dismissed/cancelled
-          announceError('Payment cancelled');
-          updateBookingStep('guest-info');
-        }
-      );
-    } catch (err) {
-      console.error('Failed to open payment gateway:', err);
-      const error = err instanceof Error ? err : new Error('Unknown error');
-      analyticsService.trackBookingError({
-        step: 'payment',
-        errorType: 'payment_gateway_failed',
-        errorMessage: error.message,
-        component: 'BookingModal',
-      });
-      announceError('Failed to open payment gateway. Please try again.');
-      updateBookingStep('guest-info');
+    // User is authenticated, navigate to QR payment
+    if (!currentBooking?.pricing) {
+      throw new Error('Missing pricing information');
     }
+
+    // Store booking data and navigate to QR payment
+    sessionStorage.setItem('pendingBooking', JSON.stringify({
+      hotelId: hotel.id,
+      hotelTitle: hotel.title,
+      guestInfo: info,
+      checkInDate: currentBooking.checkInDate,
+      checkOutDate: currentBooking.checkOutDate,
+      selectedRoom: currentBooking.selectedRoom,
+      pricing: currentBooking.pricing,
+    }));
+
+    const params = new URLSearchParams({
+      amount: currentBooking.pricing.total.toString(),
+      description: `Booking at ${hotel.title}`,
+      type: 'booking',
+    });
+    
+    navigate(`/qr-payment?${params.toString()}`);
+    onClose();
   };
 
   // Handle payment success

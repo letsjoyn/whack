@@ -47,7 +47,6 @@ import { bookOnceAIService } from '@/features/journey/services/BookOnceAIService
 import JourneyVisualization from '@/components/JourneyVisualization';
 import { BookOnceAISidebar } from '@/components/BookOnceAISidebar';
 import { ContextLayerPanel } from '@/components/ContextLayer';
-import { razorpayService } from '@/features/booking/services/RazorpayService';
 
 const RoutePlanning = () => {
   const navigate = useNavigate();
@@ -170,64 +169,14 @@ const RoutePlanning = () => {
       return;
     }
 
-    try {
-      const totalAmount = journeySummary?.cost || pricing.total;
-
-      // Get user info or use default
-      const guestInfo = {
-        firstName: user?.displayName?.split(' ')[0] || 'Guest',
-        lastName: user?.displayName?.split(' ').slice(1).join(' ') || 'User',
-        email: user?.email || 'guest@bookonce.com',
-        phone: user?.phoneNumber || '+91 9876543210',
-      };
-
-      // Open Razorpay checkout
-      await razorpayService.openCheckout(
-        totalAmount,
-        guestInfo,
-        `Journey from ${from} to ${to}`,
-        async (paymentId: string, orderId: string, signature: string) => {
-          // Payment successful
-          const verified = await razorpayService.verifyPayment(orderId, paymentId, signature);
-          if (verified) {
-            // Clear pending journey data
-            sessionStorage.removeItem('pendingJourney');
-
-            toast({
-              title: '🎉 Journey Booking Confirmed!',
-              description: `Your journey from ${from} to ${to} has been confirmed!`,
-              duration: 5000,
-            });
-
-            // Navigate to booking history
-            setTimeout(() => {
-              navigate('/booking-history');
-            }, 1500);
-          } else {
-            toast({
-              title: 'Payment Verification Failed',
-              description: 'Please contact support.',
-              variant: 'destructive',
-            });
-          }
-        },
-        () => {
-          // Payment dismissed/cancelled
-          toast({
-            title: 'Payment Cancelled',
-            description: 'You can try again when ready.',
-            variant: 'destructive',
-          });
-        }
-      );
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast({
-        title: 'Payment Error',
-        description: 'Failed to open payment gateway. Please try again.',
-        variant: 'destructive',
-      });
-    }
+    // User is authenticated, navigate to QR payment
+    const totalAmount = journeySummary?.cost || pricing.total;
+    const params = new URLSearchParams({
+      amount: totalAmount.toString(),
+      description: `Journey from ${from} to ${to}`,
+      type: 'journey',
+    });
+    navigate(`/qr-payment?${params.toString()}`);
   };
 
   // Load endangered places after planning is complete

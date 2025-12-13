@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff, Mail, Loader2, ArrowLeft } from 'lucide-react';
-import { razorpayService } from '@/features/booking/services/RazorpayService';
 
 type AuthMode = 'login' | 'signup' | 'email-otp' | 'email-otp-verify';
 
@@ -17,11 +16,13 @@ const Auth = () => {
     useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectType = searchParams.get('redirect');
   const [mode, setMode] = useState<AuthMode>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
+  
+  // Store redirect type on mount so it doesn't get lost
+  const [storedRedirect] = useState(() => searchParams.get('redirect'));
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -40,100 +41,44 @@ const Auth = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated && user) {
-      handlePostLoginRedirect();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user]);
-
-  // Handle post-login redirect and payment
-  const handlePostLoginRedirect = async () => {
-    if (redirectType === 'continue-booking') {
-      const pendingBooking = sessionStorage.getItem('pendingBooking');
-      if (pendingBooking) {
-        const bookingData = JSON.parse(pendingBooking);
-        await openRazorpayForBooking(bookingData);
-      } else {
-        navigate('/');
-      }
-    } else if (redirectType === 'continue-journey') {
-      const pendingJourney = sessionStorage.getItem('pendingJourney');
-      if (pendingJourney) {
-        const journeyData = JSON.parse(pendingJourney);
-        await openRazorpayForJourney(journeyData);
-      } else {
-        navigate('/');
-      }
-    } else {
-      navigate('/');
-    }
-  };
-
-  // Open Razorpay for booking
-  const openRazorpayForBooking = async (bookingData: any) => {
-    try {
-      await razorpayService.openCheckout(
-        bookingData.pricing.total,
-        {
-          firstName: bookingData.guestInfo.firstName,
-          lastName: bookingData.guestInfo.lastName,
-          email: bookingData.guestInfo.email,
-          phone: bookingData.guestInfo.phone,
-        },
-        `Booking at ${bookingData.hotelTitle}`,
-        async (paymentId: string, orderId: string, signature: string) => {
-          const verified = await razorpayService.verifyPayment(orderId, paymentId, signature);
-          if (verified) {
-            sessionStorage.removeItem('pendingBooking');
-            toast.success('\ud83c\udf89 Booking Confirmed!', {
-              description: 'Your booking has been confirmed successfully.',
-            });
-            setTimeout(() => navigate('/booking-history'), 1500);
-          }
-        },
-        () => {
-          toast.error('Payment Cancelled');
-          navigate('/');
+    if (isAuthenticated && user && storedRedirect) {
+      console.log('Auth: User logged in, redirecting...', storedRedirect);
+      
+      // Handle redirect after login
+      if (storedRedirect === 'continue-booking') {
+        const pendingBooking = sessionStorage.getItem('pendingBooking');
+        console.log('Pending booking:', pendingBooking);
+        
+        if (pendingBooking) {
+          const bookingData = JSON.parse(pendingBooking);
+          const params = new URLSearchParams({
+            amount: bookingData.pricing.total.toString(),
+            description: `Booking at ${bookingData.hotelTitle}`,
+            type: 'booking',
+          });
+          console.log('Navigating to QR payment:', `/qr-payment?${params.toString()}`);
+          navigate(`/qr-payment?${params.toString()}`);
+          return;
         }
-      );
-    } catch (error) {
-      toast.error('Payment failed to open');
-      navigate('/');
-    }
-  };
-
-  // Open Razorpay for journey
-  const openRazorpayForJourney = async (journeyData: any) => {
-    try {
-      await razorpayService.openCheckout(
-        journeyData.amount,
-        {
-          firstName: user?.displayName?.split(' ')[0] || 'Guest',
-          lastName: user?.displayName?.split(' ').slice(1).join(' ') || 'User',
-          email: user?.email || 'guest@bookonce.com',
-          phone: user?.phoneNumber || '+91 9876543210',
-        },
-        `Journey from ${journeyData.from} to ${journeyData.to}`,
-        async (paymentId: string, orderId: string, signature: string) => {
-          const verified = await razorpayService.verifyPayment(orderId, paymentId, signature);
-          if (verified) {
-            sessionStorage.removeItem('pendingJourney');
-            toast.success('\ud83c\udf89 Journey Booking Confirmed!', {
-              description: `Your journey from ${journeyData.from} to ${journeyData.to} has been confirmed!`,
-            });
-            setTimeout(() => navigate('/booking-history'), 1500);
-          }
-        },
-        () => {
-          toast.error('Payment Cancelled');
-          navigate('/');
+      } else if (storedRedirect === 'continue-journey') {
+        const pendingJourney = sessionStorage.getItem('pendingJourney');
+        console.log('Pending journey:', pendingJourney);
+        
+        if (pendingJourney) {
+          const journeyData = JSON.parse(pendingJourney);
+          const params = new URLSearchParams({
+            amount: journeyData.amount.toString(),
+            description: `Journey from ${journeyData.from} to ${journeyData.to}`,
+            type: 'journey',
+          });
+          console.log('Navigating to QR payment:', `/qr-payment?${params.toString()}`);
+          navigate(`/qr-payment?${params.toString()}`);
+          return;
         }
-      );
-    } catch (error) {
-      toast.error('Payment failed to open');
+      }
       navigate('/');
     }
-  };
+  }, [isAuthenticated, user, storedRedirect, navigate]);
 
   // OTP Timer
   useEffect(() => {

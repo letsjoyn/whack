@@ -22,6 +22,7 @@ const Stays = lazy(() => import('./pages/Stays'));
 const TravelUtilities = lazy(() => import('./pages/TravelUtilities'));
 const JourneyPlanner = lazy(() => import('./pages/JourneyPlanner'));
 const RoutePlanning = lazy(() => import('./pages/RoutePlanning'));
+const QRPayment = lazy(() => import('./pages/QRPayment'));
 const BookingConfirmation = lazy(() => import('./pages/BookingConfirmation'));
 const BookingHistory = lazy(() => import('./pages/BookingHistory'));
 const UserProfile = lazy(() => import('./pages/UserProfile'));
@@ -98,6 +99,9 @@ const App = () => {
                     <Route path="/utilities" element={<TravelUtilities />} />
                     <Route path="/journey" element={<JourneyPlanner />} />
                     <Route path="/journey/plan" element={<RoutePlanning />} />
+                    <Route path="/qr-payment" element={<QRPayment />} />
+                    <Route path="/booking-confirmation/:bookingId" element={<BookingConfirmation />} />
+                    <Route path="/booking-history" element={<BookingHistory />} />
 
                     {/* Protected Routes - Require Authentication */}
                     <Route
