@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -41,6 +42,9 @@ const Index = () => {
       document.documentElement.classList.remove('high-contrast');
     }
   }, [isOffline]);
+
+  // Theme for adaptive light/dark styles
+  const { resolvedTheme } = useTheme();
 
   const handleEchoClick = (echo: (typeof echoesData)[0]) => {
     setSelectedEcho(echo);
@@ -91,19 +95,25 @@ const Index = () => {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-6"
+              className={`inline-flex items-center justify-center px-4 py-2 rounded-md mb-6 ${
+                resolvedTheme === 'light' 
+                  ? 'bg-[#f5f7fa] text-[#5b6e7a] border border-[#e1e8ed]' 
+                  : 'bg-white/10 text-white'
+              }`}
             >
-              <span className="text-sm font-medium text-white">✨ BookOnce AI-Powered Travel</span>
+              <span className={`text-sm font-medium ${resolvedTheme === 'light' ? 'text-[#5b6e7a]' : 'text-white'}`}>
+                Complete door-to-door journey planning • One Click • Zero Hassle
+              </span>
             </motion.div>
 
-            <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight">
+            <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-4 leading-tight">
               <TextType
                 texts={['Plan']}
                 typingSpeed={60}
                 deletingSpeed={30}
                 pause={1000}
                 loop={false}
-                className="text-white"
+                className="text-foreground"
               />
               <br />
               <TextType
@@ -116,9 +126,12 @@ const Index = () => {
               />
             </h1>
 
-            <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto mb-8">
-              Book your perfect journey in one place. Complete travel booking platform that adapts
-              to your mood, energy, and desires.
+            <p
+              className={`text-base md:text-lg ${
+                resolvedTheme === 'light' ? 'text-[#5b6e7a]' : 'text-muted-foreground'
+              } max-w-2xl mx-auto mb-8`}
+            >
+              Plan unforgettable trips with personalised recommendations and seamless booking.
             </p>
           </motion.div>
 

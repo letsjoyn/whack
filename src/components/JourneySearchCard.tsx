@@ -780,15 +780,6 @@ const JourneySearchCard = ({
         </motion.button>
       </div>
 
-      {/* Info Text */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-center text-sm text-white/80 mt-4"
-      >
-        ✨ Complete door-to-door journey planning • AI-powered routing • Real-time updates
-      </motion.p>
     </motion.div>
   );
 };
